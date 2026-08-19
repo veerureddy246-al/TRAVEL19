@@ -1142,3 +1142,152 @@ code.ref {
   transition: all var(--transition-speed);
 }
 .btn-export:hover { background: #F7E4B6; }
+
+/* ─── CMS Status Control System ─── */
+.cms-status-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #F8FAFC;
+  color: #475569;
+  border: 1px solid #CBD5E1;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-family);
+  transition: all var(--transition-speed);
+  user-select: none;
+}
+
+.status-tab-btn:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+  border-color: #94A3B8;
+}
+
+.status-tab-btn.active {
+  background: var(--navy-primary);
+  color: #FFFFFF;
+  border-color: var(--navy-primary);
+  box-shadow: 0 2px 4px rgba(15, 39, 71, 0.2);
+}
+
+.status-tab-btn .tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, 0.08);
+  color: inherit;
+}
+
+.status-tab-btn.active .tab-count {
+  background: rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+}
+
+.status-indicator-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.dot-published { background-color: #10B981; }
+.dot-unpublished { background-color: #F59E0B; }
+.dot-trash { background-color: #EF4444; }
+
+/* ─── CMS Custom Action Buttons ─── */
+.aab-unpub {
+  background: #FFFBEB;
+  color: #B45309;
+  border: 1px solid #FCD34D;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.aab-unpub:hover {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+.aab-pub {
+  background: #ECFDF5;
+  color: #047857;
+  border: 1px solid #6EE7B7;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.aab-pub:hover {
+  background: #D1FAE5;
+  color: #065F46;
+}
+
+.aab-trash {
+  background: #FFF1F2;
+  color: #E11D48;
+  border: 1px solid #FECDD3;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.aab-trash:hover {
+  background: #FFE4E6;
+  color: #BE123C;
+}
+
+.aab-restore {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.aab-restore:hover {
+  background: #DBEAFE;
+  color: #1E40AF;
+}
+
+.aab-delete-perm {
+  background: #DC2626;
+  color: #FFFFFF;
+  border: 1px solid #B91C1C;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.aab-delete-perm:hover {
+  background: #B91C1C;
+}
+

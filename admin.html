@@ -457,13 +457,27 @@
         <div class="page-header">
           <div class="page-header-info">
             <h1 class="page-title">Travel Destinations</h1>
-            <p>Configure travel locations, regional categories, and package associations.</p>
+            <p>Configure travel locations, regional categories, status controls and package associations.</p>
           </div>
         </div>
         <div class="admin-table-wrap">
           <div class="admin-table-toolbar">
             <div class="table-title-count" id="dest-count-label">Loading Destinations...</div>
             <button class="btn btn-primary btn-sm" onclick="openDestinationModal()">+ Add Destination</button>
+          </div>
+          <div class="cms-status-tabs" id="dest-status-tabs" style="padding:12px 24px; border-bottom:1px solid var(--border-color); background:#FAFAFA;">
+            <button type="button" class="status-tab-btn active" data-status="all" onclick="filterCmsSection('destinations', 'all')">
+              All <span class="tab-count" id="dest-count-all">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="published" onclick="filterCmsSection('destinations', 'published')">
+              <span class="status-indicator-dot dot-published"></span> Published <span class="tab-count" id="dest-count-published">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="unpublished" onclick="filterCmsSection('destinations', 'unpublished')">
+              <span class="status-indicator-dot dot-unpublished"></span> Unpublished <span class="tab-count" id="dest-count-unpublished">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="trash" onclick="filterCmsSection('destinations', 'trash')">
+              <span class="status-indicator-dot dot-trash"></span> Recycle Bin <span class="tab-count" id="dest-count-trash">0</span>
+            </button>
           </div>
           <div style="overflow-x:auto">
             <table class="admin-table">
@@ -481,13 +495,27 @@
         <div class="page-header">
           <div class="page-header-info">
             <h1 class="page-title">Tour Packages</h1>
-            <p>Manage curated itineraries, slot availability, and pricing models.</p>
+            <p>Manage curated itineraries, publication statuses, pricing models and slot availability.</p>
           </div>
         </div>
         <div class="admin-table-wrap">
           <div class="admin-table-toolbar">
             <div class="table-title-count" id="pkg-count-label">Loading Packages...</div>
             <button class="btn btn-primary btn-sm" onclick="openPackageModal()">+ Add Tour Package</button>
+          </div>
+          <div class="cms-status-tabs" id="pkg-status-tabs" style="padding:12px 24px; border-bottom:1px solid var(--border-color); background:#FAFAFA;">
+            <button type="button" class="status-tab-btn active" data-status="all" onclick="filterCmsSection('packages', 'all')">
+              All <span class="tab-count" id="pkg-count-all">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="published" onclick="filterCmsSection('packages', 'published')">
+              <span class="status-indicator-dot dot-published"></span> Published <span class="tab-count" id="pkg-count-published">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="unpublished" onclick="filterCmsSection('packages', 'unpublished')">
+              <span class="status-indicator-dot dot-unpublished"></span> Unpublished <span class="tab-count" id="pkg-count-unpublished">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="trash" onclick="filterCmsSection('packages', 'trash')">
+              <span class="status-indicator-dot dot-trash"></span> Recycle Bin <span class="tab-count" id="pkg-count-trash">0</span>
+            </button>
           </div>
           <div style="overflow-x:auto">
             <table class="admin-table">
@@ -505,18 +533,34 @@
         <div class="page-header">
           <div class="page-header-info">
             <h1 class="page-title">Cruise Packages</h1>
-            <p>Luxury ocean cruise itineraries, vessels, duration, and stateroom rates.</p>
+            <p>Luxury ocean and river cruise voyages, vessels, duration, publication status and cabin pricing.</p>
           </div>
         </div>
         <div class="admin-table-wrap">
           <div class="admin-table-toolbar">
-            <div class="table-title-count" id="cruises-count-label">64 Cruise Packages</div>
+            <div class="table-title-count" id="cruises-count-label">Loading Cruise Packages...</div>
             <button class="btn btn-primary btn-sm" onclick="openCruiseModal()">+ Add Cruise</button>
+          </div>
+          <div class="cms-status-tabs" id="cruises-status-tabs" style="padding:12px 24px; border-bottom:1px solid var(--border-color); background:#FAFAFA;">
+            <button type="button" class="status-tab-btn active" data-status="all" onclick="filterCmsSection('cruises', 'all')">
+              All <span class="tab-count" id="cruises-count-all">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="published" onclick="filterCmsSection('cruises', 'published')">
+              <span class="status-indicator-dot dot-published"></span> Published <span class="tab-count" id="cruises-count-published">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="unpublished" onclick="filterCmsSection('cruises', 'unpublished')">
+              <span class="status-indicator-dot dot-unpublished"></span> Unpublished <span class="tab-count" id="cruises-count-unpublished">0</span>
+            </button>
+            <button type="button" class="status-tab-btn" data-status="trash" onclick="filterCmsSection('cruises', 'trash')">
+              <span class="status-indicator-dot dot-trash"></span> Recycle Bin <span class="tab-count" id="cruises-count-trash">0</span>
+            </button>
           </div>
           <div style="overflow-x:auto">
             <table class="admin-table">
-              <thead><tr><th>Cruise Name</th><th>Destination</th><th>Duration</th><th>Starting Price</th><th>Availability</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="cruises-table-body"></tbody>
+              <thead><tr><th>Image</th><th>Cruise Voyage Title</th><th>Route &amp; Line</th><th>Duration</th><th>Cabin Price</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="cruises-table-body">
+                <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">Loading cruises from CMS database...</td></tr>
+              </tbody>
             </table>
           </div>
         </div>

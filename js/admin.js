@@ -686,36 +686,9 @@
     }
   }
 
-  async function renderCruisesTable() {
-    const tbody = document.querySelector('#cruises-table-body');
-    const countEl = document.querySelector('#cruises-count-label');
-    if (!tbody) return;
-    try {
-      const res = await fetch('/api/admin/cruises');
-      const json = await res.json();
-      const cruises = (json.success && json.data && json.data.length > 0) ? json.data : adminData.cruises;
-      if (countEl) countEl.textContent = `${cruises.length} Cruise Packages`;
-      tbody.innerHTML = cruises.map(cr => `
-        <tr>
-          <td>
-            <strong>${escapeHtml(cr.title || cr.name)}</strong>
-            <div style="font-size:11px;color:#64748B">🚢 ${escapeHtml(cr.vessel || cr.cruise_line || 'Luxury Vessel')}</div>
-          </td>
-          <td>📍 ${escapeHtml(cr.route || cr.destination || 'Mediterranean Pass')}</td>
-          <td>${escapeHtml(cr.duration || '7 Days / 6 Nights')}</td>
-          <td style="font-weight:700;color:var(--navy-primary)">${formatINR(cr.price || 120000)}</td>
-          <td><strong>${cr.available || '8 Cabins Left'}</strong></td>
-          <td><span class="abadge ${cr.status === 'Active' || cr.status === 'published' ? 'ab-confirmed' : 'ab-cancelled'}"><span class="abadge-dot"></span>${escapeHtml(cr.status || 'Active')}</span></td>
-          <td>
-            <div class="action-btn-group">
-              <button class="aab-edit" onclick="openCruiseModal('${cr.id}')">Edit</button>
-              <button class="aab-delete" onclick="confirmDeleteCmsItem('cruises', '${cr.id}', '${escapeHtml(cr.title || cr.name || '')}')">Hide</button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    } catch (e) {
-      console.warn('Cruises load error:', e);
+  function renderCruisesTable() {
+    if (typeof window.fetchAndRenderCruises === 'function') {
+      window.fetchAndRenderCruises();
     }
   }
 
@@ -1291,147 +1264,401 @@
     renderAuditLogs();
   }
 
+  /* ══════════════════════════════════════════════════════════
+     PROFESSIONAL CMS STATUS MANAGEMENT SYSTEM
+     (Destinations, Packages, Cruises)
+     - Statuses: Published | Unpublished | Recycle Bin (Trash)
+     ══════════════════════════════════════════════════════════ */
+  const currentStatusFilter = {
+    destinations: 'all',
+    packages: 'all',
+    cruises: 'all'
+  };
+
+  window._adminDestinationsList = [];
+  window._adminPackagesList = [];
+  window._adminCruisesList = [];
+
+  window.filterCmsSection = function(resource, statusFilter) {
+    if (!['destinations', 'packages', 'cruises'].includes(resource)) return;
+    currentStatusFilter[resource] = statusFilter || 'all';
+
+    // Update active tab button style
+    const tabsContainerId = resource === 'destinations' ? 'dest-status-tabs' :
+                            resource === 'packages' ? 'pkg-status-tabs' : 'cruises-status-tabs';
+    const tabsContainer = document.getElementById(tabsContainerId);
+    if (tabsContainer) {
+      tabsContainer.querySelectorAll('.status-tab-btn').forEach(btn => {
+        if (btn.dataset.status === currentStatusFilter[resource]) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    if (resource === 'destinations') renderDestinationsFiltered();
+    else if (resource === 'packages') renderPackagesFiltered();
+    else if (resource === 'cruises') renderCruisesFiltered();
+  };
+
+  /* ── 1. DESTINATIONS STATUS MANAGEMENT ── */
   window.fetchAndRenderDestinations = async function() {
     const tbody = document.getElementById('destinations-table-body');
     const label = document.getElementById('dest-count-label');
     if (!tbody) return;
 
     try {
-      const res = await fetch('/api/destinations');
+      const res = await fetch('/api/destinations?all=true');
       const json = await res.json();
-      const items = (json.success && json.data) ? json.data : [];
+      const items = (json.success && Array.isArray(json.data)) ? json.data : [];
 
-      if (label) label.textContent = `${items.length} Destinations`;
-      if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-muted)">No destinations found. Click "+ Add Destination" to create one.</td></tr>`;
-        return;
-      }
+      window._adminDestinationsList = items;
 
-      tbody.innerHTML = items.map(d => {
-        const statusClass = d.status === 'published' ? 'ab-confirmed' : d.status === 'draft' ? 'ab-pending' : 'ab-confirmed';
-        const statusLabel = (d.status || 'published').toUpperCase();
-        return `
-          <tr>
-            <td>
-              <img src="${d.image || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}" style="width:44px;height:34px;border-radius:6px;object-fit:cover" alt="${escapeHtml(d.title)}" />
-            </td>
-            <td>
-              <strong style="color:var(--navy-primary)">${escapeHtml(d.title)}</strong>
-              <div style="font-size:11px;color:var(--text-muted)">${escapeHtml(d.city || '')}</div>
-            </td>
-            <td>📍 ${escapeHtml(d.country || 'Global')}</td>
-            <td><span class="abadge" style="background:#F0F4F8;color:var(--navy-primary)">${escapeHtml(d.category || 'General')}</span></td>
-            <td><strong style="color:var(--navy-primary)">${formatINR(d.startingPrice || 0)}</strong></td>
-            <td>${d.days || 5} Days</td>
-            <td><span class="abadge ${statusClass}"><span class="abadge-dot"></span>${statusLabel}</span></td>
-            <td style="font-size:12px;color:var(--text-muted)">${d.updated_at ? new Date(d.updated_at).toLocaleDateString() : 'Aug 2026'}</td>
-            <td>
-              <div class="action-btn-group">
-                <button class="aab-edit" onclick="openDestinationModal('${d.id || d._id}')">Edit</button>
-                <button class="aab-view" onclick="togglePublishStatus('destinations', '${d.id || d._id}', '${d.status === 'published' ? 'unpublished' : 'published'}')">${d.status === 'published' ? 'Unpublish' : 'Publish'}</button>
-                <button class="aab-delete" onclick="confirmDeleteCmsItem('destinations', '${d.id || d._id}', '${(d.title || '').replace(/'/g, "\\'")}')">Delete</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
+      const allCount = items.filter(d => (d.status || 'published').toLowerCase() !== 'trash').length;
+      const pubCount = items.filter(d => ['published', 'active'].includes((d.status || 'published').toLowerCase())).length;
+      const unpubCount = items.filter(d => ['unpublished', 'draft'].includes((d.status || '').toLowerCase())).length;
+      const trashCount = items.filter(d => (d.status || '').toLowerCase() === 'trash').length;
+
+      const countAllEl = document.getElementById('dest-count-all');
+      const countPubEl = document.getElementById('dest-count-published');
+      const countUnpubEl = document.getElementById('dest-count-unpublished');
+      const countTrashEl = document.getElementById('dest-count-trash');
+
+      if (countAllEl) countAllEl.textContent = allCount;
+      if (countPubEl) countPubEl.textContent = pubCount;
+      if (countUnpubEl) countUnpubEl.textContent = unpubCount;
+      if (countTrashEl) countTrashEl.textContent = trashCount;
+
+      if (label) label.textContent = `${allCount} Destinations Total (${pubCount} Published, ${unpubCount} Unpublished)`;
+
+      renderDestinationsFiltered();
     } catch (e) {
       console.error('Error fetching destinations:', e);
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:#EF4444">⚠️ Error loading destinations. Click to retry.</td></tr>`;
     }
   };
 
+  function renderDestinationsFiltered() {
+    const tbody = document.getElementById('destinations-table-body');
+    if (!tbody) return;
+
+    const filter = currentStatusFilter.destinations;
+    let items = window._adminDestinationsList || [];
+
+    if (filter === 'published') {
+      items = items.filter(d => ['published', 'active'].includes((d.status || 'published').toLowerCase()));
+    } else if (filter === 'unpublished') {
+      items = items.filter(d => ['unpublished', 'draft'].includes((d.status || '').toLowerCase()));
+    } else if (filter === 'trash') {
+      items = items.filter(d => (d.status || '').toLowerCase() === 'trash');
+    } else {
+      // 'all' shows all active (published + unpublished), excludes trash
+      items = items.filter(d => (d.status || 'published').toLowerCase() !== 'trash');
+    }
+
+    if (items.length === 0) {
+      const msg = filter === 'published' ? 'No published destinations. Click "Publish" on an unpublished destination.' :
+                  filter === 'unpublished' ? 'No unpublished destinations.' :
+                  filter === 'trash' ? 'Recycle bin is empty. No deleted destinations.' :
+                  'No destinations found. Click "+ Add Destination" to create one.';
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted)">${msg}</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = items.map(d => {
+      const rawStatus = (d.status || 'published').toLowerCase();
+      const isTrash = rawStatus === 'trash';
+      const isPublished = ['published', 'active'].includes(rawStatus);
+
+      let statusBadge = isTrash ?
+        `<span class="abadge ab-cancelled"><span class="abadge-dot"></span>RECYCLE BIN</span>` :
+        isPublished ?
+        `<span class="abadge ab-confirmed"><span class="abadge-dot"></span>PUBLISHED</span>` :
+        `<span class="abadge ab-pending"><span class="abadge-dot"></span>UNPUBLISHED</span>`;
+
+      let actionButtons = '';
+      if (isTrash) {
+        actionButtons = `
+          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+            <button class="aab-restore" onclick="restoreFromRecycleBin('destinations', '${d.id || d._id}', '${escapeHtml(d.title)}')">♻️ Restore</button>
+            <button class="aab-delete-perm" onclick="confirmPermanentDelete('destinations', '${d.id || d._id}', '${escapeHtml(d.title)}')">Permanently Delete</button>
+          </div>
+        `;
+      } else {
+        actionButtons = `
+          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+            <button class="aab-edit" onclick="openDestinationModal('${d.id || d._id}')">Edit</button>
+            ${isPublished ?
+              `<button class="aab-unpub" onclick="setCmsItemStatus('destinations', '${d.id || d._id}', 'unpublished')" title="Unpublish from website">Unpublish</button>` :
+              `<button class="aab-pub" onclick="setCmsItemStatus('destinations', '${d.id || d._id}', 'published')" title="Publish live on website">Publish</button>`
+            }
+            <button class="aab-trash" onclick="moveToRecycleBin('destinations', '${d.id || d._id}', '${escapeHtml(d.title)}')" title="Move to Recycle Bin">🗑️ Bin</button>
+          </div>
+        `;
+      }
+
+      return `
+        <tr id="dest-row-${d.id || d._id}">
+          <td>
+            <img src="${d.image || d.image_url || d.imageUrl || 'assets/images/dest-maldives.jpg'}" style="width:46px;height:36px;border-radius:6px;object-fit:cover" alt="${escapeHtml(d.title)}" onerror="this.src='assets/images/dest-maldives.jpg'" />
+          </td>
+          <td>
+            <strong style="color:var(--navy-primary)">${escapeHtml(d.title)}</strong>
+            <div style="font-size:11px;color:var(--text-muted)">${escapeHtml(d.city || '')}</div>
+          </td>
+          <td>📍 ${escapeHtml(d.country || 'Global')}</td>
+          <td><span class="abadge" style="background:#F0F4F8;color:var(--navy-primary)">${escapeHtml(d.category || 'General')}</span></td>
+          <td><strong style="color:var(--navy-primary)">${formatINR(d.startingPrice || d.starting_price || d.price || 0)}</strong></td>
+          <td>${d.days || 5} Days</td>
+          <td>${statusBadge}</td>
+          <td style="font-size:12px;color:var(--text-muted)">${d.updated_at ? new Date(d.updated_at).toLocaleDateString() : 'Active'}</td>
+          <td>${actionButtons}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /* ── 2. TOUR PACKAGES STATUS MANAGEMENT ── */
   window.fetchAndRenderPackages = async function() {
     const tbody = document.getElementById('packages-table-body');
     const label = document.getElementById('pkg-count-label');
     if (!tbody) return;
 
     try {
-      const res = await fetch('/api/packages');
+      const res = await fetch('/api/packages?all=true');
       const json = await res.json();
-      const items = (json.success && json.data) ? json.data : [];
+      const items = (json.success && Array.isArray(json.data)) ? json.data : [];
 
-      if (label) label.textContent = `${items.length} Tour Packages`;
-      if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-muted)">No packages found. Click "+ Add Tour Package" to create one.</td></tr>`;
-        return;
-      }
+      window._adminPackagesList = items;
 
-      tbody.innerHTML = items.map(p => {
-        const statusClass = p.status === 'published' ? 'ab-confirmed' : 'ab-confirmed';
-        const statusLabel = (p.status || 'published').toUpperCase();
-        return `
-          <tr>
-            <td>
-              <img src="${p.featuredImage || p.image || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}" style="width:44px;height:34px;border-radius:6px;object-fit:cover" alt="${escapeHtml(p.title)}" />
-            </td>
-            <td>
-              <strong style="color:var(--navy-primary)">${escapeHtml(p.title)}</strong>
-              ${p.badge ? `<div style="font-size:10.5px;color:#B2872F;font-weight:700;">★ ${escapeHtml(p.badge)}</div>` : ''}
-            </td>
-            <td>📍 ${escapeHtml(p.destination || 'Global')}</td>
-            <td><span class="abadge" style="background:#F0F4F8;color:var(--navy-primary)">${escapeHtml(p.category || 'Luxury')}</span></td>
-            <td><strong style="color:#059669">${formatINR(p.price || 0)}</strong></td>
-            <td>${escapeHtml(p.duration || '7 Days')}</td>
-            <td>👥 2-6 Guests</td>
-            <td><span class="abadge ${statusClass}"><span class="abadge-dot"></span>${statusLabel}</span></td>
-            <td>
-              <div class="action-btn-group">
-                <button class="aab-edit" onclick="openPackageModal('${p.id || p._id}')">Edit</button>
-                <button class="aab-view" onclick="togglePublishStatus('packages', '${p.id || p._id}', '${p.status === 'published' ? 'unpublished' : 'published'}')">${p.status === 'published' ? 'Unpublish' : 'Publish'}</button>
-                <button class="aab-delete" onclick="confirmDeleteCmsItem('packages', '${p.id || p._id}', '${(p.title || '').replace(/'/g, "\\'")}')">Delete</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
+      const allCount = items.filter(p => (p.status || 'published').toLowerCase() !== 'trash').length;
+      const pubCount = items.filter(p => ['published', 'active'].includes((p.status || 'published').toLowerCase())).length;
+      const unpubCount = items.filter(p => ['unpublished', 'draft'].includes((p.status || '').toLowerCase())).length;
+      const trashCount = items.filter(p => (p.status || '').toLowerCase() === 'trash').length;
+
+      const countAllEl = document.getElementById('pkg-count-all');
+      const countPubEl = document.getElementById('pkg-count-published');
+      const countUnpubEl = document.getElementById('pkg-count-unpublished');
+      const countTrashEl = document.getElementById('pkg-count-trash');
+
+      if (countAllEl) countAllEl.textContent = allCount;
+      if (countPubEl) countPubEl.textContent = pubCount;
+      if (countUnpubEl) countUnpubEl.textContent = unpubCount;
+      if (countTrashEl) countTrashEl.textContent = trashCount;
+
+      if (label) label.textContent = `${allCount} Tour Packages Total (${pubCount} Published, ${unpubCount} Unpublished)`;
+
+      renderPackagesFiltered();
     } catch (e) {
       console.error('Error fetching packages:', e);
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:#EF4444">⚠️ Error loading tour packages. Click to retry.</td></tr>`;
     }
   };
 
-  window.fetchAndRenderHotels = async function() {
-    const tbody = document.getElementById('hotels-table-body');
-    const label = document.getElementById('hotel-count-label');
+  function renderPackagesFiltered() {
+    const tbody = document.getElementById('packages-table-body');
+    if (!tbody) return;
+
+    const filter = currentStatusFilter.packages;
+    let items = window._adminPackagesList || [];
+
+    if (filter === 'published') {
+      items = items.filter(p => ['published', 'active'].includes((p.status || 'published').toLowerCase()));
+    } else if (filter === 'unpublished') {
+      items = items.filter(p => ['unpublished', 'draft'].includes((p.status || '').toLowerCase()));
+    } else if (filter === 'trash') {
+      items = items.filter(p => (p.status || '').toLowerCase() === 'trash');
+    } else {
+      items = items.filter(p => (p.status || 'published').toLowerCase() !== 'trash');
+    }
+
+    if (items.length === 0) {
+      const msg = filter === 'published' ? 'No published packages. Click "Publish" on an unpublished package.' :
+                  filter === 'unpublished' ? 'No unpublished packages.' :
+                  filter === 'trash' ? 'Recycle bin is empty. No deleted tour packages.' :
+                  'No packages found. Click "+ Add Tour Package" to create one.';
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted)">${msg}</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = items.map(p => {
+      const rawStatus = (p.status || 'published').toLowerCase();
+      const isTrash = rawStatus === 'trash';
+      const isPublished = ['published', 'active'].includes(rawStatus);
+
+      let statusBadge = isTrash ?
+        `<span class="abadge ab-cancelled"><span class="abadge-dot"></span>RECYCLE BIN</span>` :
+        isPublished ?
+        `<span class="abadge ab-confirmed"><span class="abadge-dot"></span>PUBLISHED</span>` :
+        `<span class="abadge ab-pending"><span class="abadge-dot"></span>UNPUBLISHED</span>`;
+
+      let actionButtons = '';
+      if (isTrash) {
+        actionButtons = `
+          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+            <button class="aab-restore" onclick="restoreFromRecycleBin('packages', '${p.id || p._id}', '${escapeHtml(p.title)}')">♻️ Restore</button>
+            <button class="aab-delete-perm" onclick="confirmPermanentDelete('packages', '${p.id || p._id}', '${escapeHtml(p.title)}')">Permanently Delete</button>
+          </div>
+        `;
+      } else {
+        actionButtons = `
+          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+            <button class="aab-edit" onclick="openPackageModal('${p.id || p._id}')">Edit</button>
+            ${isPublished ?
+              `<button class="aab-unpub" onclick="setCmsItemStatus('packages', '${p.id || p._id}', 'unpublished')" title="Unpublish from website">Unpublish</button>` :
+              `<button class="aab-pub" onclick="setCmsItemStatus('packages', '${p.id || p._id}', 'published')" title="Publish live on website">Publish</button>`
+            }
+            <button class="aab-trash" onclick="moveToRecycleBin('packages', '${p.id || p._id}', '${escapeHtml(p.title)}')" title="Move to Recycle Bin">🗑️ Bin</button>
+          </div>
+        `;
+      }
+
+      return `
+        <tr id="pkg-row-${p.id || p._id}">
+          <td>
+            <img src="${p.featuredImage || p.featured_image || p.image || 'assets/images/dest-maldives.jpg'}" style="width:46px;height:36px;border-radius:6px;object-fit:cover" alt="${escapeHtml(p.title)}" onerror="this.src='assets/images/dest-maldives.jpg'" />
+          </td>
+          <td>
+            <strong style="color:var(--navy-primary)">${escapeHtml(p.title)}</strong>
+            ${p.badge ? `<div style="font-size:10.5px;color:#B2872F;font-weight:700;">★ ${escapeHtml(p.badge)}</div>` : ''}
+          </td>
+          <td>📍 ${escapeHtml(p.destination || 'Global')}</td>
+          <td><span class="abadge" style="background:#F0F4F8;color:var(--navy-primary)">${escapeHtml(p.category || 'Luxury')}</span></td>
+          <td><strong style="color:#059669">${formatINR(p.price || 0)}</strong></td>
+          <td>${escapeHtml(p.duration || '7 Days')}</td>
+          <td>👥 ${p.includedGuests || 2} Guests</td>
+          <td>${statusBadge}</td>
+          <td>${actionButtons}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  /* ── 3. CRUISES STATUS MANAGEMENT ── */
+  window.fetchAndRenderCruises = async function() {
+    const tbody = document.getElementById('cruises-table-body');
+    const label = document.getElementById('cruises-count-label');
     if (!tbody) return;
 
     try {
-      const res = await fetch('/api/hotels');
+      const res = await fetch('/api/cruises?all=true');
       const json = await res.json();
-      const items = (json.success && json.data) ? json.data : [];
+      const items = (json.success && Array.isArray(json.data)) ? json.data : (adminData.cruises || []);
 
-      if (label) label.textContent = `${items.length} Partner Hotels`;
-      if (items.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">No hotels found. Click "+ Add Hotel" to create one.</td></tr>`;
-        return;
-      }
+      window._adminCruisesList = items;
 
-      tbody.innerHTML = items.map(h => {
-        return `
-          <tr>
-            <td>
-              <div style="display:flex;align-items:center;gap:10px">
-                <img src="${h.heroImage || h.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945'}" style="width:44px;height:34px;border-radius:6px;object-fit:cover" alt="${escapeHtml(h.name || h.title)}" />
-                <div><strong style="color:var(--navy-primary)">${escapeHtml(h.name || h.title)}</strong></div>
-              </div>
-            </td>
-            <td>📍 ${escapeHtml(h.location || h.destination || 'Global')}</td>
-            <td>⭐ ${h.starRating || 5}.0</td>
-            <td><strong style="color:var(--navy-primary)">${formatINR(h.price || 0)} / night</strong></td>
-            <td>12 Suites Available</td>
-            <td><span class="abadge ab-confirmed"><span class="abadge-dot"></span>PUBLISHED</span></td>
-            <td>
-              <div class="action-btn-group">
-                <button class="aab-edit" onclick="openHotelModal('${h.id || h._id}')">Edit</button>
-                <button class="aab-delete" onclick="confirmDeleteCmsItem('hotels', '${h.id || h._id}', '${(h.name || '').replace(/'/g, "\\'")}')">Delete</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
+      const allCount = items.filter(c => (c.status || 'published').toLowerCase() !== 'trash').length;
+      const pubCount = items.filter(c => ['published', 'active'].includes((c.status || 'published').toLowerCase())).length;
+      const unpubCount = items.filter(c => ['unpublished', 'draft'].includes((c.status || '').toLowerCase())).length;
+      const trashCount = items.filter(c => (c.status || '').toLowerCase() === 'trash').length;
+
+      const countAllEl = document.getElementById('cruises-count-all');
+      const countPubEl = document.getElementById('cruises-count-published');
+      const countUnpubEl = document.getElementById('cruises-count-unpublished');
+      const countTrashEl = document.getElementById('cruises-count-trash');
+
+      if (countAllEl) countAllEl.textContent = allCount;
+      if (countPubEl) countPubEl.textContent = pubCount;
+      if (countUnpubEl) countUnpubEl.textContent = unpubCount;
+      if (countTrashEl) countTrashEl.textContent = trashCount;
+
+      if (label) label.textContent = `${allCount} Cruise Packages Total (${pubCount} Published, ${unpubCount} Unpublished)`;
+
+      renderCruisesFiltered();
     } catch (e) {
-      console.error('Error fetching hotels:', e);
+      console.error('Error fetching cruises:', e);
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#EF4444">⚠️ Error loading cruises. Click to retry.</td></tr>`;
     }
   };
+
+  window.renderCruisesTable = window.fetchAndRenderCruises;
+
+  function renderCruisesFiltered() {
+    const tbody = document.getElementById('cruises-table-body');
+    if (!tbody) return;
+
+    const filter = currentStatusFilter.cruises;
+    let items = window._adminCruisesList || [];
+
+    if (filter === 'published') {
+      items = items.filter(c => ['published', 'active'].includes((c.status || 'published').toLowerCase()));
+    } else if (filter === 'unpublished') {
+      items = items.filter(c => ['unpublished', 'draft'].includes((c.status || '').toLowerCase()));
+    } else if (filter === 'trash') {
+      items = items.filter(c => (c.status || '').toLowerCase() === 'trash');
+    } else {
+      items = items.filter(c => (c.status || 'published').toLowerCase() !== 'trash');
+    }
+
+    if (items.length === 0) {
+      const msg = filter === 'published' ? 'No published cruise voyages. Click "Publish" on an unpublished cruise.' :
+                  filter === 'unpublished' ? 'No unpublished cruise packages.' :
+                  filter === 'trash' ? 'Recycle bin is empty. No deleted cruise packages.' :
+                  'No cruise packages found. Click "+ Add Cruise" to create one.';
+      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted)">${msg}</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = items.map(c => {
+      const rawStatus = (c.status || 'published').toLowerCase();
+      const isTrash = rawStatus === 'trash';
+      const isPublished = ['published', 'active'].includes(rawStatus);
+
+      let statusBadge = isTrash ?
+        `<span class="abadge ab-cancelled"><span class="abadge-dot"></span>RECYCLE BIN</span>` :
+        isPublished ?
+        `<span class="abadge ab-confirmed"><span class="abadge-dot"></span>PUBLISHED</span>` :
+        `<span class="abadge ab-pending"><span class="abadge-dot"></span>UNPUBLISHED</span>`;
+
+      const title = c.title || c.name || 'Luxury Cruise Voyage';
+      const vessel = c.vessel || c.cruiseLine || 'Royal Symphony';
+      const route = c.route || 'Mediterranean';
+      const dur = c.duration || '7 Nights';
+      const price = c.price || 189900;
+      const img = c.heroImage || c.heroImg || c.image || 'assets/images/gallery-3.jpg';
+      const rating = c.rating || 4.95;
+
+      let actionButtons = '';
+      if (isTrash) {
+        actionButtons = `
+          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+            <button class="aab-restore" onclick="restoreFromRecycleBin('cruises', '${c.id || c._id}', '${escapeHtml(title)}')">♻️ Restore</button>
+            <button class="aab-delete-perm" onclick="confirmPermanentDelete('cruises', '${c.id || c._id}', '${escapeHtml(title)}')">Permanently Delete</button>
+          </div>
+        `;
+      } else {
+        actionButtons = `
+          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+            <button class="aab-edit" onclick="openCruiseModal('${c.id || c._id}')">Edit</button>
+            ${isPublished ?
+              `<button class="aab-unpub" onclick="setCmsItemStatus('cruises', '${c.id || c._id}', 'unpublished')" title="Unpublish from website">Unpublish</button>` :
+              `<button class="aab-pub" onclick="setCmsItemStatus('cruises', '${c.id || c._id}', 'published')" title="Publish live on website">Publish</button>`
+            }
+            <button class="aab-trash" onclick="moveToRecycleBin('cruises', '${c.id || c._id}', '${escapeHtml(title)}')" title="Move to Recycle Bin">🗑️ Bin</button>
+          </div>
+        `;
+      }
+
+      return `
+        <tr id="cruise-row-${c.id || c._id}">
+          <td>
+            <img src="${img}" style="width:46px;height:36px;border-radius:6px;object-fit:cover" alt="${escapeHtml(title)}" onerror="this.src='assets/images/gallery-3.jpg'" />
+          </td>
+          <td>
+            <strong style="color:var(--navy-primary)">${escapeHtml(title)}</strong>
+            <div style="font-size:11px;color:#0284c7;">🚢 ${escapeHtml(vessel)}</div>
+          </td>
+          <td>📍 ${escapeHtml(route)}</td>
+          <td>${escapeHtml(dur)}</td>
+          <td><strong style="color:#059669">${formatINR(price)}</strong></td>
+          <td>⭐ ${rating}</td>
+          <td>${statusBadge}</td>
+          <td>${actionButtons}</td>
+        </tr>
+      `;
+    }).join('');
+  }
 
   /* ══════════════════════════════════════════════════════════
      MODAL CONTROLLERS FOR ALL ENTITIES
@@ -1713,50 +1940,68 @@
   };
 
   /* ── CRUISE MODAL ── */
-  window.openCruiseModal = function(id = null) {
+  window.openCruiseModal = async function(id = null) {
     currentEditingType = 'cruises';
-    currentEditingItem = id ? adminData.cruises.find(cr => cr.id === id) : null;
+    currentEditingItem = null;
+
+    if (id) {
+      const res = await fetch('/api/cruises?all=true');
+      const json = await res.json();
+      const list = (json.success && Array.isArray(json.data)) ? json.data : (adminData.cruises || []);
+      currentEditingItem = list.find(cr => String(cr.id || cr._id) === String(id));
+    }
     const item = currentEditingItem || {};
 
     document.getElementById('cms-modal-title').textContent = id ? 'Edit Cruise Package' : 'Add New Cruise Package';
     document.getElementById('cms-modal-fields').innerHTML = `
       <div>
         <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Cruise Voyage Title *</label>
-        <input type="text" id="field-cruise-title" class="form-control" value="${item.title || ''}" placeholder="e.g. Mediterranean Odyssey" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        <input type="text" id="field-cruise-title" class="form-control" value="${item.title || item.name || ''}" placeholder="e.g. Mediterranean Magic Voyage — 14 Days" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div>
-          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Vessel Name *</label>
-          <input type="text" id="field-cruise-vessel" class="form-control" value="${item.vessel || ''}" placeholder="e.g. Royal Symphony" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Cruise Line / Vessel Name *</label>
+          <input type="text" id="field-cruise-vessel" class="form-control" value="${item.vessel || item.cruiseLine || 'Royal Symphony'}" placeholder="e.g. Royal Symphony" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
         </div>
         <div>
           <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Duration *</label>
-          <input type="text" id="field-cruise-dur" class="form-control" value="${item.duration || '7 nights'}" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+          <input type="text" id="field-cruise-dur" class="form-control" value="${item.duration || '7 Nights / 8 Days'}" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Itinerary Route *</label>
+          <input type="text" id="field-cruise-route" class="form-control" value="${item.route || ''}" placeholder="e.g. Italy, Greece, Spain & France" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Cabin Price (₹ or $) *</label>
+          <input type="number" id="field-cruise-price" class="form-control" value="${item.price || 189900}" min="1" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
         </div>
       </div>
       <div>
-        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Itinerary Route *</label>
-        <input type="text" id="field-cruise-route" class="form-control" value="${item.route || ''}" placeholder="e.g. Barcelona → Athens" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Hero Image URL or Upload File</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="url" id="field-image" class="form-control" value="${item.heroImage || item.heroImg || item.image || 'assets/images/gallery-3.jpg'}" style="flex:1;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+          <label class="btn btn-secondary btn-sm" style="margin:0;cursor:pointer;white-space:nowrap;padding:10px 14px">
+            📁 Upload
+            <input type="file" accept="image/*" style="display:none" onchange="uploadImageFile(this, 'field-image')" />
+          </label>
+        </div>
       </div>
       <div>
-        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Cabin Price ($) *</label>
-        <input type="number" id="field-cruise-price" class="form-control" value="${item.price || 1499}" min="1" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Description *</label>
+        <textarea id="field-description" class="form-control" rows="3" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">${item.description || ''}</textarea>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Publication Status</label>
+        <select id="field-status" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
+          <option value="published" ${item.status === 'published' ? 'selected' : ''}>Published (Visible on Website)</option>
+          <option value="unpublished" ${(item.status === 'unpublished' || item.status === 'draft') ? 'selected' : ''}>Unpublished (Hidden from Website)</option>
+          <option value="trash" ${item.status === 'trash' ? 'selected' : ''}>Recycle Bin</option>
+        </select>
       </div>
     `;
     document.getElementById('cms-modal-overlay').style.display = 'flex';
-  };
-
-  window.confirmDeleteCruise = function(id) {
-    const cr = adminData.cruises.find(x => x.id === id);
-    if (!cr) return;
-    document.getElementById('cms-delete-msg').textContent = `Are you sure you want to remove cruise "${cr.title}"?`;
-    document.getElementById('cms-confirm-delete-btn').onclick = function() {
-      adminData.cruises = adminData.cruises.filter(x => x.id !== id);
-      renderCruisesTable();
-      closeCmsDeleteModal();
-      showToast(`Removed cruise ${cr.title}`, '🗑️');
-    };
-    document.getElementById('cms-delete-modal').style.display = 'flex';
   };
 
   /* ── VISA ACTIONS ── */
@@ -2190,8 +2435,8 @@
         <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Publication Status</label>
         <select id="field-status" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
           <option value="published" ${item.status === 'published' ? 'selected' : ''}>Published (Visible on Website)</option>
-          <option value="draft" ${item.status === 'draft' ? 'selected' : ''}>Draft (Hidden from Website)</option>
-          <option value="unpublished" ${item.status === 'unpublished' ? 'selected' : ''}>Unpublished</option>
+          <option value="unpublished" ${(item.status === 'unpublished' || item.status === 'draft') ? 'selected' : ''}>Unpublished (Hidden from Website)</option>
+          <option value="trash" ${item.status === 'trash' ? 'selected' : ''}>Recycle Bin</option>
         </select>
       </div>
     `;
@@ -2272,8 +2517,8 @@
           <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Publication Status</label>
           <select id="field-status" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
             <option value="published" ${item.status === 'published' ? 'selected' : ''}>Published (Visible on Website)</option>
-            <option value="draft" ${item.status === 'draft' ? 'selected' : ''}>Draft (Hidden from Website)</option>
-            <option value="unpublished" ${item.status === 'unpublished' ? 'selected' : ''}>Unpublished</option>
+            <option value="unpublished" ${(item.status === 'unpublished' || item.status === 'draft') ? 'selected' : ''}>Unpublished (Hidden from Website)</option>
+            <option value="trash" ${item.status === 'trash' ? 'selected' : ''}>Recycle Bin</option>
           </select>
         </div>
       </div>
@@ -3143,7 +3388,14 @@
     }
   };
 
-  window.togglePublishStatus = async function(resource, id, newStatus) {
+  /* ══════════════════════════════════════════════════════════
+     CMS UNIVERSAL STATUS MUTATION HANDLERS
+     - Unpublish ≠ Delete (Unpublish ONLY sets status = 'unpublished')
+     - Move to Recycle Bin sets status = 'trash'
+     - Restore sets status = 'unpublished'
+     - Permanent Delete removes record from database / Supabase
+     ══════════════════════════════════════════════════════════ */
+  window.setCmsItemStatus = async function(resource, id, newStatus) {
     try {
       const res = await fetch(`/api/admin/${resource}/${id}`, {
         method: 'PATCH',
@@ -3152,31 +3404,70 @@
       });
       const json = await res.json();
       if (json.success) {
-        showToast(`Status updated to ${newStatus.toUpperCase()}`, '🔄');
-        loadDynamicCmsContent();
+        if (newStatus === 'unpublished') {
+          showToast('Unpublished: Item removed from public website', '⏸️');
+        } else if (newStatus === 'published') {
+          showToast('Published: Item is now live on website!', '✅');
+        } else if (newStatus === 'trash') {
+          showToast('Moved item to Recycle Bin', '🗑️');
+        } else {
+          showToast(`Status updated to ${newStatus.toUpperCase()}`, '🔄');
+        }
+
+        if (resource === 'destinations') window.fetchAndRenderDestinations();
+        else if (resource === 'packages') window.fetchAndRenderPackages();
+        else if (resource === 'cruises') window.fetchAndRenderCruises();
+        else loadDynamicCmsContent();
+      } else {
+        showToast(json.message || 'Failed to update status', '⚠️');
       }
     } catch (e) {
+      console.error('Status update error:', e);
       showToast('Failed to update status', '⚠️');
     }
   };
 
-  window.confirmDeleteCmsItem = function(resource, id, name) {
-    document.getElementById('cms-delete-msg').textContent = `Are you sure you want to delete "${name}"?`;
-    document.getElementById('cms-confirm-delete-btn').onclick = async function() {
-      try {
-        const res = await fetch(`/api/admin/${resource}/${id}`, { method: 'DELETE' });
-        const json = await res.json();
-        if (json.success) {
-          showToast(`Deleted "${name}"`, '🗑️');
-          closeCmsDeleteModal();
-          loadDynamicCmsContent();
-        }
-      } catch (e) {
-        showToast('Failed to delete record', '❌');
-      }
-    };
-    document.getElementById('cms-delete-modal').style.display = 'flex';
+  window.moveToRecycleBin = function(resource, id, name) {
+    window.setCmsItemStatus(resource, id, 'trash');
   };
 
+  window.restoreFromRecycleBin = function(resource, id, name) {
+    window.setCmsItemStatus(resource, id, 'unpublished');
+  };
+
+  window.confirmPermanentDelete = function(resource, id, name) {
+    const msgEl = document.getElementById('cms-delete-msg');
+    if (msgEl) {
+      msgEl.textContent = `Are you sure you want to permanently delete "${name}"? This action cannot be undone and will permanently remove all data and images from database.`;
+    }
+    const confirmBtn = document.getElementById('cms-confirm-delete-btn');
+    if (confirmBtn) {
+      confirmBtn.onclick = async function() {
+        try {
+          const res = await fetch(`/api/admin/${resource}/${id}`, { method: 'DELETE' });
+          const json = await res.json();
+          if (json.success) {
+            showToast(`Permanently deleted "${name}"`, '🗑️');
+            closeCmsDeleteModal();
+            if (resource === 'destinations') window.fetchAndRenderDestinations();
+            else if (resource === 'packages') window.fetchAndRenderPackages();
+            else if (resource === 'cruises') window.fetchAndRenderCruises();
+            else loadDynamicCmsContent();
+          } else {
+            showToast(json.message || 'Failed to permanently delete', '⚠️');
+          }
+        } catch (e) {
+          showToast('Error deleting item', '❌');
+        }
+      };
+    }
+    const modal = document.getElementById('cms-delete-modal');
+    if (modal) modal.style.display = 'flex';
+  };
+
+  window.togglePublishStatus = window.setCmsItemStatus;
+  window.confirmDeleteCmsItem = window.confirmPermanentDelete;
+
 })();
+
 
