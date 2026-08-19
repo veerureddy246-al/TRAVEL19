@@ -101,11 +101,9 @@
     if (typeof renderUsersTable === 'function') renderUsersTable();
     if (typeof renderStaffTable === 'function') renderStaffTable();
     if (typeof renderBookingsTable === 'function') renderBookingsTable();
-    if (typeof renderFlightsTable === 'function') renderFlightsTable();
     if (typeof renderCarsTable === 'function') renderCarsTable();
     if (typeof renderCruisesTable === 'function') renderCruisesTable();
     if (typeof renderVisaTable === 'function') renderVisaTable();
-    if (typeof renderInsuranceTable === 'function') renderInsuranceTable();
     if (typeof renderPaymentsTable === 'function') renderPaymentsTable();
     if (typeof renderRefundsTable === 'function') renderRefundsTable();
     if (typeof renderCouponsTable === 'function') renderCouponsTable();
@@ -121,8 +119,6 @@
       window.fetchAndRenderDestinations();
     } else if (panelId === 'p-packages' && typeof window.fetchAndRenderPackages === 'function') {
       window.fetchAndRenderPackages();
-    } else if (panelId === 'p-hotels' && typeof window.fetchAndRenderHotels === 'function') {
-      window.fetchAndRenderHotels();
     } else if (panelId === 'p-faqs' && typeof window.fetchAndRenderFaqs === 'function') {
       window.fetchAndRenderFaqs();
     } else if (panelId === 'p-inquiries' && typeof window.fetchAndRenderInquiries === 'function') {
@@ -175,18 +171,12 @@
           window.fetchAndRenderDestinations();
         } else if (target === 'p-packages' && typeof window.fetchAndRenderPackages === 'function') {
           window.fetchAndRenderPackages();
-        } else if (target === 'p-hotels' && typeof window.fetchAndRenderHotels === 'function') {
-          window.fetchAndRenderHotels();
-        } else if (target === 'p-flights' && typeof renderFlightsTable === 'function') {
-          renderFlightsTable();
         } else if (target === 'p-cars' && typeof renderCarsTable === 'function') {
           renderCarsTable();
         } else if (target === 'p-cruises' && typeof renderCruisesTable === 'function') {
           renderCruisesTable();
         } else if (target === 'p-visa' && typeof renderVisaTable === 'function') {
           renderVisaTable();
-        } else if (target === 'p-insurance' && typeof renderInsuranceTable === 'function') {
-          renderInsuranceTable();
         } else if (target === 'p-users' && typeof renderUsersTable === 'function') {
           renderUsersTable();
         } else if (target === 'p-staff' && typeof renderStaffTable === 'function') {

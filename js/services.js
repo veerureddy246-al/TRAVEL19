@@ -10407,13 +10407,6 @@
     }
 
     const catAliasMap = {
-      'hotel': 'hotels',
-      'hotels': 'hotels',
-      'accommodation': 'hotels',
-      'accommodations': 'hotels',
-      'resort': 'hotels',
-      'resorts': 'hotels',
-      
       'dest': 'destinations',
       'destination': 'destinations',
       'destinations': 'destinations',
@@ -10427,19 +10420,11 @@
       'cruise': 'cruises',
       'cruises': 'cruises',
       
-      'flight': 'flights',
-      'flights': 'flights',
-      'airline': 'flights',
-      
       'car': 'transport',
       'cars': 'transport',
       'transport': 'transport',
       'transfers': 'transport',
       'transfer': 'transport',
-      
-      'insurance': 'insurance',
-      'travel-insurance': 'insurance',
-      'travel_insurance': 'insurance',
       
       'specialty': 'specialty',
       'specialty-tours': 'specialty',
@@ -10456,6 +10441,12 @@
       'gallery': 'gallery',
       'photos': 'gallery',
       'photo': 'gallery',
+      
+      'hotel': 'packages',
+      'hotels': 'packages',
+      'flight': 'packages',
+      'flights': 'packages',
+      'insurance': 'packages',
       
       'all': 'all'
     };
@@ -10501,18 +10492,12 @@
       } else if (cat === 'packages') {
         const subCat = new URLSearchParams(window.location.search).get('sub') || new URLSearchParams(window.location.search).get('pkgCat') || 'all';
         renderPackageGrid(subCat, q);
-      } else if (cat === 'hotels') {
-        renderHotelGrid(q);
-      } else if (cat === 'flights') {
-        renderFlightGrid(q);
       } else if (cat === 'cruises') {
         renderCruiseGrid(q);
       } else if (cat === 'transport') {
         renderTransportGrid(q);
       } else if (cat === 'visa') {
         renderVisaGrid(q);
-      } else if (cat === 'insurance') {
-        renderInsuranceGrid(q);
       } else if (cat === 'specialty') {
         renderSpecialtyGrid(q);
       } else if (cat === 'experiences') {
@@ -10543,22 +10528,18 @@
       });
     });
 
-    // URL Query Parameter Filtering (e.g. ?cat=hotels or ?cat=destinations or ?q=maldives)
+    // URL Query Parameter Filtering (e.g. ?cat=destinations or ?q=maldives)
     const urlParams = new URLSearchParams(window.location.search);
     let initialCat = urlParams.get('cat') || urlParams.get('category') || urlParams.get('service') || '';
     const initialQuery = (urlParams.get('q') || urlParams.get('search') || urlParams.get('query') || '').trim();
     const subCat = urlParams.get('sub') || urlParams.get('pkgCat');
     
-    // Auto-detect category if user navigated with ?q=hotel or ?q=cruises without cat
     if (!initialCat && initialQuery) {
       const qLower = initialQuery.toLowerCase();
-      if (['hotel', 'hotels', 'resort', 'resorts', 'stay'].some(k => qLower.includes(k))) initialCat = 'hotels';
-      else if (['cruise', 'cruises', 'ship', 'vessel'].some(k => qLower.includes(k))) initialCat = 'cruises';
-      else if (['flight', 'flights', 'airline'].some(k => qLower.includes(k))) initialCat = 'flights';
+      if (['cruise', 'cruises', 'ship', 'vessel'].some(k => qLower.includes(k))) initialCat = 'cruises';
       else if (['package', 'packages', 'tour', 'tours'].some(k => qLower.includes(k))) initialCat = 'packages';
       else if (['dest', 'destination', 'destinations'].some(k => qLower.includes(k))) initialCat = 'destinations';
       else if (['car', 'cars', 'transfer', 'transfers', 'cab'].some(k => qLower.includes(k))) initialCat = 'transport';
-      else if (['insurance'].some(k => qLower.includes(k))) initialCat = 'insurance';
       else if (['visa'].some(k => qLower.includes(k))) initialCat = 'visa';
       else initialCat = 'all';
     } else if (!initialCat) {
@@ -10595,12 +10576,10 @@
     if (!grid) return;
 
     const cats = [
-      { id: 'packages', emoji: '📦', title: 'Tour Packages', desc: 'Handcrafted luxury tour packages with flights, hotels & transfers included.', count: packageCatalogDb.length, color: '#fbbf24', border: 'rgba(251,191,36,0.3)', img: (packageCatalogDb[0] && (packageCatalogDb[0].heroImg || packageCatalogDb[0].heroImage)) || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85' },
+      { id: 'packages', emoji: '📦', title: 'Tour Packages', desc: 'Handcrafted luxury tour packages with transfers and guided excursions included.', count: packageCatalogDb.length, color: '#fbbf24', border: 'rgba(251,191,36,0.3)', img: (packageCatalogDb[0] && (packageCatalogDb[0].heroImg || packageCatalogDb[0].heroImage)) || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85' },
       { id: 'destinations', emoji: '🌍', title: 'Destinations', desc: 'World-class destinations with curated itineraries and luxury travel experiences.', count: destinationCatalogDb.length, color: '#38bdf8', border: 'rgba(56,189,248,0.3)', img: (destinationCatalogDb[0] && destinationCatalogDb[0].heroImg) || 'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=800&q=85' },
       { id: 'cruises', emoji: '🚢', title: 'Cruises', desc: 'Luxury ocean and river cruises with world-class onboard dining and entertainment.', count: cruiseCatalogDb.length, color: '#34d399', border: 'rgba(52,211,153,0.3)', img: 'https://images.unsplash.com/photo-1548574505-5e2386903d8f?auto=format&fit=crop&w=800&q=85' },
-      { id: 'hotels', emoji: '🏨', title: 'Hotels & Resorts', desc: '5-star luxury hotels and private resorts with exclusive rates and butler service.', count: hotelCatalogDb.length, color: '#a78bfa', border: 'rgba(167,139,250,0.3)', img: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800&q=85' },
-      { id: 'flights', emoji: '✈️', title: 'Flights', desc: 'Business and first class international flights with lounge access and priority boarding.', count: flightCatalogDb.length, color: '#f472b6', border: 'rgba(244,114,182,0.3)', img: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=85' },
-      { id: 'insurance', emoji: '🛡️', title: 'Travel Insurance', desc: 'Comprehensive protection plans covering medical emergencies and trip cancellations.', count: '10', color: '#22d3ee', border: 'rgba(34,211,238,0.3)', img: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=800&q=85' },
+      { id: 'transport', emoji: '🚗', title: 'Car & Transfers', desc: 'Private chauffeur airport transfers and luxury vehicle rentals worldwide.', count: transportCatalogDb.length, color: '#fb923c', border: 'rgba(251,146,60,0.3)', img: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=800&q=85' },
       { id: 'specialty', emoji: '💎', title: 'Specialty Tours', desc: 'Exclusive VIP experiences — aurora hunts, private islands, helicopter tours and more.', count: '15', color: '#D4AF37', border: 'rgba(212,175,55,0.3)', img: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=800&q=85' },
       { id: 'experiences', emoji: '🎟️', title: 'Experiences & Guides', desc: 'Curated local experiences, private guides, cultural immersions and activities.', count: '25', color: '#4ade80', border: 'rgba(74,222,128,0.3)', img: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=85' },
       { id: 'visa', emoji: '🛂', title: 'Visa Services', desc: 'Fast-track visa processing for 40+ countries with expert document support.', count: visaCatalogDb.length, color: '#f87171', border: 'rgba(248,113,113,0.3)', img: 'https://images.unsplash.com/photo-1575506726823-c6b1cb0da484?auto=format&fit=crop&w=800&q=85' },

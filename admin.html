@@ -59,14 +59,6 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="6" rx="2"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
         <span class="admin-nav-label">Packages</span>
       </div>
-      <div class="admin-nav-item" data-panel="p-hotels">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/><path d="m9 16 .348-.24c1.465-1.013 3.84-1.013 5.304 0L15 16"/><path d="M8 7h.01"/><path d="M16 7h.01"/><path d="M12 7h.01"/><path d="M12 11h.01"/><path d="M16 11h.01"/><path d="M8 11h.01"/></svg>
-        <span class="admin-nav-label">Hotels &amp; Resorts</span>
-      </div>
-      <div class="admin-nav-item" data-panel="p-flights">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
-        <span class="admin-nav-label">Flights</span>
-      </div>
       <div class="admin-nav-item" data-panel="p-cruises">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.94 5.34 2.81 7.23"/><path d="M12 10V4"/><path d="M8 6h8"/></svg>
         <span class="admin-nav-label">Cruises</span>
@@ -74,10 +66,6 @@
       <div class="admin-nav-item" data-panel="p-visa">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h6"/></svg>
         <span class="admin-nav-label">Visa Requests</span>
-      </div>
-      <div class="admin-nav-item" data-panel="p-insurance">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span class="admin-nav-label">Insurance</span>
       </div>
 
       <div class="admin-section-label">Commerce</div>
@@ -512,59 +500,6 @@
         </div>
       </div>
 
-      <!-- ════ HOTELS & RESORTS ════ -->
-      <div class="admin-panel" id="p-hotels">
-        <div class="page-header">
-          <div class="page-header-info">
-            <h1 class="page-title">5-Star Hotels &amp; Luxury Resorts</h1>
-            <p>Manage exclusive hotel partners, suites, nightly rates, and concierge amenities.</p>
-          </div>
-          <div class="page-header-actions">
-            <button class="btn btn-primary" onclick="openHotelModal()">+ Add Luxury Hotel</button>
-          </div>
-        </div>
-        <div class="admin-table-wrap">
-          <div class="admin-table-toolbar">
-            <div class="table-title-count" id="hotels-count-label">Loading Hotels...</div>
-          </div>
-          <div style="overflow-x:auto">
-            <table class="admin-table">
-              <thead><tr><th>Property</th><th>Location</th><th>Rating</th><th>Starting Price</th><th>Rooms / Availability</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="hotels-table-body">
-                <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">Loading luxury hotels from database...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- ════ FLIGHTS ════ -->
-      <div class="admin-panel" id="p-flights">
-        <div class="page-header">
-          <div class="page-header-info">
-            <h1 class="page-title">Flight Inventory &amp; Routes</h1>
-            <p>Manage international airlines, route schedules, cabin classes, and seat availability.</p>
-          </div>
-          <div class="page-header-actions">
-            <button class="btn btn-primary" onclick="openFlightModal()">+ Add Flight Route</button>
-          </div>
-        </div>
-        <div class="admin-table-wrap">
-          <div class="admin-table-toolbar">
-            <div class="table-title-count" id="flights-count-label">Loading Flights...</div>
-          </div>
-          <div style="overflow-x:auto">
-            <table class="admin-table">
-              <thead><tr><th>Airline &amp; Code</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="flights-table-body">
-                <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">Loading flights from database...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-
       <!-- ════ CRUISES ════ -->
       <div class="admin-panel" id="p-cruises">
         <div class="page-header">
@@ -608,28 +543,6 @@
               <tbody id="visa-table-body">
                 <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">Loading visa applications...</td></tr>
               </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- ════ INSURANCE ════ -->
-      <div class="admin-panel" id="p-insurance">
-        <div class="page-header">
-          <div class="page-header-info">
-            <h1 class="page-title">Insurance &amp; Claims</h1>
-            <p>Travel protection policies, coverage limits, premiums, and claim adjudication.</p>
-          </div>
-        </div>
-        <div class="admin-table-wrap">
-          <div class="admin-table-toolbar">
-            <div class="table-title-count" id="insurance-count-label">842 Active Policies</div>
-            <button class="btn btn-primary btn-sm" onclick="openInsuranceModal()">+ Add Policy</button>
-          </div>
-          <div style="overflow-x:auto">
-            <table class="admin-table">
-              <thead><tr><th>Customer</th><th>Plan</th><th>Destination</th><th>Coverage</th><th>Start Date</th><th>End Date</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="insurance-table-body"></tbody>
             </table>
           </div>
         </div>

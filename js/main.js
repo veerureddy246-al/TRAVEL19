@@ -232,12 +232,10 @@ window.getHDImageUrl = function (url, width = 3840) {
     async function loadSearchData() {
       if (isDataLoaded) return;
       try {
-        const [destRes, pkgRes, hotelRes, cruiseRes, flightRes, carRes] = await Promise.all([
+        const [destRes, pkgRes, cruiseRes, carRes] = await Promise.all([
           fetch('/api/destinations').then(r => r.json()).catch(() => null),
           fetch('/api/packages').then(r => r.json()).catch(() => null),
-          fetch('/api/hotels').then(r => r.json()).catch(() => null),
           fetch('/api/cruises').then(r => r.json()).catch(() => null),
-          fetch('/api/flights').then(r => r.json()).catch(() => null),
           fetch('/api/cars').then(r => r.json()).catch(() => null)
         ]);
 
@@ -279,25 +277,7 @@ window.getHDImageUrl = function (url, width = 3840) {
           });
         }
 
-        // 3. Hotels
-        if (hotelRes && hotelRes.success && Array.isArray(hotelRes.data)) {
-          hotelRes.data.forEach(h => {
-            items.push({
-              id: h.id,
-              type: 'hotel',
-              catSlug: 'hotels',
-              categoryName: 'HOTELS',
-              title: h.name || h.title || 'Luxury Hotel',
-              location: h.location || 'Resort Sanctuary',
-              description: h.description || '',
-              image: h.heroImage || h.hero_image || h.image || 'assets/images/hotel-luxury.jpg',
-              price: h.price,
-              rawObj: h
-            });
-          });
-        }
-
-        // 4. Cruises
+        // 3. Cruises
         if (cruiseRes && cruiseRes.success && Array.isArray(cruiseRes.data)) {
           cruiseRes.data.forEach(c => {
             items.push({
@@ -315,25 +295,7 @@ window.getHDImageUrl = function (url, width = 3840) {
           });
         }
 
-        // 5. Flights
-        if (flightRes && flightRes.success && Array.isArray(flightRes.data)) {
-          flightRes.data.forEach(f => {
-            items.push({
-              id: f.id,
-              type: 'flight',
-              catSlug: 'flights',
-              categoryName: 'FLIGHTS',
-              title: (f.airline || 'First Class Flight') + ' · ' + (f.route || 'International'),
-              location: f.cabin || f.duration || 'Direct Flight',
-              description: f.features ? f.features.join(', ') : 'Luxury international flight.',
-              image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80',
-              price: f.price,
-              rawObj: f
-            });
-          });
-        }
-
-        // 6. Car & Transfers
+        // 4. Car & Transfers
         if (carRes && carRes.success && Array.isArray(carRes.data)) {
           carRes.data.forEach(car => {
             items.push({
@@ -351,21 +313,7 @@ window.getHDImageUrl = function (url, width = 3840) {
           });
         }
 
-        // 7. Travel Insurance
-        items.push({
-          id: 'ins-gold',
-          type: 'insurance',
-          catSlug: 'insurance',
-          categoryName: 'TRAVEL INSURANCE',
-          title: 'Comprehensive Global Travel Insurance',
-          location: 'Worldwide Coverage up to $500,000',
-          description: 'Medical emergencies, trip cancellation, baggage loss and 24/7 assistance.',
-          image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=600&q=80',
-          price: 99,
-          rawObj: { id: 'ins-gold', title: 'Global Travel Insurance', price: '$99' }
-        });
-
-        // 8. Visa Services
+        // 5. Visa Services
         items.push({
           id: 'visa-schengen',
           type: 'visa',
@@ -396,11 +344,8 @@ window.getHDImageUrl = function (url, width = 3840) {
     const catSlugMap = {
       'DESTINATIONS': 'destinations',
       'PACKAGES': 'packages',
-      'HOTELS': 'hotels',
       'CRUISES': 'cruises',
-      'FLIGHTS': 'flights',
       'CAR & TRANSFERS': 'transport',
-      'TRAVEL INSURANCE': 'insurance',
       'VISA SERVICES': 'visa'
     };
 
@@ -431,7 +376,7 @@ window.getHDImageUrl = function (url, width = 3840) {
           <div style="padding:32px 20px; text-align:center; color:var(--text-muted, #94a3b8);">
             <div style="font-size:32px; margin-bottom:8px;">🏝️</div>
             <div style="font-size:16px; font-weight:700; color:var(--text-primary, #ffffff); margin-bottom:8px;">No matching services found for "${query}"</div>
-            <div style="font-size:13px; margin-bottom:16px;">Try searching for hotels, packages, destinations, cruises, flights, cars or insurance.</div>
+            <div style="font-size:13px; margin-bottom:16px;">Try searching for destinations, tour packages, cruises, car rentals or visa services.</div>
             <a href="services.html" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:9999px; text-decoration:none;">
               Browse All Services →
             </a>
@@ -441,7 +386,7 @@ window.getHDImageUrl = function (url, width = 3840) {
       }
 
       // Group matches by category
-      const categoriesOrder = ['DESTINATIONS', 'PACKAGES', 'HOTELS', 'CRUISES', 'FLIGHTS', 'CAR & TRANSFERS', 'TRAVEL INSURANCE', 'VISA SERVICES'];
+      const categoriesOrder = ['DESTINATIONS', 'PACKAGES', 'CRUISES', 'CAR & TRANSFERS', 'VISA SERVICES'];
       const grouped = {};
       categoriesOrder.forEach(cat => grouped[cat] = []);
       matches.forEach(item => {
@@ -3559,19 +3504,14 @@ window.getHDImageUrl = function (url, width = 3840) {
     const catSlugMap = {
       'DESTINATIONS': 'destinations',
       'PACKAGES': 'packages',
-      'HOTELS': 'hotels',
       'CRUISES': 'cruises',
-      'FLIGHTS': 'flights',
       'CAR & TRANSFERS': 'transport',
-      'TRAVEL INSURANCE': 'insurance',
       'VISA SERVICES': 'visa',
       'dest': 'destinations',
       'pkg': 'packages',
-      'hotel': 'hotels',
       'cruise': 'cruises',
-      'flight': 'flights',
       'car': 'transport',
-      'insurance': 'insurance',
+      'transport': 'transport',
       'visa': 'visa'
     };
 
@@ -3580,12 +3520,10 @@ window.getHDImageUrl = function (url, width = 3840) {
       if (isFetching) return;
       isFetching = true;
       try {
-        const [destRes, pkgRes, hotelRes, cruiseRes, flightRes, carRes] = await Promise.all([
+        const [destRes, pkgRes, cruiseRes, carRes] = await Promise.all([
           fetch('/api/destinations').then(r => r.json()).catch(() => null),
           fetch('/api/packages').then(r => r.json()).catch(() => null),
-          fetch('/api/hotels').then(r => r.json()).catch(() => null),
           fetch('/api/cruises').then(r => r.json()).catch(() => null),
-          fetch('/api/flights').then(r => r.json()).catch(() => null),
           fetch('/api/cars').then(r => r.json()).catch(() => null)
         ]);
 
@@ -3633,28 +3571,7 @@ window.getHDImageUrl = function (url, width = 3840) {
           });
         }
 
-        // 3. Hotels
-        if (hotelRes && hotelRes.success && Array.isArray(hotelRes.data)) {
-          hotelRes.data.forEach(h => {
-            items.push({
-              id: h.id,
-              type: 'hotel',
-              catSlug: 'hotels',
-              rawType: 'hotel',
-              categoryLabel: '🏨 HOTEL',
-              categoryHeader: 'HOTELS',
-              title: h.name || h.title || 'Luxury Hotel',
-              location: h.location || 'Resort Sanctuary',
-              description: h.description || '',
-              sub: h.location || 'Luxury Resort',
-              image: h.heroImage || h.hero_image || h.image || 'assets/images/hotel-luxury.jpg',
-              price: h.price,
-              rawObj: h
-            });
-          });
-        }
-
-        // 4. Cruises
+        // 3. Cruises
         if (cruiseRes && cruiseRes.success && Array.isArray(cruiseRes.data)) {
           cruiseRes.data.forEach(c => {
             items.push({
@@ -3675,28 +3592,7 @@ window.getHDImageUrl = function (url, width = 3840) {
           });
         }
 
-        // 5. Flights
-        if (flightRes && flightRes.success && Array.isArray(flightRes.data)) {
-          flightRes.data.forEach(f => {
-            items.push({
-              id: f.id,
-              type: 'flight',
-              catSlug: 'flights',
-              rawType: 'flight',
-              categoryLabel: '✈️ FLIGHT',
-              categoryHeader: 'FLIGHTS',
-              title: (f.airline || 'First Class Flight') + ' · ' + (f.route || 'International'),
-              location: f.cabin || f.duration || 'Direct Flight',
-              description: f.features ? f.features.join(', ') : 'Luxury international flight.',
-              sub: f.duration || 'Direct Flight',
-              image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80',
-              price: f.price,
-              rawObj: f
-            });
-          });
-        }
-
-        // 6. Car & Transfers
+        // 4. Car & Transfers
         if (carRes && carRes.success && Array.isArray(carRes.data)) {
           carRes.data.forEach(car => {
             items.push({
@@ -3717,24 +3613,7 @@ window.getHDImageUrl = function (url, width = 3840) {
           });
         }
 
-        // 7. Travel Insurance
-        items.push({
-          id: 'ins-gold',
-          type: 'insurance',
-          catSlug: 'insurance',
-          rawType: 'insurance',
-          categoryLabel: '🛡️ INSURANCE',
-          categoryHeader: 'TRAVEL INSURANCE',
-          title: 'Comprehensive Global Travel Insurance',
-          location: 'Worldwide Coverage up to $500,000',
-          description: 'Medical emergencies, trip cancellation, baggage loss and 24/7 assistance.',
-          sub: 'Worldwide Coverage up to $500,000',
-          image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=600&q=80',
-          price: 99,
-          rawObj: { id: 'ins-gold', title: 'Global Travel Insurance', price: '$99' }
-        });
-
-        // 8. Visa Services
+        // 5. Visa Services
         items.push({
           id: 'visa-schengen',
           type: 'visa',
@@ -3769,7 +3648,7 @@ window.getHDImageUrl = function (url, width = 3840) {
         resultsContainer.innerHTML = `
           <div class="search-empty-state" style="text-align:center; padding:30px 16px; color:#94a3b8;">
             <div style="font-size:32px; margin-bottom:8px;">🔍</div>
-            <p style="font-size:14px;">Type to search destinations, luxury packages, hotels, cruises, flights & services...</p>
+            <p style="font-size:14px;">Type to search destinations, luxury packages, cruises & services...</p>
           </div>
         `;
         return;
@@ -3793,11 +3672,8 @@ window.getHDImageUrl = function (url, width = 3840) {
         const tabLabels = {
           dest: 'destinations',
           pkg: 'packages',
-          hotel: 'hotels',
           cruise: 'cruises',
-          flight: 'flights',
           transport: 'car & transfer services',
-          insurance: 'insurance plans',
           visa: 'visa services'
         };
         const categoryName = tabLabels[currentFilter] || '';
@@ -3807,7 +3683,7 @@ window.getHDImageUrl = function (url, width = 3840) {
           <div class="search-empty-state" style="text-align:center; padding:32px 16px; color:#94a3b8;">
             <div style="font-size:32px; margin-bottom:8px;">🏝️</div>
             <p style="font-size:15px; font-weight:700; color:#ffffff; margin-bottom:6px;">${msg}</p>
-            <p style="font-size:13px; color:#94a3b8; margin-bottom:14px;">Try another destination, hotel or service search.</p>
+            <p style="font-size:13px; color:#94a3b8; margin-bottom:14px;">Try another destination, package or service search.</p>
             <a href="services.html" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:9999px; text-decoration:none;">
               Browse All Services →
             </a>
@@ -3818,7 +3694,7 @@ window.getHDImageUrl = function (url, width = 3840) {
 
       // Render Search Results
       if (currentFilter === 'all') {
-        const categoryOrder = ['DESTINATIONS', 'PACKAGES', 'HOTELS', 'CRUISES', 'FLIGHTS', 'CAR & TRANSFERS', 'TRAVEL INSURANCE', 'VISA SERVICES'];
+        const categoryOrder = ['DESTINATIONS', 'PACKAGES', 'CRUISES', 'CAR & TRANSFERS', 'VISA SERVICES'];
         const grouped = {};
         categoryOrder.forEach(cat => grouped[cat] = []);
         filtered.forEach(item => {
