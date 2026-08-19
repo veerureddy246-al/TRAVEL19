@@ -1341,10 +1341,19 @@
 
   function renderDestinationsFiltered() {
     const tbody = document.getElementById('destinations-table-body');
+    const thead = document.getElementById('dest-table-head');
     if (!tbody) return;
 
     const filter = currentStatusFilter.destinations;
     let items = window._adminDestinationsList || [];
+
+    if (thead) {
+      if (filter === 'trash') {
+        thead.innerHTML = `<tr><th>Image</th><th>Destination Name</th><th>Category</th><th>Original Status</th><th>Date Moved to Recycle Bin</th><th>Current Status</th><th>Actions</th></tr>`;
+      } else {
+        thead.innerHTML = `<tr><th>Image</th><th>Destination Name</th><th>Country / Location</th><th>Category</th><th>Starting Price</th><th>Duration</th><th>Status</th><th>Updated</th><th>Actions</th></tr>`;
+      }
+    }
 
     if (filter === 'published') {
       items = items.filter(d => ['published', 'active'].includes((d.status || 'published').toLowerCase()));
@@ -1353,7 +1362,6 @@
     } else if (filter === 'trash') {
       items = items.filter(d => (d.status || '').toLowerCase() === 'trash');
     } else {
-      // 'all' shows all active (published + unpublished), excludes trash
       items = items.filter(d => (d.status || 'published').toLowerCase() !== 'trash');
     }
 
@@ -1362,7 +1370,8 @@
                   filter === 'unpublished' ? 'No unpublished destinations.' :
                   filter === 'trash' ? 'Recycle bin is empty. No deleted destinations.' :
                   'No destinations found. Click "+ Add Destination" to create one.';
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted)">${msg}</td></tr>`;
+      const colSpan = filter === 'trash' ? 7 : 9;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center;padding:36px;color:var(--text-muted)">${msg}</td></tr>`;
       return;
     }
 
@@ -1371,32 +1380,50 @@
       const isTrash = rawStatus === 'trash';
       const isPublished = ['published', 'active'].includes(rawStatus);
 
-      let statusBadge = isTrash ?
-        `<span class="abadge ab-cancelled"><span class="abadge-dot"></span>RECYCLE BIN</span>` :
-        isPublished ?
+      if (isTrash) {
+        const origStat = (d.originalStatus || 'published').toLowerCase();
+        const origBadge = (origStat === 'published' || origStat === 'active') ?
+          `<span class="abadge" style="background:#ECFDF5;color:#047857;border:1px solid #A7F3D0;font-weight:700;font-size:11px;">Previously Published</span>` :
+          `<span class="abadge" style="background:#FFFBEB;color:#B45309;border:1px solid #FDE68A;font-weight:700;font-size:11px;">Previously Unpublished</span>`;
+        const trashedDate = formatDateTime(d.trashedAt || d.updated_at);
+
+        return `
+          <tr id="dest-row-${d.id || d._id}">
+            <td>
+              <img src="${d.image || d.image_url || d.imageUrl || 'assets/images/dest-maldives.jpg'}" style="width:46px;height:36px;border-radius:6px;object-fit:cover" alt="${escapeHtml(d.title)}" onerror="this.src='assets/images/dest-maldives.jpg'" />
+            </td>
+            <td>
+              <strong style="color:var(--navy-primary)">${escapeHtml(d.title)}</strong>
+              <div style="font-size:11px;color:var(--text-muted)">📍 ${escapeHtml(d.country || 'Global')}${d.city ? ` &bull; ${escapeHtml(d.city)}` : ''}</div>
+            </td>
+            <td><span class="abadge" style="background:#F0F4F8;color:var(--navy-primary)">${escapeHtml(d.category || 'General')}</span></td>
+            <td>${origBadge}</td>
+            <td style="font-size:12px;color:#64748B;">🕒 ${trashedDate}</td>
+            <td><span class="abadge ab-cancelled"><span class="abadge-dot"></span>RECYCLE BIN</span></td>
+            <td>
+              <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+                <button class="aab-restore" onclick="restoreFromRecycleBin('destinations', '${d.id || d._id}', '${escapeHtml(d.title)}')" title="Restore item back to Unpublished list">♻️ Restore</button>
+                <button class="aab-delete-perm" onclick="confirmPermanentDelete('destinations', '${d.id || d._id}', '${escapeHtml(d.title)}')" title="Permanently delete from database">🗑️ Permanently Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      const statusBadge = isPublished ?
         `<span class="abadge ab-confirmed"><span class="abadge-dot"></span>PUBLISHED</span>` :
         `<span class="abadge ab-pending"><span class="abadge-dot"></span>UNPUBLISHED</span>`;
 
-      let actionButtons = '';
-      if (isTrash) {
-        actionButtons = `
-          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
-            <button class="aab-restore" onclick="restoreFromRecycleBin('destinations', '${d.id || d._id}', '${escapeHtml(d.title)}')">♻️ Restore</button>
-            <button class="aab-delete-perm" onclick="confirmPermanentDelete('destinations', '${d.id || d._id}', '${escapeHtml(d.title)}')">Permanently Delete</button>
-          </div>
-        `;
-      } else {
-        actionButtons = `
-          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
-            <button class="aab-edit" onclick="openDestinationModal('${d.id || d._id}')">Edit</button>
-            ${isPublished ?
-              `<button class="aab-unpub" onclick="setCmsItemStatus('destinations', '${d.id || d._id}', 'unpublished')" title="Unpublish from website">Unpublish</button>` :
-              `<button class="aab-pub" onclick="setCmsItemStatus('destinations', '${d.id || d._id}', 'published')" title="Publish live on website">Publish</button>`
-            }
-            <button class="aab-trash" onclick="moveToRecycleBin('destinations', '${d.id || d._id}', '${escapeHtml(d.title)}')" title="Move to Recycle Bin">🗑️ Bin</button>
-          </div>
-        `;
-      }
+      const actionButtons = `
+        <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+          <button class="aab-edit" onclick="openDestinationModal('${d.id || d._id}')">Edit</button>
+          ${isPublished ?
+            `<button class="aab-unpub" onclick="setCmsItemStatus('destinations', '${d.id || d._id}', 'unpublished')" title="Unpublish from website">Unpublish</button>` :
+            `<button class="aab-pub" onclick="setCmsItemStatus('destinations', '${d.id || d._id}', 'published')" title="Publish live on website">Publish</button>`
+          }
+          <button class="aab-trash" onclick="moveToRecycleBin('destinations', '${d.id || d._id}', '${escapeHtml(d.title)}')" title="Move to Recycle Bin">🗑️ Bin</button>
+        </div>
+      `;
 
       return `
         <tr id="dest-row-${d.id || d._id}">
@@ -1458,10 +1485,19 @@
 
   function renderPackagesFiltered() {
     const tbody = document.getElementById('packages-table-body');
+    const thead = document.getElementById('pkg-table-head');
     if (!tbody) return;
 
     const filter = currentStatusFilter.packages;
     let items = window._adminPackagesList || [];
+
+    if (thead) {
+      if (filter === 'trash') {
+        thead.innerHTML = `<tr><th>Image</th><th>Package Name</th><th>Category</th><th>Original Status</th><th>Date Moved to Recycle Bin</th><th>Current Status</th><th>Actions</th></tr>`;
+      } else {
+        thead.innerHTML = `<tr><th>Image</th><th>Package Name</th><th>Destination</th><th>Category</th><th>Price</th><th>Duration</th><th>Guests</th><th>Status</th><th>Actions</th></tr>`;
+      }
+    }
 
     if (filter === 'published') {
       items = items.filter(p => ['published', 'active'].includes((p.status || 'published').toLowerCase()));
@@ -1478,7 +1514,8 @@
                   filter === 'unpublished' ? 'No unpublished packages.' :
                   filter === 'trash' ? 'Recycle bin is empty. No deleted tour packages.' :
                   'No packages found. Click "+ Add Tour Package" to create one.';
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted)">${msg}</td></tr>`;
+      const colSpan = filter === 'trash' ? 7 : 9;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center;padding:36px;color:var(--text-muted)">${msg}</td></tr>`;
       return;
     }
 
@@ -1487,32 +1524,50 @@
       const isTrash = rawStatus === 'trash';
       const isPublished = ['published', 'active'].includes(rawStatus);
 
-      let statusBadge = isTrash ?
-        `<span class="abadge ab-cancelled"><span class="abadge-dot"></span>RECYCLE BIN</span>` :
-        isPublished ?
+      if (isTrash) {
+        const origStat = (p.originalStatus || 'published').toLowerCase();
+        const origBadge = (origStat === 'published' || origStat === 'active') ?
+          `<span class="abadge" style="background:#ECFDF5;color:#047857;border:1px solid #A7F3D0;font-weight:700;font-size:11px;">Previously Published</span>` :
+          `<span class="abadge" style="background:#FFFBEB;color:#B45309;border:1px solid #FDE68A;font-weight:700;font-size:11px;">Previously Unpublished</span>`;
+        const trashedDate = formatDateTime(p.trashedAt || p.updated_at);
+
+        return `
+          <tr id="pkg-row-${p.id || p._id}">
+            <td>
+              <img src="${p.featuredImage || p.featured_image || p.image || 'assets/images/dest-maldives.jpg'}" style="width:46px;height:36px;border-radius:6px;object-fit:cover" alt="${escapeHtml(p.title)}" onerror="this.src='assets/images/dest-maldives.jpg'" />
+            </td>
+            <td>
+              <strong style="color:var(--navy-primary)">${escapeHtml(p.title)}</strong>
+              <div style="font-size:11px;color:var(--text-muted)">📍 ${escapeHtml(p.destination || 'Global')} &bull; ${escapeHtml(p.duration || '7 Days')}</div>
+            </td>
+            <td><span class="abadge" style="background:#F0F4F8;color:var(--navy-primary)">${escapeHtml(p.category || 'Luxury')}</span></td>
+            <td>${origBadge}</td>
+            <td style="font-size:12px;color:#64748B;">🕒 ${trashedDate}</td>
+            <td><span class="abadge ab-cancelled"><span class="abadge-dot"></span>RECYCLE BIN</span></td>
+            <td>
+              <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+                <button class="aab-restore" onclick="restoreFromRecycleBin('packages', '${p.id || p._id}', '${escapeHtml(p.title)}')" title="Restore item back to Unpublished list">♻️ Restore</button>
+                <button class="aab-delete-perm" onclick="confirmPermanentDelete('packages', '${p.id || p._id}', '${escapeHtml(p.title)}')" title="Permanently delete from database">🗑️ Permanently Delete</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+
+      const statusBadge = isPublished ?
         `<span class="abadge ab-confirmed"><span class="abadge-dot"></span>PUBLISHED</span>` :
         `<span class="abadge ab-pending"><span class="abadge-dot"></span>UNPUBLISHED</span>`;
 
-      let actionButtons = '';
-      if (isTrash) {
-        actionButtons = `
-          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
-            <button class="aab-restore" onclick="restoreFromRecycleBin('packages', '${p.id || p._id}', '${escapeHtml(p.title)}')">♻️ Restore</button>
-            <button class="aab-delete-perm" onclick="confirmPermanentDelete('packages', '${p.id || p._id}', '${escapeHtml(p.title)}')">Permanently Delete</button>
-          </div>
-        `;
-      } else {
-        actionButtons = `
-          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
-            <button class="aab-edit" onclick="openPackageModal('${p.id || p._id}')">Edit</button>
-            ${isPublished ?
-              `<button class="aab-unpub" onclick="setCmsItemStatus('packages', '${p.id || p._id}', 'unpublished')" title="Unpublish from website">Unpublish</button>` :
-              `<button class="aab-pub" onclick="setCmsItemStatus('packages', '${p.id || p._id}', 'published')" title="Publish live on website">Publish</button>`
-            }
-            <button class="aab-trash" onclick="moveToRecycleBin('packages', '${p.id || p._id}', '${escapeHtml(p.title)}')" title="Move to Recycle Bin">🗑️ Bin</button>
-          </div>
-        `;
-      }
+      const actionButtons = `
+        <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+          <button class="aab-edit" onclick="openPackageModal('${p.id || p._id}')">Edit</button>
+          ${isPublished ?
+            `<button class="aab-unpub" onclick="setCmsItemStatus('packages', '${p.id || p._id}', 'unpublished')" title="Unpublish from website">Unpublish</button>` :
+            `<button class="aab-pub" onclick="setCmsItemStatus('packages', '${p.id || p._id}', 'published')" title="Publish live on website">Publish</button>`
+          }
+          <button class="aab-trash" onclick="moveToRecycleBin('packages', '${p.id || p._id}', '${escapeHtml(p.title)}')" title="Move to Recycle Bin">🗑️ Bin</button>
+        </div>
+      `;
 
       return `
         <tr id="pkg-row-${p.id || p._id}">
@@ -1576,10 +1631,19 @@
 
   function renderCruisesFiltered() {
     const tbody = document.getElementById('cruises-table-body');
+    const thead = document.getElementById('cruises-table-head');
     if (!tbody) return;
 
     const filter = currentStatusFilter.cruises;
     let items = window._adminCruisesList || [];
+
+    if (thead) {
+      if (filter === 'trash') {
+        thead.innerHTML = `<tr><th>Image</th><th>Cruise Voyage Title</th><th>Vessel &amp; Route</th><th>Original Status</th><th>Date Moved to Recycle Bin</th><th>Current Status</th><th>Actions</th></tr>`;
+      } else {
+        thead.innerHTML = `<tr><th>Image</th><th>Cruise Voyage Title</th><th>Route &amp; Line</th><th>Duration</th><th>Cabin Price</th><th>Rating</th><th>Status</th><th>Actions</th></tr>`;
+      }
+    }
 
     if (filter === 'published') {
       items = items.filter(c => ['published', 'active'].includes((c.status || 'published').toLowerCase()));
@@ -1596,7 +1660,8 @@
                   filter === 'unpublished' ? 'No unpublished cruise packages.' :
                   filter === 'trash' ? 'Recycle bin is empty. No deleted cruise packages.' :
                   'No cruise packages found. Click "+ Add Cruise" to create one.';
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:var(--text-muted)">${msg}</td></tr>`;
+      const colSpan = filter === 'trash' ? 7 : 8;
+      tbody.innerHTML = `<tr><td colspan="${colSpan}" style="text-align:center;padding:36px;color:var(--text-muted)">${msg}</td></tr>`;
       return;
     }
 
@@ -1604,12 +1669,6 @@
       const rawStatus = (c.status || 'published').toLowerCase();
       const isTrash = rawStatus === 'trash';
       const isPublished = ['published', 'active'].includes(rawStatus);
-
-      let statusBadge = isTrash ?
-        `<span class="abadge ab-cancelled"><span class="abadge-dot"></span>RECYCLE BIN</span>` :
-        isPublished ?
-        `<span class="abadge ab-confirmed"><span class="abadge-dot"></span>PUBLISHED</span>` :
-        `<span class="abadge ab-pending"><span class="abadge-dot"></span>UNPUBLISHED</span>`;
 
       const title = c.title || c.name || 'Luxury Cruise Voyage';
       const vessel = c.vessel || c.cruiseLine || 'Royal Symphony';
@@ -1619,26 +1678,50 @@
       const img = c.heroImage || c.heroImg || c.image || 'assets/images/gallery-3.jpg';
       const rating = c.rating || 4.95;
 
-      let actionButtons = '';
       if (isTrash) {
-        actionButtons = `
-          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
-            <button class="aab-restore" onclick="restoreFromRecycleBin('cruises', '${c.id || c._id}', '${escapeHtml(title)}')">♻️ Restore</button>
-            <button class="aab-delete-perm" onclick="confirmPermanentDelete('cruises', '${c.id || c._id}', '${escapeHtml(title)}')">Permanently Delete</button>
-          </div>
-        `;
-      } else {
-        actionButtons = `
-          <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
-            <button class="aab-edit" onclick="openCruiseModal('${c.id || c._id}')">Edit</button>
-            ${isPublished ?
-              `<button class="aab-unpub" onclick="setCmsItemStatus('cruises', '${c.id || c._id}', 'unpublished')" title="Unpublish from website">Unpublish</button>` :
-              `<button class="aab-pub" onclick="setCmsItemStatus('cruises', '${c.id || c._id}', 'published')" title="Publish live on website">Publish</button>`
-            }
-            <button class="aab-trash" onclick="moveToRecycleBin('cruises', '${c.id || c._id}', '${escapeHtml(title)}')" title="Move to Recycle Bin">🗑️ Bin</button>
-          </div>
+        const origStat = (c.originalStatus || 'published').toLowerCase();
+        const origBadge = (origStat === 'published' || origStat === 'active') ?
+          `<span class="abadge" style="background:#ECFDF5;color:#047857;border:1px solid #A7F3D0;font-weight:700;font-size:11px;">Previously Published</span>` :
+          `<span class="abadge" style="background:#FFFBEB;color:#B45309;border:1px solid #FDE68A;font-weight:700;font-size:11px;">Previously Unpublished</span>`;
+        const trashedDate = formatDateTime(c.trashedAt || c.updated_at);
+
+        return `
+          <tr id="cruise-row-${c.id || c._id}">
+            <td>
+              <img src="${img}" style="width:46px;height:36px;border-radius:6px;object-fit:cover" alt="${escapeHtml(title)}" onerror="this.src='assets/images/gallery-3.jpg'" />
+            </td>
+            <td>
+              <strong style="color:var(--navy-primary)">${escapeHtml(title)}</strong>
+              <div style="font-size:11px;color:#0284c7;">🚢 ${escapeHtml(vessel)} &bull; ${escapeHtml(dur)}</div>
+            </td>
+            <td>📍 ${escapeHtml(route)}</td>
+            <td>${origBadge}</td>
+            <td style="font-size:12px;color:#64748B;">🕒 ${trashedDate}</td>
+            <td><span class="abadge ab-cancelled"><span class="abadge-dot"></span>RECYCLE BIN</span></td>
+            <td>
+              <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+                <button class="aab-restore" onclick="restoreFromRecycleBin('cruises', '${c.id || c._id}', '${escapeHtml(title)}')" title="Restore item back to Unpublished list">♻️ Restore</button>
+                <button class="aab-delete-perm" onclick="confirmPermanentDelete('cruises', '${c.id || c._id}', '${escapeHtml(title)}')" title="Permanently delete from database">🗑️ Permanently Delete</button>
+              </div>
+            </td>
+          </tr>
         `;
       }
+
+      const statusBadge = isPublished ?
+        `<span class="abadge ab-confirmed"><span class="abadge-dot"></span>PUBLISHED</span>` :
+        `<span class="abadge ab-pending"><span class="abadge-dot"></span>UNPUBLISHED</span>`;
+
+      const actionButtons = `
+        <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
+          <button class="aab-edit" onclick="openCruiseModal('${c.id || c._id}')">Edit</button>
+          ${isPublished ?
+            `<button class="aab-unpub" onclick="setCmsItemStatus('cruises', '${c.id || c._id}', 'unpublished')" title="Unpublish from website">Unpublish</button>` :
+            `<button class="aab-pub" onclick="setCmsItemStatus('cruises', '${c.id || c._id}', 'published')" title="Publish live on website">Publish</button>`
+          }
+          <button class="aab-trash" onclick="moveToRecycleBin('cruises', '${c.id || c._id}', '${escapeHtml(title)}')" title="Move to Recycle Bin">🗑️ Bin</button>
+        </div>
+      `;
 
       return `
         <tr id="cruise-row-${c.id || c._id}">
@@ -3389,27 +3472,32 @@
   };
 
   /* ══════════════════════════════════════════════════════════
-     CMS UNIVERSAL STATUS MUTATION HANDLERS
-     - Unpublish ≠ Delete (Unpublish ONLY sets status = 'unpublished')
-     - Move to Recycle Bin sets status = 'trash'
-     - Restore sets status = 'unpublished'
-     - Permanent Delete removes record from database / Supabase
+     SAFE RECYCLE BIN & STATUS LIFECYCLE HANDLERS
+     Lifecycle: PUBLISHED ⇄ UNPUBLISHED ⇄ RECYCLE BIN → PERMANENT DELETE
+     - Moving to bin retains ALL images, videos, descriptions, durations, pricing & relationships.
+     - Restoring returns the item to Unpublished by default.
+     - Permanent Delete is ONLY available from Recycle Bin after explicit confirmation.
      ══════════════════════════════════════════════════════════ */
-  window.setCmsItemStatus = async function(resource, id, newStatus) {
+  window.setCmsItemStatus = async function(resource, id, newStatus, extraData = {}) {
     try {
+      const payload = Object.assign({ status: newStatus, id: id }, extraData);
       const res = await fetch(`/api/admin/${resource}/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus, id: id })
+        body: JSON.stringify(payload)
       });
       const json = await res.json();
       if (json.success) {
         if (newStatus === 'unpublished') {
-          showToast('Unpublished: Item removed from public website', '⏸️');
+          if (extraData && extraData.restoredAt) {
+            showToast('Restored record to Unpublished list.', '♻️');
+          } else {
+            showToast('Unpublished: Item hidden from public website.', '⏸️');
+          }
         } else if (newStatus === 'published') {
           showToast('Published: Item is now live on website!', '✅');
         } else if (newStatus === 'trash') {
-          showToast('Moved item to Recycle Bin', '🗑️');
+          showToast('Moved item to Recycle Bin. All data safely preserved.', '🗑️');
         } else {
           showToast(`Status updated to ${newStatus.toUpperCase()}`, '🔄');
         }
@@ -3428,17 +3516,35 @@
   };
 
   window.moveToRecycleBin = function(resource, id, name) {
-    window.setCmsItemStatus(resource, id, 'trash');
+    const list = resource === 'destinations' ? window._adminDestinationsList :
+                 resource === 'packages' ? window._adminPackagesList : window._adminCruisesList;
+    const item = (list || []).find(x => String(x.id || x._id) === String(id));
+    const currentStat = item ? (item.status || 'published').toLowerCase() : 'published';
+    const originalStatus = (currentStat === 'published' || currentStat === 'active') ? 'published' : 'unpublished';
+    const trashedAt = new Date().toISOString();
+
+    window.setCmsItemStatus(resource, id, 'trash', {
+      originalStatus: originalStatus,
+      trashedAt: trashedAt
+    });
   };
 
   window.restoreFromRecycleBin = function(resource, id, name) {
-    window.setCmsItemStatus(resource, id, 'unpublished');
+    // Restore returns the complete record to Unpublished status by default
+    window.setCmsItemStatus(resource, id, 'unpublished', {
+      restoredAt: new Date().toISOString()
+    });
   };
 
   window.confirmPermanentDelete = function(resource, id, name) {
     const msgEl = document.getElementById('cms-delete-msg');
     if (msgEl) {
-      msgEl.textContent = `Are you sure you want to permanently delete "${name}"? This action cannot be undone and will permanently remove all data and images from database.`;
+      msgEl.textContent = 'Are you sure you want to permanently delete this item? This action cannot be undone.';
+    }
+    const previewEl = document.getElementById('cms-delete-item-preview');
+    if (previewEl) {
+      previewEl.innerHTML = `<span>Resource: <strong style="text-transform:capitalize;color:#0284c7">${resource}</strong> &bull; Item: <strong>"${escapeHtml(name)}"</strong></span>`;
+      previewEl.style.display = 'block';
     }
     const confirmBtn = document.getElementById('cms-confirm-delete-btn');
     if (confirmBtn) {

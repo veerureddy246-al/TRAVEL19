@@ -481,7 +481,7 @@
           </div>
           <div style="overflow-x:auto">
             <table class="admin-table">
-              <thead><tr><th>Image</th><th>Destination Name</th><th>Country / Location</th><th>Category</th><th>Starting Price</th><th>Duration</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
+              <thead id="dest-table-head"><tr><th>Image</th><th>Destination Name</th><th>Country / Location</th><th>Category</th><th>Starting Price</th><th>Duration</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
               <tbody id="destinations-table-body">
                 <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-muted)">Loading destinations from CMS database...</td></tr>
               </tbody>
@@ -519,7 +519,7 @@
           </div>
           <div style="overflow-x:auto">
             <table class="admin-table">
-              <thead><tr><th>Image</th><th>Package Name</th><th>Destination</th><th>Category</th><th>Price</th><th>Duration</th><th>Guests</th><th>Status</th><th>Actions</th></tr></thead>
+              <thead id="pkg-table-head"><tr><th>Image</th><th>Package Name</th><th>Destination</th><th>Category</th><th>Price</th><th>Duration</th><th>Guests</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody id="packages-table-body">
                 <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-muted)">Loading tour packages from CMS database...</td></tr>
               </tbody>
@@ -557,7 +557,7 @@
           </div>
           <div style="overflow-x:auto">
             <table class="admin-table">
-              <thead><tr><th>Image</th><th>Cruise Voyage Title</th><th>Route &amp; Line</th><th>Duration</th><th>Cabin Price</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
+              <thead id="cruises-table-head"><tr><th>Image</th><th>Cruise Voyage Title</th><th>Route &amp; Line</th><th>Duration</th><th>Cabin Price</th><th>Rating</th><th>Status</th><th>Actions</th></tr></thead>
               <tbody id="cruises-table-body">
                 <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">Loading cruises from CMS database...</td></tr>
               </tbody>
@@ -1187,14 +1187,18 @@
   </div>
 </div>
 
-<!-- CMS Delete Confirmation Modal -->
-<div id="cms-delete-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:9995;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#FFFFFF;border:1px solid #E4E7EC;border-radius:12px;width:100%;max-width:440px;box-shadow:0 20px 40px rgba(0,0,0,0.15);padding:24px">
-    <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:var(--navy-primary)">Confirm Deletion</h3>
-    <p id="cms-delete-msg" style="font-size:14px;color:var(--text-secondary);margin-bottom:20px">Are you sure you want to delete this record? This action will remove it from the CMS and public website.</p>
-    <div style="display:flex;justify-content:flex-end;gap:12px">
+<!-- CMS Permanent Delete Confirmation Modal -->
+<div id="cms-delete-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.65);backdrop-filter:blur(4px);z-index:9995;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#FFFFFF;border:1px solid #FECACA;border-radius:12px;width:100%;max-width:460px;box-shadow:0 20px 40px rgba(0,0,0,0.18);padding:24px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span style="font-size:22px;background:#FEE2E2;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center">⚠️</span>
+      <h3 style="margin:0;font-size:17px;font-weight:800;color:#991B1B">Confirm Permanent Deletion</h3>
+    </div>
+    <p id="cms-delete-msg" style="font-size:14px;line-height:1.5;color:#334155;margin-bottom:8px">Are you sure you want to permanently delete this item? This action cannot be undone.</p>
+    <div id="cms-delete-item-preview" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;font-size:13px;color:#0F172A;font-weight:600;margin-bottom:20px;"></div>
+    <div style="display:flex;justify-content:flex-end;gap:10px">
       <button type="button" class="btn btn-secondary btn-sm" onclick="closeCmsDeleteModal()">Cancel</button>
-      <button type="button" class="btn btn-danger btn-sm" id="cms-confirm-delete-btn">Delete Record</button>
+      <button type="button" class="btn btn-danger btn-sm" id="cms-confirm-delete-btn" style="background:#DC2626;border:none;padding:8px 16px;font-weight:700;">Permanently Delete</button>
     </div>
   </div>
 </div>
