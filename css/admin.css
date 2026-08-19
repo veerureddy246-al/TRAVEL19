@@ -1330,12 +1330,27 @@ code.ref {
   border-radius: 10px;
   padding: 16px 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
 }
 
 .stat-counter-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  border-color: #CBD5E1;
+}
+
+.stat-counter-card:focus-visible {
+  box-shadow: 0 0 0 2px #0284C7, 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.stat-counter-card.active {
+  background: #F8FAFC;
+  box-shadow: 0 0 0 2px #0284C7, 0 4px 12px rgba(2, 132, 199, 0.12);
+  border-color: #0284C7;
 }
 
 .aab-wa {

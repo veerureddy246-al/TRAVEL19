@@ -737,24 +737,24 @@
         </div>
 
         <!-- Live Daily Counters for Bookings (Calculated from Real Database) -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:20px;">
-          <div class="stat-counter-card" style="border-left:4px solid #0284C7;">
+        <div class="booking-stat-cards-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:20px;">
+          <div class="stat-counter-card" id="bk-card-today" role="button" tabindex="0" aria-label="Filter bookings by Today's Queries" onclick="window.filterBookingsByCard('today')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.filterBookingsByCard('today');}" style="border-left:4px solid #0284C7;" title="Click to show bookings created today">
             <div style="font-size:11.5px; font-weight:700; color:#0284C7; text-transform:uppercase; letter-spacing:0.04em;">Today's Booking Queries</div>
             <div id="stat-bk-today" style="font-size:26px; font-weight:800; color:var(--navy-primary); margin-top:4px;">0</div>
           </div>
-          <div class="stat-counter-card" style="border-left:4px solid #F59E0B;">
+          <div class="stat-counter-card" id="bk-card-pending" role="button" tabindex="0" aria-label="Filter bookings by New or Pending status" onclick="window.filterBookingsByCard('pending')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.filterBookingsByCard('pending');}" style="border-left:4px solid #F59E0B;" title="Click to show New / Pending bookings">
             <div style="font-size:11.5px; font-weight:700; color:#D97706; text-transform:uppercase; letter-spacing:0.04em;">New / Pending</div>
             <div id="stat-bk-pending" style="font-size:26px; font-weight:800; color:#D97706; margin-top:4px;">0</div>
           </div>
-          <div class="stat-counter-card" style="border-left:4px solid #6366F1;">
+          <div class="stat-counter-card" id="bk-card-progress" role="button" tabindex="0" aria-label="Filter bookings by In Progress status" onclick="window.filterBookingsByCard('progress')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.filterBookingsByCard('progress');}" style="border-left:4px solid #6366F1;" title="Click to show In Progress bookings">
             <div style="font-size:11.5px; font-weight:700; color:#4F46E5; text-transform:uppercase; letter-spacing:0.04em;">In Progress</div>
             <div id="stat-bk-progress" style="font-size:26px; font-weight:800; color:#4F46E5; margin-top:4px;">0</div>
           </div>
-          <div class="stat-counter-card" style="border-left:4px solid #10B981;">
+          <div class="stat-counter-card" id="bk-card-confirmed" role="button" tabindex="0" aria-label="Filter bookings by Confirmed or Responded status" onclick="window.filterBookingsByCard('confirmed')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.filterBookingsByCard('confirmed');}" style="border-left:4px solid #10B981;" title="Click to show Confirmed / Responded bookings">
             <div style="font-size:11.5px; font-weight:700; color:#059669; text-transform:uppercase; letter-spacing:0.04em;">Confirmed / Responded</div>
             <div id="stat-bk-confirmed" style="font-size:26px; font-weight:800; color:#059669; margin-top:4px;">0</div>
           </div>
-          <div class="stat-counter-card" style="border-left:4px solid #64748B;">
+          <div class="stat-counter-card active" id="bk-card-total" role="button" tabindex="0" aria-label="Show All Bookings" onclick="window.filterBookingsByCard('all')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.filterBookingsByCard('all');}" style="border-left:4px solid #64748B;" title="Click to show all bookings">
             <div style="font-size:11.5px; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.04em;">Total Bookings</div>
             <div id="stat-bk-total" style="font-size:26px; font-weight:800; color:#334155; margin-top:4px;">0</div>
           </div>
@@ -774,7 +774,7 @@
               </div>
             </div>
             <div class="toolbar-controls">
-              <input type="text" class="admin-search-bar" data-table="bookings-table-body" placeholder="🔍 Search by guest, ref, package..." style="min-width:200px" />
+              <input type="text" class="admin-search-bar" id="bookings-search-input" data-table="bookings-table-body" placeholder="🔍 Search by guest, ref, package..." style="min-width:200px" oninput="window.filterBookingsTable()" />
               <select class="admin-search-bar" id="bookings-status-filter" style="min-width:140px" onchange="window.filterBookingsByStatus(this.value)">
                 <option value="ALL">All Statuses</option>
                 <option value="Confirmed">Confirmed</option>

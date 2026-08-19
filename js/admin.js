@@ -3493,8 +3493,116 @@
      ══════════════════════════════════════════════════════════ */
   let currentActiveBooking = null;
   window._adminBookingsList = [];
+  let currentActiveBookingCard = 'all'; // 'today', 'pending', 'progress', 'confirmed', 'all'
   let currentBookingDateFilter = 'all';
   let currentBookingStatusFilter = 'ALL';
+
+  function updateBookingCardsVisualState(activeKey) {
+    const cardMap = {
+      'today': 'bk-card-today',
+      'pending': 'bk-card-pending',
+      'progress': 'bk-card-progress',
+      'confirmed': 'bk-card-confirmed',
+      'all': 'bk-card-total'
+    };
+
+    ['bk-card-today', 'bk-card-pending', 'bk-card-progress', 'bk-card-confirmed', 'bk-card-total'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('active');
+    });
+
+    const activeId = cardMap[activeKey];
+    if (activeId) {
+      const activeEl = document.getElementById(activeId);
+      if (activeEl) activeEl.classList.add('active');
+    }
+  }
+
+  window.filterBookingsByCard = function(cardKey) {
+    currentActiveBookingCard = cardKey || 'all';
+
+    if (cardKey === 'today') {
+      // 1. TODAY'S BOOKING QUERIES:
+      // → automatically select the "Today" filter
+      // → show ONLY bookings created today
+      currentBookingDateFilter = 'today';
+      currentBookingStatusFilter = 'ALL';
+
+      const dateBar = document.getElementById('bookings-date-filter-bar');
+      if (dateBar) {
+        dateBar.querySelectorAll('.date-filter-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.date === 'today');
+        });
+      }
+      const statusSelect = document.getElementById('bookings-status-filter');
+      if (statusSelect) statusSelect.value = 'ALL';
+
+    } else if (cardKey === 'pending') {
+      // 2. NEW / PENDING:
+      // → show ONLY bookings with status New/Pending
+      currentBookingDateFilter = 'all';
+      currentBookingStatusFilter = 'Pending';
+
+      const dateBar = document.getElementById('bookings-date-filter-bar');
+      if (dateBar) {
+        dateBar.querySelectorAll('.date-filter-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.date === 'all');
+        });
+      }
+      const statusSelect = document.getElementById('bookings-status-filter');
+      if (statusSelect) statusSelect.value = 'Pending';
+
+    } else if (cardKey === 'progress') {
+      // 3. IN PROGRESS:
+      // → show ONLY bookings with status In Progress
+      currentBookingDateFilter = 'all';
+      currentBookingStatusFilter = 'In Progress';
+
+      const dateBar = document.getElementById('bookings-date-filter-bar');
+      if (dateBar) {
+        dateBar.querySelectorAll('.date-filter-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.date === 'all');
+        });
+      }
+      const statusSelect = document.getElementById('bookings-status-filter');
+      if (statusSelect) statusSelect.value = 'In Progress';
+
+    } else if (cardKey === 'confirmed') {
+      // 4. CONFIRMED / RESPONDED:
+      // → show ONLY bookings with Confirmed/Responded status
+      currentBookingDateFilter = 'all';
+      currentBookingStatusFilter = 'Confirmed';
+
+      const dateBar = document.getElementById('bookings-date-filter-bar');
+      if (dateBar) {
+        dateBar.querySelectorAll('.date-filter-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.date === 'all');
+        });
+      }
+      const statusSelect = document.getElementById('bookings-status-filter');
+      if (statusSelect) statusSelect.value = 'Confirmed';
+
+    } else {
+      // 5. TOTAL BOOKINGS:
+      // → remove status/date filtering
+      // → show ALL bookings
+      // → automatically select "All Time"
+      currentBookingDateFilter = 'all';
+      currentBookingStatusFilter = 'ALL';
+
+      const dateBar = document.getElementById('bookings-date-filter-bar');
+      if (dateBar) {
+        dateBar.querySelectorAll('.date-filter-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.date === 'all');
+        });
+      }
+      const statusSelect = document.getElementById('bookings-status-filter');
+      if (statusSelect) statusSelect.value = 'ALL';
+    }
+
+    updateBookingCardsVisualState(currentActiveBookingCard);
+    window.filterBookingsTable();
+  };
 
   window.filterBookingsDate = function(dateKey) {
     currentBookingDateFilter = dateKey || 'all';
@@ -3504,11 +3612,49 @@
         btn.classList.toggle('active', btn.dataset.date === currentBookingDateFilter);
       });
     }
+
+    // Sync active summary card highlight
+    if (currentBookingDateFilter === 'today' && currentBookingStatusFilter === 'ALL') {
+      currentActiveBookingCard = 'today';
+      updateBookingCardsVisualState('today');
+    } else if (currentBookingDateFilter === 'all' && currentBookingStatusFilter === 'ALL') {
+      currentActiveBookingCard = 'all';
+      updateBookingCardsVisualState('all');
+    } else {
+      currentActiveBookingCard = null;
+      updateBookingCardsVisualState(null);
+    }
+
     window.filterBookingsTable();
   };
 
   window.filterBookingsByStatus = function(statusFilter) {
     currentBookingStatusFilter = statusFilter || 'ALL';
+
+    // Sync active summary card highlight
+    const sLow = currentBookingStatusFilter.toLowerCase();
+    if (currentBookingDateFilter === 'all') {
+      if (['pending', 'new', 'draft'].includes(sLow)) {
+        currentActiveBookingCard = 'pending';
+        updateBookingCardsVisualState('pending');
+      } else if (['in progress', 'in_progress', 'processing', 'pending review'].includes(sLow)) {
+        currentActiveBookingCard = 'progress';
+        updateBookingCardsVisualState('progress');
+      } else if (['confirmed', 'responded', 'active', 'approved'].includes(sLow)) {
+        currentActiveBookingCard = 'confirmed';
+        updateBookingCardsVisualState('confirmed');
+      } else if (currentBookingStatusFilter === 'ALL') {
+        currentActiveBookingCard = 'all';
+        updateBookingCardsVisualState('all');
+      } else {
+        currentActiveBookingCard = null;
+        updateBookingCardsVisualState(null);
+      }
+    } else {
+      currentActiveBookingCard = null;
+      updateBookingCardsVisualState(null);
+    }
+
     window.filterBookingsTable();
   };
 
@@ -3519,16 +3665,43 @@
 
     let items = window._adminBookingsList || [];
 
-    // Filter by Date
+    // Filter by Date (Creation Date/Time: created_at, createdAt, date)
     if (currentBookingDateFilter && currentBookingDateFilter !== 'all') {
       items = items.filter(b => isDateInFilter(b.created_at || b.createdAt || b.date, currentBookingDateFilter));
     }
 
     // Filter by Status
     if (currentBookingStatusFilter && currentBookingStatusFilter !== 'ALL') {
+      const sFilterLow = currentBookingStatusFilter.toLowerCase();
       items = items.filter(b => {
         const s = (b.booking_status || b.status || 'Confirmed').toLowerCase();
-        return s === currentBookingStatusFilter.toLowerCase();
+        if (sFilterLow === 'pending') {
+          return ['pending', 'new', 'draft'].includes(s);
+        } else if (sFilterLow === 'in progress' || sFilterLow === 'in_progress') {
+          return ['in progress', 'in_progress', 'pending review', 'processing'].includes(s);
+        } else if (sFilterLow === 'confirmed') {
+          return ['confirmed', 'approved', 'responded', 'active'].includes(s);
+        } else if (sFilterLow === 'responded') {
+          return ['responded', 'replied'].includes(s) || !!b.admin_reply;
+        } else if (sFilterLow === 'cancelled') {
+          return ['cancelled', 'rejected'].includes(s);
+        }
+        return s === sFilterLow;
+      });
+    }
+
+    // Filter by Search Input
+    const searchInput = document.getElementById('bookings-search-input') || document.querySelector('[data-table="bookings-table-body"]');
+    const query = (searchInput?.value || '').toLowerCase().trim();
+    if (query) {
+      items = items.filter(b => {
+        const ref = (b.booking_reference || b.refNo || b.id || '').toLowerCase();
+        const name = (b.customer_name || b.full_name || b.customerName || b.name || '').toLowerCase();
+        const email = (b.email || '').toLowerCase();
+        const phone = (b.phone || '').toLowerCase();
+        const service = (b.item_title || b.productName || b.product_name || b.package || '').toLowerCase();
+        const dest = (b.destination || b.location || '').toLowerCase();
+        return ref.includes(query) || name.includes(query) || email.includes(query) || phone.includes(query) || service.includes(query) || dest.includes(query);
       });
     }
 
@@ -3537,7 +3710,17 @@
     }
 
     if (items.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:36px;color:var(--text-muted)">No bookings matching current date/status filter criteria.</td></tr>`;
+      let emptyMsg = 'No bookings matching current date/status filter criteria.';
+      if (currentActiveBookingCard === 'today' || currentBookingDateFilter === 'today') {
+        emptyMsg = 'No booking queries received today.';
+      } else if (currentActiveBookingCard === 'pending' || currentBookingStatusFilter.toLowerCase() === 'pending') {
+        emptyMsg = 'No new or pending bookings.';
+      } else if (currentActiveBookingCard === 'progress' || currentBookingStatusFilter.toLowerCase() === 'in progress') {
+        emptyMsg = 'No bookings currently in progress.';
+      } else if (currentActiveBookingCard === 'confirmed' || currentBookingStatusFilter.toLowerCase() === 'confirmed') {
+        emptyMsg = 'No confirmed or responded bookings found.';
+      }
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:36px;color:var(--text-muted);font-size:13.5px;">${emptyMsg}</td></tr>`;
       return;
     }
 
