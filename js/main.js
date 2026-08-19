@@ -217,8 +217,7 @@ window.getHDImageUrl = function (url, width = 3840) {
     });
   }
 
-  /* ─── Instant Multi-Criteria Live Global Search Engine (Requirement 10) ─── */
-  /* ─── Instant Live Global Search Engine (Connected to Live API & CMS Data) ─── */
+  /* ─── Instant Multi-Criteria Live Global Search Engine ─── */
   function initSearchOverlay() {
     const btn = document.querySelector('#search-trigger');
     const overlay = document.querySelector('.search-overlay');
@@ -233,11 +232,13 @@ window.getHDImageUrl = function (url, width = 3840) {
     async function loadSearchData() {
       if (isDataLoaded) return;
       try {
-        const [destRes, pkgRes, hotelRes, cruiseRes] = await Promise.all([
+        const [destRes, pkgRes, hotelRes, cruiseRes, flightRes, carRes] = await Promise.all([
           fetch('/api/destinations').then(r => r.json()).catch(() => null),
           fetch('/api/packages').then(r => r.json()).catch(() => null),
           fetch('/api/hotels').then(r => r.json()).catch(() => null),
-          fetch('/api/cruises').then(r => r.json()).catch(() => null)
+          fetch('/api/cruises').then(r => r.json()).catch(() => null),
+          fetch('/api/flights').then(r => r.json()).catch(() => null),
+          fetch('/api/cars').then(r => r.json()).catch(() => null)
         ]);
 
         const items = [];
@@ -248,8 +249,9 @@ window.getHDImageUrl = function (url, width = 3840) {
             items.push({
               id: d.id,
               type: 'destination',
+              catSlug: 'destinations',
               categoryName: 'DESTINATIONS',
-              title: d.title || '',
+              title: d.title || d.name || '',
               location: [d.city, d.country].filter(Boolean).join(', ') || d.country || 'Global Destination',
               description: d.description || '',
               image: d.image || d.image_url || d.imageUrl || 'assets/images/dest-maldives.jpg',
@@ -265,8 +267,9 @@ window.getHDImageUrl = function (url, width = 3840) {
             items.push({
               id: p.id,
               type: 'package',
+              catSlug: 'packages',
               categoryName: 'PACKAGES',
-              title: p.title || '',
+              title: p.title || p.name || '',
               location: p.destination || p.country || 'Luxury Package',
               description: p.description || '',
               image: p.featuredImage || p.featured_image || p.image || p.image_url || 'assets/images/dest-maldives.jpg',
@@ -276,12 +279,31 @@ window.getHDImageUrl = function (url, width = 3840) {
           });
         }
 
-        // 3. Cruises
+        // 3. Hotels
+        if (hotelRes && hotelRes.success && Array.isArray(hotelRes.data)) {
+          hotelRes.data.forEach(h => {
+            items.push({
+              id: h.id,
+              type: 'hotel',
+              catSlug: 'hotels',
+              categoryName: 'HOTELS',
+              title: h.name || h.title || 'Luxury Hotel',
+              location: h.location || 'Resort Sanctuary',
+              description: h.description || '',
+              image: h.heroImage || h.hero_image || h.image || 'assets/images/hotel-luxury.jpg',
+              price: h.price,
+              rawObj: h
+            });
+          });
+        }
+
+        // 4. Cruises
         if (cruiseRes && cruiseRes.success && Array.isArray(cruiseRes.data)) {
           cruiseRes.data.forEach(c => {
             items.push({
               id: c.id,
               type: 'cruise',
+              catSlug: 'cruises',
               categoryName: 'CRUISES',
               title: c.title || c.vessel || 'Luxury Cruise',
               location: [c.vessel, c.route || c.duration].filter(Boolean).join(' · '),
@@ -293,22 +315,69 @@ window.getHDImageUrl = function (url, width = 3840) {
           });
         }
 
-        // 4. Hotels
-        if (hotelRes && hotelRes.success && Array.isArray(hotelRes.data)) {
-          hotelRes.data.forEach(h => {
+        // 5. Flights
+        if (flightRes && flightRes.success && Array.isArray(flightRes.data)) {
+          flightRes.data.forEach(f => {
             items.push({
-              id: h.id,
-              type: 'hotel',
-              categoryName: 'HOTELS',
-              title: h.name || h.title || 'Luxury Hotel',
-              location: h.location || 'Resort Sanctuary',
-              description: h.description || '',
-              image: h.heroImage || h.hero_image || h.image || 'assets/images/hotel-luxury.jpg',
-              price: h.price,
-              rawObj: h
+              id: f.id,
+              type: 'flight',
+              catSlug: 'flights',
+              categoryName: 'FLIGHTS',
+              title: (f.airline || 'First Class Flight') + ' · ' + (f.route || 'International'),
+              location: f.cabin || f.duration || 'Direct Flight',
+              description: f.features ? f.features.join(', ') : 'Luxury international flight.',
+              image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80',
+              price: f.price,
+              rawObj: f
             });
           });
         }
+
+        // 6. Car & Transfers
+        if (carRes && carRes.success && Array.isArray(carRes.data)) {
+          carRes.data.forEach(car => {
+            items.push({
+              id: car.id,
+              type: 'transport',
+              catSlug: 'transport',
+              categoryName: 'CAR & TRANSFERS',
+              title: car.title || car.vehicle || 'Luxury Chauffeur Transfer',
+              location: car.capacity || 'Private Luxury Transfer',
+              description: car.features ? car.features.join(', ') : 'Private airport and city transfer.',
+              image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80',
+              price: car.price,
+              rawObj: car
+            });
+          });
+        }
+
+        // 7. Travel Insurance
+        items.push({
+          id: 'ins-gold',
+          type: 'insurance',
+          catSlug: 'insurance',
+          categoryName: 'TRAVEL INSURANCE',
+          title: 'Comprehensive Global Travel Insurance',
+          location: 'Worldwide Coverage up to $500,000',
+          description: 'Medical emergencies, trip cancellation, baggage loss and 24/7 assistance.',
+          image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=600&q=80',
+          price: 99,
+          rawObj: { id: 'ins-gold', title: 'Global Travel Insurance', price: '$99' }
+        });
+
+        // 8. Visa Services
+        items.push({
+          id: 'visa-schengen',
+          type: 'visa',
+          catSlug: 'visa',
+          categoryName: 'VISA SERVICES',
+          title: 'Fast-Track Global Visa Services',
+          location: '40+ Countries Covered',
+          description: 'Expert documentation, appointment scheduling and express visa assistance.',
+          image: 'https://images.unsplash.com/photo-1575506726823-c6b1cb0da484?auto=format&fit=crop&w=600&q=80',
+          price: 12000,
+          rawObj: { id: 'visa-services', title: 'Visa Services', price: '₹12,000' }
+        });
 
         searchableItems = items;
         isDataLoaded = true;
@@ -323,6 +392,17 @@ window.getHDImageUrl = function (url, width = 3840) {
       if (num < 10000) num = num * 100;
       return '₹' + num.toLocaleString('en-IN');
     }
+
+    const catSlugMap = {
+      'DESTINATIONS': 'destinations',
+      'PACKAGES': 'packages',
+      'HOTELS': 'hotels',
+      'CRUISES': 'cruises',
+      'FLIGHTS': 'flights',
+      'CAR & TRANSFERS': 'transport',
+      'TRAVEL INSURANCE': 'insurance',
+      'VISA SERVICES': 'visa'
+    };
 
     function performSearch(query) {
       if (!resultsContainer) return;
@@ -349,15 +429,19 @@ window.getHDImageUrl = function (url, width = 3840) {
       if (matches.length === 0) {
         resultsContainer.innerHTML = `
           <div style="padding:32px 20px; text-align:center; color:var(--text-muted, #94a3b8);">
-            <div style="font-size:16px; font-weight:700; color:var(--text-primary, #ffffff); margin-bottom:8px;">No results found</div>
-            <div style="font-size:13px;">Try another destination, package or travel experience.</div>
+            <div style="font-size:32px; margin-bottom:8px;">🏝️</div>
+            <div style="font-size:16px; font-weight:700; color:var(--text-primary, #ffffff); margin-bottom:8px;">No matching services found for "${query}"</div>
+            <div style="font-size:13px; margin-bottom:16px;">Try searching for hotels, packages, destinations, cruises, flights, cars or insurance.</div>
+            <a href="services.html" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:9999px; text-decoration:none;">
+              Browse All Services →
+            </a>
           </div>
         `;
         return;
       }
 
       // Group matches by category
-      const categoriesOrder = ['DESTINATIONS', 'PACKAGES', 'CRUISES', 'HOTELS'];
+      const categoriesOrder = ['DESTINATIONS', 'PACKAGES', 'HOTELS', 'CRUISES', 'FLIGHTS', 'CAR & TRANSFERS', 'TRAVEL INSURANCE', 'VISA SERVICES'];
       const grouped = {};
       categoriesOrder.forEach(cat => grouped[cat] = []);
       matches.forEach(item => {
@@ -365,14 +449,20 @@ window.getHDImageUrl = function (url, width = 3840) {
         grouped[item.categoryName].push(item);
       });
 
-      let html = `<div style="font-size:13px; font-weight:700; color:var(--text-muted, #94a3b8); margin-bottom:16px;">Search results for "${query}"</div>`;
+      let html = `<div style="font-size:13px; font-weight:700; color:var(--text-muted, #94a3b8); margin-bottom:16px;">Search results for "${query}" (${matches.length} matches)</div>`;
 
       categoriesOrder.forEach(cat => {
         const catItems = grouped[cat];
         if (catItems && catItems.length > 0) {
+          const catSlug = catSlugMap[cat] || 'all';
           html += `
-            <div style="font-size:11px; font-weight:800; color:#38bdf8; letter-spacing:1.2px; text-transform:uppercase; margin:16px 0 8px 0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:4px;">
-              ${cat}
+            <div style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 8px 0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px;">
+              <span style="font-size:11px; font-weight:800; color:#38bdf8; letter-spacing:1.2px; text-transform:uppercase;">
+                ${cat} (${catItems.length})
+              </span>
+              <a href="services.html?cat=${catSlug}&q=${encodeURIComponent(query)}" style="font-size:11px; font-weight:700; color:#fbbf24; text-decoration:none; display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:6px; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.25);">
+                View All ${cat.charAt(0) + cat.slice(1).toLowerCase()} →
+              </a>
             </div>
             <div style="display:flex; flex-direction:column; gap:8px;">
           `;
@@ -383,14 +473,16 @@ window.getHDImageUrl = function (url, width = 3840) {
             const itemJson = JSON.stringify(item.rawObj).replace(/"/g, '&quot;');
             
             html += `
-              <div class="search-result-row" onclick="document.querySelector('.search-overlay')?.classList.remove('open'); if(window.VentouraEnquiry) window.VentouraEnquiry.openDetailPage(${itemJson}, '${item.type}')" style="display:flex; align-items:center; gap:14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:10px 14px; border-radius:12px; cursor:pointer; transition:all 0.2s ease;">
-
+              <div class="search-result-row" onclick="document.querySelector('.search-overlay')?.classList.remove('open'); window.location.href='services.html?cat=${item.catSlug}&q=${encodeURIComponent(item.title)}';" style="display:flex; align-items:center; gap:14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); padding:10px 14px; border-radius:12px; cursor:pointer; transition:all 0.2s ease;">
                 <img src="${item.image}" alt="${item.title}" style="width:48px; height:48px; object-fit:cover; border-radius:8px; flex-shrink:0;" onerror="this.onerror=null;this.src='assets/images/dest-maldives.jpg'" />
                 <div style="flex:1; min-width:0;">
                   <div style="font-size:14px; font-weight:700; color:#ffffff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>
                   <div style="font-size:12px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">
                     ${item.location}${priceTag}
                   </div>
+                </div>
+                <div style="font-size:11px; color:#38bdf8; font-weight:700; display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                  View →
                 </div>
               </div>
             `;
@@ -399,6 +491,14 @@ window.getHDImageUrl = function (url, width = 3840) {
           html += `</div>`;
         }
       });
+
+      html += `
+        <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.1); text-align:center;">
+          <a href="services.html?q=${encodeURIComponent(query)}" class="btn btn-primary btn-sm" style="display:inline-flex; justify-content:center; align-items:center; gap:8px; padding:10px 22px; font-size:13px; font-weight:800; text-decoration:none; border-radius:9999px;">
+            🔍 View All Results in Services Hub →
+          </a>
+        </div>
+      `;
 
       resultsContainer.innerHTML = html;
     }
@@ -3456,16 +3556,37 @@ window.getHDImageUrl = function (url, width = 3840) {
       return `${days} Days / ${nights} Nights`;
     }
 
+    const catSlugMap = {
+      'DESTINATIONS': 'destinations',
+      'PACKAGES': 'packages',
+      'HOTELS': 'hotels',
+      'CRUISES': 'cruises',
+      'FLIGHTS': 'flights',
+      'CAR & TRANSFERS': 'transport',
+      'TRAVEL INSURANCE': 'insurance',
+      'VISA SERVICES': 'visa',
+      'dest': 'destinations',
+      'pkg': 'packages',
+      'hotel': 'hotels',
+      'cruise': 'cruises',
+      'flight': 'flights',
+      'car': 'transport',
+      'insurance': 'insurance',
+      'visa': 'visa'
+    };
+
     // Fetch live CMS data dynamically from backend API endpoints
     async function loadCmsSearchData() {
       if (isFetching) return;
       isFetching = true;
       try {
-        const [destRes, pkgRes, hotelRes, cruiseRes] = await Promise.all([
+        const [destRes, pkgRes, hotelRes, cruiseRes, flightRes, carRes] = await Promise.all([
           fetch('/api/destinations').then(r => r.json()).catch(() => null),
           fetch('/api/packages').then(r => r.json()).catch(() => null),
           fetch('/api/hotels').then(r => r.json()).catch(() => null),
-          fetch('/api/cruises').then(r => r.json()).catch(() => null)
+          fetch('/api/cruises').then(r => r.json()).catch(() => null),
+          fetch('/api/flights').then(r => r.json()).catch(() => null),
+          fetch('/api/cars').then(r => r.json()).catch(() => null)
         ]);
 
         const items = [];
@@ -3476,10 +3597,11 @@ window.getHDImageUrl = function (url, width = 3840) {
             items.push({
               id: d.id,
               type: 'dest',
+              catSlug: 'destinations',
               rawType: 'destination',
               categoryLabel: '📍 DESTINATION',
               categoryHeader: 'DESTINATIONS',
-              title: d.title || '',
+              title: d.title || d.name || '',
               location: [d.city, d.country].filter(Boolean).join(', ') || d.country || 'Global Destination',
               description: d.description || '',
               sub: `${d.city || d.country || ''} · ${formatDuration(d)}`,
@@ -3496,10 +3618,11 @@ window.getHDImageUrl = function (url, width = 3840) {
             items.push({
               id: p.id,
               type: 'pkg',
+              catSlug: 'packages',
               rawType: 'package',
               categoryLabel: '📦 PACKAGE',
               categoryHeader: 'PACKAGES',
-              title: p.title || '',
+              title: p.title || p.name || '',
               location: p.destination || p.country || 'Luxury Package',
               description: p.description || '',
               sub: `${p.destination || p.country || ''} · ${formatDuration(p)}`,
@@ -3516,6 +3639,7 @@ window.getHDImageUrl = function (url, width = 3840) {
             items.push({
               id: h.id,
               type: 'hotel',
+              catSlug: 'hotels',
               rawType: 'hotel',
               categoryLabel: '🏨 HOTEL',
               categoryHeader: 'HOTELS',
@@ -3536,6 +3660,7 @@ window.getHDImageUrl = function (url, width = 3840) {
             items.push({
               id: c.id,
               type: 'cruise',
+              catSlug: 'cruises',
               rawType: 'cruise',
               categoryLabel: '🚢 CRUISE',
               categoryHeader: 'CRUISES',
@@ -3550,6 +3675,82 @@ window.getHDImageUrl = function (url, width = 3840) {
           });
         }
 
+        // 5. Flights
+        if (flightRes && flightRes.success && Array.isArray(flightRes.data)) {
+          flightRes.data.forEach(f => {
+            items.push({
+              id: f.id,
+              type: 'flight',
+              catSlug: 'flights',
+              rawType: 'flight',
+              categoryLabel: '✈️ FLIGHT',
+              categoryHeader: 'FLIGHTS',
+              title: (f.airline || 'First Class Flight') + ' · ' + (f.route || 'International'),
+              location: f.cabin || f.duration || 'Direct Flight',
+              description: f.features ? f.features.join(', ') : 'Luxury international flight.',
+              sub: f.duration || 'Direct Flight',
+              image: 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80',
+              price: f.price,
+              rawObj: f
+            });
+          });
+        }
+
+        // 6. Car & Transfers
+        if (carRes && carRes.success && Array.isArray(carRes.data)) {
+          carRes.data.forEach(car => {
+            items.push({
+              id: car.id,
+              type: 'transport',
+              catSlug: 'transport',
+              rawType: 'transport',
+              categoryLabel: '🚗 CAR & TRANSFERS',
+              categoryHeader: 'CAR & TRANSFERS',
+              title: car.title || car.vehicle || 'Luxury Chauffeur Transfer',
+              location: car.capacity || 'Private Luxury Transfer',
+              description: car.features ? car.features.join(', ') : 'Private airport and city transfer.',
+              sub: car.capacity || 'Private Luxury Transfer',
+              image: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80',
+              price: car.price,
+              rawObj: car
+            });
+          });
+        }
+
+        // 7. Travel Insurance
+        items.push({
+          id: 'ins-gold',
+          type: 'insurance',
+          catSlug: 'insurance',
+          rawType: 'insurance',
+          categoryLabel: '🛡️ INSURANCE',
+          categoryHeader: 'TRAVEL INSURANCE',
+          title: 'Comprehensive Global Travel Insurance',
+          location: 'Worldwide Coverage up to $500,000',
+          description: 'Medical emergencies, trip cancellation, baggage loss and 24/7 assistance.',
+          sub: 'Worldwide Coverage up to $500,000',
+          image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=600&q=80',
+          price: 99,
+          rawObj: { id: 'ins-gold', title: 'Global Travel Insurance', price: '$99' }
+        });
+
+        // 8. Visa Services
+        items.push({
+          id: 'visa-schengen',
+          type: 'visa',
+          catSlug: 'visa',
+          rawType: 'visa',
+          categoryLabel: '🛂 VISA',
+          categoryHeader: 'VISA SERVICES',
+          title: 'Fast-Track Global Visa Services',
+          location: '40+ Countries Covered',
+          description: 'Expert documentation, appointment scheduling and express visa assistance.',
+          sub: '40+ Countries Covered',
+          image: 'https://images.unsplash.com/photo-1575506726823-c6b1cb0da484?auto=format&fit=crop&w=600&q=80',
+          price: 12000,
+          rawObj: { id: 'visa-services', title: 'Visa Services', price: '₹12,000' }
+        });
+
         searchableItems = items;
         isDataLoaded = true;
       } catch (err) {
@@ -3563,12 +3764,12 @@ window.getHDImageUrl = function (url, width = 3840) {
       if (!resultsContainer) return;
       const q = (query || '').trim().toLowerCase();
 
-      // Requirement 17: Empty Search shows placeholder
+      // Empty Search shows placeholder
       if (!q) {
         resultsContainer.innerHTML = `
           <div class="search-empty-state" style="text-align:center; padding:30px 16px; color:#94a3b8;">
             <div style="font-size:32px; margin-bottom:8px;">🔍</div>
-            <p style="font-size:14px;">Type to search 100+ destinations, luxury packages, hotels & cruises...</p>
+            <p style="font-size:14px;">Type to search destinations, luxury packages, hotels, cruises, flights & services...</p>
           </div>
         `;
         return;
@@ -3576,7 +3777,7 @@ window.getHDImageUrl = function (url, width = 3840) {
 
       // Filter matches by current filter tab AND search query across multiple fields
       const filtered = searchableItems.filter(item => {
-        const matchesType = (currentFilter === 'all' || item.type === currentFilter);
+        const matchesType = (currentFilter === 'all' || item.type === currentFilter || item.catSlug === currentFilter);
         const matchesQuery = (
           item.title.toLowerCase().includes(q) ||
           item.location.toLowerCase().includes(q) ||
@@ -3588,30 +3789,36 @@ window.getHDImageUrl = function (url, width = 3840) {
         return matchesType && matchesQuery;
       });
 
-      // Requirement 8, 9, 18: Tab-specific No Results message
       if (filtered.length === 0) {
         const tabLabels = {
           dest: 'destinations',
           pkg: 'packages',
           hotel: 'hotels',
-          cruise: 'cruises'
+          cruise: 'cruises',
+          flight: 'flights',
+          transport: 'car & transfer services',
+          insurance: 'insurance plans',
+          visa: 'visa services'
         };
         const categoryName = tabLabels[currentFilter] || '';
-        const msg = categoryName ? `No ${categoryName} found for "${query}".` : 'No matching travel experiences found.';
+        const msg = categoryName ? `No ${categoryName} found for "${query}".` : `No matching services found for "${query}".`;
 
         resultsContainer.innerHTML = `
           <div class="search-empty-state" style="text-align:center; padding:32px 16px; color:#94a3b8;">
             <div style="font-size:32px; margin-bottom:8px;">🏝️</div>
             <p style="font-size:15px; font-weight:700; color:#ffffff; margin-bottom:6px;">${msg}</p>
-            <p style="font-size:13px; color:#94a3b8;">Try another destination, package or travel experience.</p>
+            <p style="font-size:13px; color:#94a3b8; margin-bottom:14px;">Try another destination, hotel or service search.</p>
+            <a href="services.html" class="btn btn-primary btn-sm" style="display:inline-flex; align-items:center; gap:6px; padding:8px 18px; border-radius:9999px; text-decoration:none;">
+              Browse All Services →
+            </a>
           </div>
         `;
         return;
       }
 
-      // Requirement 5, 10: Render Search Results
+      // Render Search Results
       if (currentFilter === 'all') {
-        const categoryOrder = ['DESTINATIONS', 'PACKAGES', 'HOTELS', 'CRUISES'];
+        const categoryOrder = ['DESTINATIONS', 'PACKAGES', 'HOTELS', 'CRUISES', 'FLIGHTS', 'CAR & TRANSFERS', 'TRAVEL INSURANCE', 'VISA SERVICES'];
         const grouped = {};
         categoryOrder.forEach(cat => grouped[cat] = []);
         filtered.forEach(item => {
@@ -3623,9 +3830,15 @@ window.getHDImageUrl = function (url, width = 3840) {
         categoryOrder.forEach(cat => {
           const itemsInCat = grouped[cat];
           if (itemsInCat && itemsInCat.length > 0) {
+            const catSlug = catSlugMap[cat] || 'all';
             html += `
-              <div style="font-size:11px; font-weight:800; color:#38bdf8; letter-spacing:1.2px; text-transform:uppercase; margin:14px 0 8px 0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:4px;">
-                ${cat}
+              <div style="display:flex; justify-content:space-between; align-items:center; margin:16px 0 8px 0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:6px;">
+                <span style="font-size:11px; font-weight:800; color:#38bdf8; letter-spacing:1.2px; text-transform:uppercase;">
+                  ${cat} (${itemsInCat.length})
+                </span>
+                <a href="services.html?cat=${catSlug}&q=${encodeURIComponent(query)}" style="font-size:11px; font-weight:700; color:#fbbf24; text-decoration:none; display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:6px; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.25);">
+                  View All ${cat.charAt(0) + cat.slice(1).toLowerCase()} →
+                </a>
               </div>
               <div style="display:flex; flex-direction:column; gap:8px;">
             `;
@@ -3633,10 +3846,9 @@ window.getHDImageUrl = function (url, width = 3840) {
             itemsInCat.forEach(item => {
               const formattedPrice = item.price ? formatINR(item.price) : '';
               const priceTag = formattedPrice ? ` · <span style="color:#fbbf24; font-weight:700;">${formattedPrice}</span>` : '';
-              const itemJson = JSON.stringify(item.rawObj).replace(/"/g, '&quot;');
 
               html += `
-                <div class="search-result-item" onclick="document.getElementById('search-modal')?.classList.remove('open'); document.querySelector('.search-overlay')?.classList.remove('open'); document.body.style.overflow=''; if(window.VentouraEnquiry && window.VentouraEnquiry.openDetailPage) { window.VentouraEnquiry.openDetailPage(${itemJson}, '${item.rawType}'); }" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; margin-bottom:6px; cursor:pointer; transition:all 0.2s ease;">
+                <div class="search-result-item" onclick="document.getElementById('search-modal')?.classList.remove('open'); document.querySelector('.search-overlay')?.classList.remove('open'); document.body.style.overflow=''; window.location.href='services.html?cat=${item.catSlug}&q=${encodeURIComponent(item.title)}';" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; margin-bottom:6px; cursor:pointer; transition:all 0.2s ease;">
                   <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:0;">
                     <img src="${item.image}" alt="${item.title}" style="width:48px; height:48px; border-radius:8px; object-fit:cover; flex-shrink:0;" onerror="this.onerror=null;this.src='assets/images/dest-maldives.jpg'" />
                     <div style="flex:1; min-width:0;">
@@ -3647,6 +3859,9 @@ window.getHDImageUrl = function (url, width = 3840) {
                       <div style="font-weight:700; font-size:14px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px;">${item.title}</div>
                       <div style="font-size:12px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.sub}</div>
                     </div>
+                  </div>
+                  <div style="font-size:11px; color:#38bdf8; font-weight:700; display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                    View →
                   </div>
                 </div>
               `;
@@ -3656,18 +3871,31 @@ window.getHDImageUrl = function (url, width = 3840) {
           }
         });
 
+        html += `
+          <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.1); text-align:center;">
+            <a href="services.html?q=${encodeURIComponent(query)}" class="btn btn-primary btn-sm" style="display:inline-flex; justify-content:center; align-items:center; gap:8px; padding:10px 22px; font-size:13px; font-weight:800; text-decoration:none; border-radius:9999px;">
+              🔍 View All Results in Services Hub →
+            </a>
+          </div>
+        `;
+
         resultsContainer.innerHTML = html;
       } else {
-        // Specific tab active (Destinations / Packages / Hotels / Cruises)
+        const catSlug = catSlugMap[currentFilter] || 'all';
         resultsContainer.innerHTML = `
-          <div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin:8px 0 12px 0;">
+            <span style="font-size:12px; color:#94a3b8; font-weight:700;">Showing ${filtered.length} matching items</span>
+            <a href="services.html?cat=${catSlug}&q=${encodeURIComponent(query)}" style="font-size:11px; font-weight:700; color:#fbbf24; text-decoration:none; display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:6px; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.25);">
+              View All in Services Hub →
+            </a>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
             ${filtered.map(item => {
               const formattedPrice = item.price ? formatINR(item.price) : '';
               const priceTag = formattedPrice ? ` · <span style="color:#fbbf24; font-weight:700;">${formattedPrice}</span>` : '';
-              const itemJson = JSON.stringify(item.rawObj).replace(/"/g, '&quot;');
 
               return `
-                <div class="search-result-item" onclick="document.getElementById('search-modal')?.classList.remove('open'); document.querySelector('.search-overlay')?.classList.remove('open'); document.body.style.overflow=''; if(window.VentouraEnquiry && window.VentouraEnquiry.openDetailPage) { window.VentouraEnquiry.openDetailPage(${itemJson}, '${item.rawType}'); }" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; margin-bottom:6px; cursor:pointer; transition:all 0.2s ease;">
+                <div class="search-result-item" onclick="document.getElementById('search-modal')?.classList.remove('open'); document.querySelector('.search-overlay')?.classList.remove('open'); document.body.style.overflow=''; window.location.href='services.html?cat=${item.catSlug}&q=${encodeURIComponent(item.title)}';" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; margin-bottom:6px; cursor:pointer; transition:all 0.2s ease;">
                   <div style="display:flex; align-items:center; gap:14px; flex:1; min-width:0;">
                     <img src="${item.image}" alt="${item.title}" style="width:48px; height:48px; border-radius:8px; object-fit:cover; flex-shrink:0;" onerror="this.onerror=null;this.src='assets/images/dest-maldives.jpg'" />
                     <div style="flex:1; min-width:0;">
@@ -3679,9 +3907,17 @@ window.getHDImageUrl = function (url, width = 3840) {
                       <div style="font-size:12px; color:#94a3b8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.sub}</div>
                     </div>
                   </div>
+                  <div style="font-size:11px; color:#38bdf8; font-weight:700; display:flex; align-items:center; gap:4px; flex-shrink:0;">
+                    View →
+                  </div>
                 </div>
               `;
             }).join('')}
+          </div>
+          <div style="margin-top:20px; padding-top:14px; border-top:1px solid rgba(255,255,255,0.1); text-align:center;">
+            <a href="services.html?cat=${catSlug}&q=${encodeURIComponent(query)}" class="btn btn-primary btn-sm" style="display:inline-flex; justify-content:center; align-items:center; gap:8px; padding:10px 22px; font-size:13px; font-weight:800; text-decoration:none; border-radius:9999px;">
+              🔍 View All Matching in Services Hub →
+            </a>
           </div>
         `;
       }

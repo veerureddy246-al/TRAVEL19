@@ -10406,7 +10406,65 @@
       subCatBar.style.top = (navbarH + servicesNavH) + 'px';
     }
 
-    function activateCategory(cat, fromUserClick) {
+    const catAliasMap = {
+      'hotel': 'hotels',
+      'hotels': 'hotels',
+      'accommodation': 'hotels',
+      'accommodations': 'hotels',
+      'resort': 'hotels',
+      'resorts': 'hotels',
+      
+      'dest': 'destinations',
+      'destination': 'destinations',
+      'destinations': 'destinations',
+      
+      'pkg': 'packages',
+      'package': 'packages',
+      'packages': 'packages',
+      'tour': 'packages',
+      'tours': 'packages',
+      
+      'cruise': 'cruises',
+      'cruises': 'cruises',
+      
+      'flight': 'flights',
+      'flights': 'flights',
+      'airline': 'flights',
+      
+      'car': 'transport',
+      'cars': 'transport',
+      'transport': 'transport',
+      'transfers': 'transport',
+      'transfer': 'transport',
+      
+      'insurance': 'insurance',
+      'travel-insurance': 'insurance',
+      'travel_insurance': 'insurance',
+      
+      'specialty': 'specialty',
+      'specialty-tours': 'specialty',
+      'specialty_tours': 'specialty',
+      
+      'experience': 'experiences',
+      'experiences': 'experiences',
+      'guide': 'experiences',
+      'guides': 'experiences',
+      
+      'visa': 'visa',
+      'visas': 'visa',
+      
+      'gallery': 'gallery',
+      'photos': 'gallery',
+      'photo': 'gallery',
+      
+      'all': 'all'
+    };
+
+    function activateCategory(rawCat, fromUserClick, query) {
+      const normalizedCat = catAliasMap[String(rawCat || '').toLowerCase().trim()] || 'all';
+      const cat = normalizedCat;
+      const q = typeof query === 'string' ? query : (new URLSearchParams(window.location.search).get('q') || new URLSearchParams(window.location.search).get('search') || '');
+
       chips.forEach(c => {
         c.style.background = '';
         c.style.boxShadow = '';
@@ -10429,38 +10487,40 @@
 
       if (fromUserClick) {
         try {
-          const newUrl = cat === 'all' ? 'services.html' : 'services.html?cat=' + encodeURIComponent(cat);
-          window.history.pushState({ category: cat }, '', newUrl);
+          let newUrl = cat === 'all' ? 'services.html' : 'services.html?cat=' + encodeURIComponent(cat);
+          if (q) newUrl += '&q=' + encodeURIComponent(q);
+          window.history.pushState({ category: cat, q: q }, '', newUrl);
         } catch (e) {}
         window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       }
 
       if (cat === 'all') {
-        renderAllServicesGrid();
+        renderAllServicesGrid(q);
       } else if (cat === 'destinations') {
-        renderDestinationGrid();
+        renderDestinationGrid(q);
       } else if (cat === 'packages') {
-        renderPackageGrid('all');
+        const subCat = new URLSearchParams(window.location.search).get('sub') || new URLSearchParams(window.location.search).get('pkgCat') || 'all';
+        renderPackageGrid(subCat, q);
       } else if (cat === 'hotels') {
-        renderHotelGrid();
+        renderHotelGrid(q);
       } else if (cat === 'flights') {
-        renderFlightGrid();
+        renderFlightGrid(q);
       } else if (cat === 'cruises') {
-        renderCruiseGrid();
+        renderCruiseGrid(q);
       } else if (cat === 'transport') {
-        renderTransportGrid();
+        renderTransportGrid(q);
       } else if (cat === 'visa') {
-        renderVisaGrid();
+        renderVisaGrid(q);
       } else if (cat === 'insurance') {
-        renderInsuranceGrid();
+        renderInsuranceGrid(q);
       } else if (cat === 'specialty') {
-        renderSpecialtyGrid();
+        renderSpecialtyGrid(q);
       } else if (cat === 'experiences') {
-        renderExperiencesGrid();
+        renderExperiencesGrid(q);
       } else if (cat === 'gallery') {
         renderGalleryGrid();
       } else {
-        renderAllServicesGrid(); // Fallback default shows all services
+        renderAllServicesGrid(q);
       }
 
       setTimeout(() => {
@@ -10472,25 +10532,45 @@
       }, 50);
     }
 
+    window.renderActiveServiceTab = function(cat, query) {
+      activateCategory(cat, false, query);
+    };
+
     chips.forEach(chip => {
       chip.addEventListener('click', () => {
         const cat = chip.dataset.category;
         activateCategory(cat, true);
       });
-
     });
 
-    // URL Query Parameter Filtering (e.g. ?cat=destinations or ?cat=packages&sub=beach)
+    // URL Query Parameter Filtering (e.g. ?cat=hotels or ?cat=destinations or ?q=maldives)
     const urlParams = new URLSearchParams(window.location.search);
-    const initialCat = urlParams.get('cat') || 'all';
+    let initialCat = urlParams.get('cat') || urlParams.get('category') || urlParams.get('service') || '';
+    const initialQuery = (urlParams.get('q') || urlParams.get('search') || urlParams.get('query') || '').trim();
     const subCat = urlParams.get('sub') || urlParams.get('pkgCat');
     
-    activateCategory(initialCat);
+    // Auto-detect category if user navigated with ?q=hotel or ?q=cruises without cat
+    if (!initialCat && initialQuery) {
+      const qLower = initialQuery.toLowerCase();
+      if (['hotel', 'hotels', 'resort', 'resorts', 'stay'].some(k => qLower.includes(k))) initialCat = 'hotels';
+      else if (['cruise', 'cruises', 'ship', 'vessel'].some(k => qLower.includes(k))) initialCat = 'cruises';
+      else if (['flight', 'flights', 'airline'].some(k => qLower.includes(k))) initialCat = 'flights';
+      else if (['package', 'packages', 'tour', 'tours'].some(k => qLower.includes(k))) initialCat = 'packages';
+      else if (['dest', 'destination', 'destinations'].some(k => qLower.includes(k))) initialCat = 'destinations';
+      else if (['car', 'cars', 'transfer', 'transfers', 'cab'].some(k => qLower.includes(k))) initialCat = 'transport';
+      else if (['insurance'].some(k => qLower.includes(k))) initialCat = 'insurance';
+      else if (['visa'].some(k => qLower.includes(k))) initialCat = 'visa';
+      else initialCat = 'all';
+    } else if (!initialCat) {
+      initialCat = 'all';
+    }
+
+    activateCategory(initialCat, false, initialQuery);
 
     if (initialCat === 'packages' && subCat) {
       setTimeout(() => {
         if (typeof renderPackageGrid === 'function') {
-          renderPackageGrid(subCat);
+          renderPackageGrid(subCat, initialQuery);
         }
         document.querySelectorAll('.pkg-sub-chip').forEach(c => {
           if (c.dataset.pkgCat === subCat) {
@@ -10556,7 +10636,7 @@
   // ═══════════════════════════════════════════════════
   // TRAVEL INSURANCE GRID
   // ═══════════════════════════════════════════════════
-  function renderInsuranceGrid() {
+  function renderInsuranceGrid(query) {
     var grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
@@ -10569,8 +10649,19 @@
       { id: 'ins-family', emoji: '👨‍👩‍👧', title: 'Family Protection Plan', coverage: 'Up to $500,000 family', price: '$149', duration: 'Per Trip', features: ['Covers Entire Family (4)', 'Children Cover Included', 'Maternity Emergency', 'School Year Cover', 'Activity Injuries', 'Repatriation Cover'], badge: 'FAMILY FAVORITE', badgeColor: '#f472b6' }
     ];
 
+    var list = insurancePlans;
+    if (query) {
+      var qClean = query.toLowerCase().trim();
+      var matched = insurancePlans.filter(function(p) {
+        return (p.title && p.title.toLowerCase().includes(qClean)) ||
+               (p.coverage && p.coverage.toLowerCase().includes(qClean)) ||
+               (p.features && p.features.some(function(f) { return f.toLowerCase().includes(qClean); }));
+      });
+      if (matched.length > 0) list = matched;
+    }
+
     var html = '';
-    insurancePlans.forEach(function(plan) {
+    list.forEach(function(plan) {
       html += '<div class="glass-card service-hub-card" style="padding:20px; border:1px solid rgba(34,211,238,0.15); border-radius:20px; display:flex; flex-direction:column; justify-content:space-between;">';
       html += '<div>';
       html += '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">';
@@ -10594,7 +10685,7 @@
   // ═══════════════════════════════════════════════════
   // SPECIALTY TOURS GRID
   // ═══════════════════════════════════════════════════
-  function renderSpecialtyGrid() {
+  function renderSpecialtyGrid(query) {
     var grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
@@ -10610,8 +10701,19 @@
       { id: 'sp-dive', emoji: '🤿', title: 'Deep Sea Diving Experience', location: 'Maldives / Great Barrier Reef', duration: '5 Days', price: '$2,199', img: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85', desc: 'Certified dive experiences in the world\'s most pristine coral reefs with marine biologist guides.', badge: 'UNDERWATER VIP' }
     ];
 
+    var list = specialtyTours;
+    if (query) {
+      var qClean = query.toLowerCase().trim();
+      var matched = specialtyTours.filter(function(t) {
+        return (t.title && t.title.toLowerCase().includes(qClean)) ||
+               (t.location && t.location.toLowerCase().includes(qClean)) ||
+               (t.desc && t.desc.toLowerCase().includes(qClean));
+      });
+      if (matched.length > 0) list = matched;
+    }
+
     var html = '';
-    specialtyTours.forEach(function(tour) {
+    list.forEach(function(tour) {
       html += '<div class="glass-card service-hub-card" style="padding:0; overflow:hidden; border-radius:20px; border:1px solid rgba(212,175,55,0.2); background:#0f172a; display:flex; flex-direction:column;">';
       html += '<div style="position:relative; height:170px; overflow:hidden;">';
       html += '<img src="' + tour.img + '" alt="' + tour.title + '" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85\'" style="width:100%; height:100%; object-fit:cover;" />';
@@ -10633,7 +10735,7 @@
   // ═══════════════════════════════════════════════════
   // EXPERIENCES & GUIDES GRID
   // ═══════════════════════════════════════════════════
-  function renderExperiencesGrid() {
+  function renderExperiencesGrid(query) {
     var grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
@@ -10649,8 +10751,20 @@
       { id: 'exp-amalfi', emoji: '⛵', title: 'Amalfi Private Boat Day Trip', location: 'Positano, Italy', duration: '8 Hours', price: '$299', img: 'https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=800&q=85', desc: 'Rent a private boat along the Amalfi coast visiting sea caves, cliff diving spots and hidden beaches.', category: 'Nautical' }
     ];
 
+    var list = experiencesList;
+    if (query) {
+      var qClean = query.toLowerCase().trim();
+      var matched = experiencesList.filter(function(e) {
+        return (e.title && e.title.toLowerCase().includes(qClean)) ||
+               (e.location && e.location.toLowerCase().includes(qClean)) ||
+               (e.category && e.category.toLowerCase().includes(qClean)) ||
+               (e.desc && e.desc.toLowerCase().includes(qClean));
+      });
+      if (matched.length > 0) list = matched;
+    }
+
     var html = '';
-    experiencesList.forEach(function(exp) {
+    list.forEach(function(exp) {
       html += '<div class="glass-card service-hub-card" style="padding:0; overflow:hidden; border-radius:20px; border:1px solid rgba(74,222,128,0.2); background:#0f172a; display:flex; flex-direction:column;">';
       html += '<div style="position:relative; height:145px; overflow:hidden;">';
       html += '<img src="' + exp.img + '" alt="' + exp.title + '" onerror="this.onerror=null;this.src=\'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=85\'" style="width:100%; height:100%; object-fit:cover;" />';
@@ -10685,12 +10799,25 @@
   }
 
   // 1. Render Destination Cards Grid
-  function renderDestinationGrid() {
+  function renderDestinationGrid(query) {
     const grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
-    window._servDestDb = destinationCatalogDb;
-    grid.innerHTML = destinationCatalogDb.map((dest, i) => `
+    let list = destinationCatalogDb;
+    if (query) {
+      const qClean = query.toLowerCase().trim();
+      const matched = destinationCatalogDb.filter(d =>
+        (d.name && d.name.toLowerCase().includes(qClean)) ||
+        (d.country && d.country.toLowerCase().includes(qClean)) ||
+        (d.city && d.city.toLowerCase().includes(qClean)) ||
+        (d.type && d.type.toLowerCase().includes(qClean)) ||
+        (d.highlights && d.highlights.some(h => h.toLowerCase().includes(qClean)))
+      );
+      if (matched.length > 0) list = matched;
+    }
+
+    window._servDestDb = list;
+    grid.innerHTML = list.map((dest, i) => `
       <div class="glass-card service-hub-card" data-category="destinations" style="padding:0; overflow:hidden; display:flex; flex-direction:column; border:1px solid rgba(255,255,255,0.1); border-radius:12px; background:#0f172a;">
         <div style="position:relative; height:160px; overflow:hidden;">
           <img src="${dest.heroImg}" alt="${dest.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=3840&q=95'" style="width:100%; height:100%; object-fit:cover; transition:transform 0.5s ease;" />
@@ -10727,12 +10854,24 @@
   }
 
   // 2. Render Hotels & Resorts Grid
-  function renderHotelGrid() {
+  function renderHotelGrid(query) {
     const grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
-    window._servHotelDb = hotelCatalogDb;
-    grid.innerHTML = hotelCatalogDb.map((h, i) => `
+    let list = hotelCatalogDb;
+    if (query) {
+      const qClean = query.toLowerCase().trim();
+      const matched = hotelCatalogDb.filter(h =>
+        (h.name && h.name.toLowerCase().includes(qClean)) ||
+        (h.location && h.location.toLowerCase().includes(qClean)) ||
+        (h.specs && h.specs.toLowerCase().includes(qClean)) ||
+        (h.amenities && h.amenities.some(a => a.toLowerCase().includes(qClean)))
+      );
+      if (matched.length > 0) list = matched;
+    }
+
+    window._servHotelDb = list;
+    grid.innerHTML = list.map((h, i) => `
       <div class="glass-card service-hub-card" style="padding:0; overflow:hidden; display:flex; flex-direction:column; border:1px solid rgba(255,255,255,0.1); border-radius:12px; background:#0f172a;">
         <div style="position:relative; height:160px; overflow:hidden;">
           <img src="${h.heroImg}" alt="${h.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=3840&q=95'" style="width:100%; height:100%; object-fit:cover;" />
@@ -10768,12 +10907,23 @@
   }
 
   // 3. Render Flights Grid
-  function renderFlightGrid() {
+  function renderFlightGrid(query) {
     const grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
-    window._servFlightDb = flightCatalogDb;
-    grid.innerHTML = flightCatalogDb.map((f, i) => `
+    let list = flightCatalogDb;
+    if (query) {
+      const qClean = query.toLowerCase().trim();
+      const matched = flightCatalogDb.filter(f =>
+        (f.airline && f.airline.toLowerCase().includes(qClean)) ||
+        (f.route && f.route.toLowerCase().includes(qClean)) ||
+        (f.cabin && f.cabin.toLowerCase().includes(qClean))
+      );
+      if (matched.length > 0) list = matched;
+    }
+
+    window._servFlightDb = list;
+    grid.innerHTML = list.map((f, i) => `
       <div class="glass-card service-hub-card" style="padding:20px; border:1px solid rgba(255,255,255,0.1); border-radius:20px; display:flex; flex-direction:column; justify-content:space-between;">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -10809,12 +10959,23 @@
   }
 
   // 4. Render Cruises Grid
-  function renderCruiseGrid() {
+  function renderCruiseGrid(query) {
     const grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
-    window._servCruiseDb = cruiseCatalogDb;
-    grid.innerHTML = cruiseCatalogDb.map((c, i) => `
+    let list = cruiseCatalogDb;
+    if (query) {
+      const qClean = query.toLowerCase().trim();
+      const matched = cruiseCatalogDb.filter(c =>
+        (c.name && c.name.toLowerCase().includes(qClean)) ||
+        (c.vessel && c.vessel.toLowerCase().includes(qClean)) ||
+        (c.route && c.route.toLowerCase().includes(qClean))
+      );
+      if (matched.length > 0) list = matched;
+    }
+
+    window._servCruiseDb = list;
+    grid.innerHTML = list.map((c, i) => `
       <div class="glass-card service-hub-card" style="padding:0; overflow:hidden; display:flex; flex-direction:column; border:1px solid rgba(255,255,255,0.1); border-radius:12px; background:#0f172a;">
         <div style="position:relative; height:160px; overflow:hidden;">
           <img src="${c.heroImg}" alt="${c.name}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1548574505-5e2386903d8f?auto=format&fit=crop&w=3840&q=95'" style="width:100%; height:100%; object-fit:cover;" />
@@ -10850,11 +11011,22 @@
   }
 
   // 5. Render Car & Transfers Grid
-  function renderTransportGrid() {
+  function renderTransportGrid(query) {
     const grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
-    grid.innerHTML = transportCatalogDb.map(t => `
+    let list = transportCatalogDb;
+    if (query) {
+      const qClean = query.toLowerCase().trim();
+      const matched = transportCatalogDb.filter(t =>
+        (t.title && t.title.toLowerCase().includes(qClean)) ||
+        (t.vehicle && t.vehicle.toLowerCase().includes(qClean)) ||
+        (t.capacity && t.capacity.toLowerCase().includes(qClean))
+      );
+      if (matched.length > 0) list = matched;
+    }
+
+    grid.innerHTML = list.map(t => `
       <div class="glass-card service-hub-card" style="padding:20px; border:1px solid rgba(255,255,255,0.1); border-radius:20px; display:flex; flex-direction:column; justify-content:space-between;">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
@@ -10882,11 +11054,22 @@
   }
 
   // 6. Render Visa & Passport Services Grid
-  function renderVisaGrid() {
+  function renderVisaGrid(query) {
     const grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
-    grid.innerHTML = visaCatalogDb.map(v => `
+    let list = visaCatalogDb;
+    if (query) {
+      const qClean = query.toLowerCase().trim();
+      const matched = visaCatalogDb.filter(v =>
+        (v.title && v.title.toLowerCase().includes(qClean)) ||
+        (v.country && v.country.toLowerCase().includes(qClean)) ||
+        (v.type && v.type.toLowerCase().includes(qClean))
+      );
+      if (matched.length > 0) list = matched;
+    }
+
+    grid.innerHTML = list.map(v => `
       <div class="glass-card service-hub-card" style="padding:20px; border:1px solid rgba(255,255,255,0.1); border-radius:20px; display:flex; flex-direction:column; justify-content:space-between;">
         <div>
           <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
@@ -11077,11 +11260,12 @@
         }));
       }
 
-      // Re-trigger active grid rendering
+      // Re-trigger active grid rendering with fresh Supabase data
       const urlParams = new URLSearchParams(window.location.search);
-      const activeCat = urlParams.get('cat') || 'destinations';
+      const activeCat = urlParams.get('cat') || urlParams.get('category') || urlParams.get('service') || '';
+      const activeQuery = urlParams.get('q') || urlParams.get('search') || urlParams.get('query') || '';
       if (typeof window.renderActiveServiceTab === 'function') {
-        window.renderActiveServiceTab(activeCat);
+        window.renderActiveServiceTab(activeCat || 'all', activeQuery);
       }
     } catch (e) {
       console.warn('[Services.js] Error syncing CMS data:', e);
@@ -11113,7 +11297,7 @@
   }
 
   // Render Tour Package Cards Grid dynamically
-  function renderPackageGrid(subCat) {
+  function renderPackageGrid(subCat, query) {
     const grid = document.getElementById('services-hub-grid');
     if (!grid) return;
 
@@ -11122,15 +11306,19 @@
       filtered = packageCatalogDb.filter(p => p.category === subCat || (p.altCategories && p.altCategories.includes(subCat)));
     }
 
+    if (query) {
+      const qClean = query.toLowerCase().trim();
+      const matched = filtered.filter(p =>
+        (p.title && p.title.toLowerCase().includes(qClean)) ||
+        (p.country && p.country.toLowerCase().includes(qClean)) ||
+        (p.city && p.city.toLowerCase().includes(qClean)) ||
+        (p.overview && p.overview.toLowerCase().includes(qClean))
+      );
+      if (matched.length > 0) filtered = matched;
+    }
+
     if (filtered.length === 0) {
-      grid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align:center; padding:60px 20px; color:#94a3b8;">
-          <div style="font-size:48px; margin-bottom:16px;">🏝️</div>
-          <h3 style="font-size:22px; color:#fff; margin-bottom:8px;">No packages found in this category</h3>
-          <p style="font-size:14px;">Select "🌟 All Categories" above to explore 100+ tour packages worldwide!</p>
-        </div>
-      `;
-      return;
+      filtered = packageCatalogDb;
     }
 
     grid.innerHTML = filtered.map(pkg => `
