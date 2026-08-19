@@ -1,0 +1,512 @@
+/* ═══════════════════════════════════════════════════════════════
+   VENTOURA TRAVEL — INSTANT TRAVEL BOOKING MODAL STYLING
+   Dark Premium Navy & Cyan/Emerald Accents — Exact Reference Match
+   ═══════════════════════════════════════════════════════════════ */
+
+.enquiry-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(4, 9, 20, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s ease;
+}
+
+.enquiry-modal-backdrop.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.enquiry-modal-card {
+  background: #0b1325;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  position: relative;
+  transform: translateY(20px) scale(0.97);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  color: #f8fafc;
+  padding: 26px 28px 24px;
+  box-sizing: border-box;
+}
+
+.enquiry-modal-backdrop.active .enquiry-modal-card {
+  transform: translateY(0) scale(1);
+}
+
+/* Custom scrollbar for modal card */
+.enquiry-modal-card::-webkit-scrollbar {
+  width: 6px;
+}
+.enquiry-modal-card::-webkit-scrollbar-track {
+  background: #0b1325;
+}
+.enquiry-modal-card::-webkit-scrollbar-thumb {
+  background: #1e293b;
+  border-radius: 4px;
+}
+
+/* Close Button (×) */
+.enquiry-modal-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #152238;
+  border: 1px solid #233554;
+  color: #cbd5e1;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 20;
+}
+
+.enquiry-modal-close:hover {
+  background: #1e293b;
+  color: #ffffff;
+  border-color: #38bdf8;
+  transform: scale(1.05);
+}
+
+/* Header Typography */
+.enquiry-modal-header {
+  padding-right: 40px;
+}
+
+.enquiry-modal-title {
+  font-size: 30px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+  line-height: 1.15;
+  font-family: 'Playfair Display', 'Cormorant Garamond', 'Cinzel', Georgia, serif;
+  letter-spacing: -0.5px;
+}
+
+.enquiry-modal-subtitle {
+  font-size: 13.5px;
+  color: #94a3b8;
+  margin: 6px 0 0;
+  line-height: 1.45;
+  font-weight: 400;
+}
+
+/* Automatic Trip Preview Box (Matches Screenshot) */
+.enquiry-product-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  background: #101b33;
+  border: 1px solid #1e2d4e;
+  border-radius: 12px;
+  margin: 16px 0 20px;
+}
+
+.enquiry-product-img {
+  width: 58px;
+  height: 58px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.enquiry-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.enquiry-product-tag {
+  font-size: 10.5px;
+  font-weight: 800;
+  color: #0284c7;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 2px;
+}
+
+.enquiry-product-name {
+  font-size: 15.5px;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 3px;
+  line-height: 1.25;
+}
+
+.enquiry-product-meta {
+  font-size: 12px;
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.enquiry-product-price {
+  font-size: 19px;
+  font-weight: 800;
+  color: #10b981;
+  white-space: nowrap;
+  margin-left: auto;
+  text-align: right;
+}
+
+/* Form Layout (2-Column Desktop, 1-Column Mobile) */
+.enquiry-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px 14px;
+  margin-bottom: 12px;
+}
+
+.enquiry-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.enquiry-form-label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.enquiry-form-control {
+  width: 100%;
+  padding: 10.5px 14px;
+  background: #0f1a30;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 13px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.enquiry-form-control::placeholder {
+  color: #64748b;
+  font-size: 12.5px;
+}
+
+.enquiry-form-control:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+  background: #111e38;
+}
+
+.enquiry-form-control.has-error {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.field-error-msg {
+  font-size: 11.5px;
+  color: #f87171;
+  font-weight: 600;
+  margin-top: 4px;
+  display: none;
+}
+
+.field-error-msg.visible {
+  display: block;
+}
+
+/* Promo / Coupon Box (Matches Screenshot) */
+.enquiry-coupon-wrapper {
+  background: #101b33;
+  border: 1px solid #1e2d4e;
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 14px 0 16px;
+}
+
+.coupon-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.coupon-label-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0;
+}
+
+.coupon-applied-pill {
+  font-size: 11px;
+  font-weight: 800;
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: none;
+}
+
+.coupon-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.coupon-input-field {
+  flex: 1;
+  padding: 10px 14px;
+  background: #0b1324;
+  border: 1px solid #1e293b;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-sizing: border-box;
+}
+
+.coupon-input-field::placeholder {
+  color: #64748b;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.coupon-input-field:focus {
+  outline: none;
+  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+}
+
+.coupon-apply-btn {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.coupon-apply-btn:hover {
+  background: #0369a1;
+}
+
+.coupon-apply-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.coupon-feedback-box {
+  display: none;
+  font-size: 12px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.coupon-feedback-box.success {
+  display: block;
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.coupon-feedback-box.error {
+  display: block;
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.coupon-feedback-box.info {
+  display: block;
+  background: rgba(2, 132, 199, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+
+/* Pricing Breakdown in Coupon Section */
+.price-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #94a3b8;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Primary Confirm Booking Button (Matches Screenshot) */
+.enquiry-submit-btn {
+  width: 100%;
+  padding: 13.5px;
+  font-size: 15px;
+  font-weight: 800;
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+  margin-top: 6px;
+}
+
+.enquiry-submit-btn:hover {
+  background: #0369a1;
+  box-shadow: 0 8px 22px rgba(2, 132, 199, 0.45);
+}
+
+.enquiry-submit-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Success Confirmation View */
+.enquiry-success-view {
+  text-align: center;
+  padding: 8px 0;
+}
+
+.enquiry-success-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.15);
+  border: 2px solid rgba(16, 185, 129, 0.4);
+  color: #10b981;
+  font-size: 30px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+}
+
+.enquiry-success-ref {
+  display: inline-block;
+  padding: 6px 14px;
+  background: rgba(2, 132, 199, 0.12);
+  border: 1px solid rgba(2, 132, 199, 0.3);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  color: #38bdf8;
+  letter-spacing: 0.8px;
+  margin: 10px 0 16px;
+  font-family: monospace;
+}
+
+.enquiry-summary-card {
+  background: #101b33;
+  border: 1px solid #1e2d4e;
+  border-radius: 12px;
+  padding: 14px 16px;
+  text-align: left;
+  font-size: 13px;
+  color: #cbd5e1;
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.enquiry-summary-card .row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.enquiry-summary-card .row .label {
+  color: #94a3b8;
+  font-size: 12.5px;
+}
+
+.enquiry-summary-card .row .value {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.whatsapp-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 20px;
+  background: #25d366;
+  color: #ffffff;
+  font-size: 14.5px;
+  font-weight: 800;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.35);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.whatsapp-btn:hover {
+  background: #22c35e;
+  box-shadow: 0 10px 24px rgba(37, 211, 102, 0.45);
+}
+
+/* Responsive Handling */
+@media (max-width: 640px) {
+  .enquiry-modal-card {
+    padding: 20px 18px;
+    border-radius: 14px;
+  }
+  .enquiry-modal-title {
+    font-size: 24px;
+  }
+  .enquiry-form-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .enquiry-product-preview {
+    flex-wrap: wrap;
+  }
+  .enquiry-product-price {
+    width: 100%;
+    text-align: left;
+    margin-left: 0;
+    margin-top: 4px;
+  }
+}

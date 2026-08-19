@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Secure Travel Checkout — Complete your booking with Ventoura Travel. Interactive seat map, room choice, coupon discount engine, and instant QR tickets." />
+  <title>Secure Luxury Booking Checkout | Ventoura Travel</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dark-light.css" />
+  <link rel="stylesheet" href="css/checkout.css" />
+  <link rel="stylesheet" href="css/timeline.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER & NAVIGATION
+═══════════════════════════════════════════════════ -->
+<header class="navbar" id="navbar">
+  <div class="container">
+    <nav class="nav-inner">
+
+      <!-- Logo -->
+      <a href="index.html" class="nav-logo" aria-label="Ventoura Travel Home">
+        <img src="assets/images/logo.png" alt="Ventoura Travel Logo" class="brand-logo-img" />
+      </a>
+
+
+      <!-- Nav Menu -->
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="services.html" class="nav-link">Services</a></li>
+        <li class="nav-item"><a href="checkout.html" class="nav-link active">🛄 Checkout</a></li>
+        <li class="nav-item"><a href="index.html#contact" class="nav-link">Contact</a></li>
+      </ul>
+
+      <!-- Nav Actions -->
+      <div class="nav-actions">
+        <!-- SSL Badge -->
+        <span style="font-size:12px;color:var(--emerald);font-weight:700;white-space:nowrap">🔒 SSL Secured</span>
+
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <span class="theme-toggle-thumb">🌙</span>
+        </button>
+
+        <!-- Wishlist -->
+        <button class="nav-action-btn" id="wishlist-trigger" aria-label="Wishlist">
+          ❤️
+          <span class="badge-count" id="wishlist-count">0</span>
+        </button>
+
+        <!-- Login -->
+        <button class="btn btn-ghost btn-sm" id="login-btn" onclick="window.openAuthModal('login')" style="padding:8px 14px;font-size:13px;cursor:pointer;">Login</button>
+
+        <!-- Cancel Booking -->
+        <a href="services.html" class="btn btn-outline btn-sm">Cancel</a>
+
+        <!-- Hamburger -->
+        <button class="hamburger" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </nav>
+  </div>
+</header>
+
+<!-- Mobile Nav Overlay -->
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <div class="mobile-nav-item"><a href="index.html" class="mobile-nav-link">🏠 Home</a></div>
+  <div class="mobile-nav-item"><a href="services.html" class="mobile-nav-link">🌟 Services</a></div>
+  <div class="mobile-nav-item"><a href="index.html#contact" class="mobile-nav-link">📞 Contact</a></div>
+  <div style="margin-top:32px;display:flex;gap:12px">
+    <a href="services.html" class="btn btn-ghost" style="flex:1">Cancel Booking</a>
+    <button class="btn btn-primary" style="flex:1" id="mobile-login">Login</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════
+     CHECKOUT STEPPER & CONTENT
+═══════════════════════════════════════════════════ -->
+<main class="section">
+  <div class="container">
+
+    <!-- Stepper Indicator -->
+    <div class="checkout-stepper">
+      <div class="stepper-step active" data-step="1">
+        <div class="stepper-circle">1</div>
+        <div class="stepper-label">Trip Details & Seats</div>
+      </div>
+      <div class="stepper-step" data-step="2">
+        <div class="stepper-circle">2</div>
+        <div class="stepper-label">Travelers</div>
+      </div>
+      <div class="stepper-step" data-step="3">
+        <div class="stepper-circle">3</div>
+        <div class="stepper-label">Discounts</div>
+      </div>
+      <div class="stepper-step" data-step="4">
+        <div class="stepper-circle">4</div>
+        <div class="stepper-label">Payment</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="grid-template-columns:2fr 1fr">
+
+      <!-- LEFT: STEP PANELS -->
+      <div>
+
+        <!-- ─── STEP 1: ROOM & SEAT SELECTION ─── -->
+        <div class="checkout-step-panel" data-step="1">
+
+        </div>
+
+        <!-- ─── STEP 2: TRAVELERS DETAILS & EMERGENCY CONTACT ─── -->
+        <div class="checkout-step-panel" data-step="2" style="display:none">
+          <div class="glass-card" style="padding:28px;margin-bottom:24px">
+            <h2 class="section-title" style="font-size:22px;text-align:left;margin-bottom:8px">Lead <span>Traveler Details</span></h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Enter official passport information matching travel documents.</p>
+
+            <form id="travelers-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">First Name *</label>
+                  <input type="text" id="traveler1-first" class="form-control" placeholder="e.g. John" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Last Name *</label>
+                  <input type="text" id="traveler1-last" class="form-control" placeholder="e.g. Doe" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Email Address *</label>
+                  <input type="email" id="traveler1-email" class="form-control" placeholder="john@example.com" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Phone Number *</label>
+                  <input type="tel" id="traveler1-phone" class="form-control" placeholder="+1 555 0192" required />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Passport Number *</label>
+                <input type="text" id="traveler1-passport" class="form-control" placeholder="e.g. A98241928" required />
+              </div>
+
+              <!-- Emergency Contact -->
+              <h3 style="font-size:16px;font-weight:700;color:var(--text-primary);margin-top:24px;margin-bottom:12px">🚨 Emergency Contact</h3>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Contact Name *</label>
+                  <input type="text" id="emergency-name" class="form-control" placeholder="e.g. Robert Doe" required />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Emergency Phone *</label>
+                  <input type="tel" id="emergency-phone" class="form-control" placeholder="+1 555 9944" required />
+                </div>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;margin-top:24px">
+                <button type="button" class="btn btn-ghost checkout-prev-btn">← Back</button>
+                <button type="button" class="btn btn-primary checkout-next-btn">Continue to Discounts →</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- ─── STEP 3: DISCOUNT ENGINE & COUPONS ─── -->
+        <div class="checkout-step-panel" data-step="3" style="display:none">
+          <div class="glass-card" style="padding:28px;margin-bottom:24px">
+            <h2 class="section-title" style="font-size:22px;text-align:left;margin-bottom:8px">Apply <span>Coupons & Gift Cards</span></h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:24px">Redeem special promotional codes or gift card balances.</p>
+
+            <div style="margin-bottom:24px">
+              <label class="form-label">Coupon Code</label>
+              <div class="coupon-box">
+                <input type="text" class="coupon-input" id="coupon-input-field" placeholder="Try 'SUMMER2026' or 'WANDER50'" />
+                <button type="button" class="btn btn-primary" id="apply-coupon-btn">Apply Coupon</button>
+              </div>
+              <div style="font-size:12px;color:var(--emerald)">💡 Hint: Type <strong>SUMMER2026</strong> for instant $200 discount!</div>
+            </div>
+
+            <div style="margin-bottom:24px">
+              <label class="form-label">Redeem Gift Card</label>
+              <div class="coupon-box">
+                <input type="text" class="coupon-input" id="giftcard-input-field" placeholder="Try 'GIFT-8842'" />
+                <button type="button" class="btn btn-ghost" id="apply-giftcard-btn">Redeem Gift Card</button>
+              </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;margin-top:32px">
+              <button type="button" class="btn btn-ghost checkout-prev-btn">← Back</button>
+              <button type="button" class="btn btn-primary checkout-next-btn">Proceed to Payment →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── STEP 4: PAYMENT GATEWAYS ─── -->
+        <div class="checkout-step-panel" data-step="4" style="display:none">
+          <div class="glass-card" style="padding:28px;margin-bottom:24px">
+            <h2 class="section-title" style="font-size:22px;text-align:left;margin-bottom:8px">Payment <span>Gateway</span></h2>
+            <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">Choose your preferred secure payment method.</p>
+
+            <div class="payment-tabs">
+              <div class="payment-tab active" data-pay-mode="card">💳 Credit / Debit Card</div>
+              <div class="payment-tab" data-pay-mode="paypal">🟦 PayPal</div>
+              <div class="payment-tab" data-pay-mode="klarna">🛍️ Klarna (0% Installments)</div>
+            </div>
+
+            <!-- Card Form -->
+            <div class="payment-form-panel" data-mode="card">
+              <div class="form-group">
+                <label class="form-label">Cardholder Name</label>
+                <input type="text" class="form-control" value="John Doe" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Card Number</label>
+                <input type="text" class="form-control" value="4532 •••• •••• 8842" />
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Expiry Date</label>
+                  <input type="text" class="form-control" value="08/28" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">CVV</label>
+                  <input type="password" class="form-control" value="882" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Paypal / Klarna Panels -->
+            <div class="payment-form-panel" data-mode="paypal" style="display:none;text-align:center;padding:20px">
+              <p style="color:var(--text-secondary)">You will be redirected to PayPal to complete authentication securely.</p>
+            </div>
+            <div class="payment-form-panel" data-mode="klarna" style="display:none;text-align:center;padding:20px">
+              <p style="color:var(--text-secondary)">Pay in 4 equal interest-free installments of <strong>$1,312 / month</strong>.</p>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;margin-top:32px">
+              <button type="button" class="btn btn-ghost checkout-prev-btn">← Back</button>
+              <button type="button" class="btn btn-accent btn-lg checkout-next-btn">🔒 Complete & Pay Now</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── STEP 5: CONFIRMATION OUTPUT ─── -->
+        <div class="checkout-step-panel" data-step="5" style="display:none">
+          <div class="printable-invoice" id="confirmation-output-container"></div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT: ORDER SUMMARY SIDEBAR -->
+      <div>
+        <div class="glass-card order-summary-card" style="padding:24px;position:sticky;top:96px;background:#FFFFFF !important;border:1px solid #E5E7EB !important;border-radius:18px !important;box-shadow:0 8px 30px rgba(0,0,0,0.08) !important;">
+          <!-- Primary Action Button at Top of Order Summary -->
+          <div style="margin-bottom:20px" id="order-summary-action-btn-wrap">
+            <button type="button" class="btn btn-primary checkout-next-btn" style="width:100%;padding:14px 20px;font-size:15px;font-weight:700;border-radius:14px;background:#0B132B !important;color:#FFFFFF !important;border:2px solid #0B132B !important;box-shadow:0 4px 15px rgba(11,19,43,0.15)">
+              Continue to Traveler Details →
+            </button>
+          </div>
+
+          <h3 style="font-size:20px;font-weight:700;color:#111827 !important;margin-bottom:16px;font-family:'Inter', sans-serif;">Order Summary</h3>
+
+          <div style="display:flex;gap:12px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid #E5E7EB">
+            <img id="summary-pkg-img" src="assets/images/dest-maldives.jpg" style="width:70px;height:70px;border-radius:12px;object-fit:cover" />
+            <div>
+              <div id="summary-pkg-title" style="font-weight:700;font-size:15px;color:#111827 !important;font-family:'Inter', sans-serif;line-height:1.4;">Maldives Overwater Paradise</div>
+              <div id="summary-pkg-info" style="font-size:13px;color:#4B5563 !important;font-family:'Inter', sans-serif;margin-top:2px;">7 Days / 6 Nights · 2 Travelers</div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;font-size:14px;color:#374151 !important;margin-bottom:16px;font-family:'Inter', sans-serif;">
+            <div style="display:flex;justify-content:space-between">
+              <span id="summary-base-label" style="color:#374151 !important;font-weight:500;">Base Package ($2,499 x 2):</span>
+              <span id="summary-subtotal" style="color:#111827 !important;font-weight:600;">$4,998</span>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="color:#374151 !important;font-weight:500;">Room Upgrade (Suite):</span>
+              <span id="summary-room-upgrade" style="color:#111827 !important;font-weight:600;">+$250</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;color:#2F6B45 !important;">
+              <span style="color:#2F6B45 !important;font-weight:600;">Discounts Applied:</span>
+              <span id="summary-discount" style="color:#2F6B45 !important;font-weight:700;">-$0</span>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;padding-top:16px;border-top:1px solid #E5E7EB;font-size:18px;font-weight:800;color:#111827 !important;font-family:'Inter', sans-serif;">
+            <span style="color:#111827 !important;font-weight:800;">Total Payable:</span>
+            <span style="color:#2F6B45 !important;font-size:24px;font-weight:800;font-family:'Inter', sans-serif;" id="summary-total">$5,248</span>
+          </div>
+
+          <div style="margin-top:20px;padding:12px;background:#F8FAFC !important;border:1px solid #E2E8F0 !important;border-radius:12px;font-size:12px;font-weight:500;color:#1E2937 !important;text-align:center;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <span>🛡️</span> <span style="color:#1E2937 !important;">Free cancellation within 24 hours of booking.</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════ -->
+<script src="js/database.js"></script>
+<script src="js/main.js"></script>
+<script src="js/booking-engine.js"></script>
+<script src="js/timeline.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/checkout.js"></script>
+<script src="js/fold-text.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (window.BookingEngine && typeof window.BookingEngine.loadSelectedTripFromStorage === 'function') {
+      window.BookingEngine.loadSelectedTripFromStorage();
+    }
+    const d = window.BookingEngine?.draft;
+    const pkgKey = d?.packageKey || d?.destination || 'tokyo-6d';
+    const daysCount = d?.daysCount || 6;
+
+  });
+</script>
+
+</body>
+</html>

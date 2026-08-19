@@ -1,0 +1,2536 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ventoura Travel Agency — Discover the world's most breathtaking destinations. Luxury packages, honeymoon escapes, adventure tours, cruises & more. Book your dream vacation today." />
+  <meta name="keywords" content="travel agency, vacation packages, luxury travel, honeymoon, adventure tours, cruises, beach holidays, international tours" />
+  <meta name="author" content="Ventoura Travel Agency" />
+  <meta property="og:title" content="Ventoura Travel — Travel Beyond Every Horizon in Luxury" />
+  <meta property="og:description" content="Premium travel packages to 100+ destinations. Best price guarantee. 24/7 support." />
+  <meta property="og:type" content="website" />
+  <script>
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    if (window.location.hash) {
+      history.replaceState(null, null, window.location.pathname);
+    }
+    window.scrollTo(0, 0);
+  </script>
+  <title>Ventoura Travel | World-Class Luxury Travel & Beyond Every Horizon</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/lumora-utilities.css?v=clean2026_v3" />
+  <link rel="stylesheet" href="css/style.css?v=clean2026_v3" />
+  <link rel="stylesheet" href="css/enquiry.css?v=clean2026_v3" />
+  <link rel="stylesheet" href="css/dark-light.css?v=clean2026_v3" />
+  <link rel="stylesheet" href="css/services.css?v=clean2026_v3" />
+  <link rel="stylesheet" href="css/timeline.css?v=clean2026_v3" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Supabase JS Client Integration -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/wishlist.js"></script>
+
+  <script>
+    /* ============================================================
+       GLOBAL AUTH MODAL OPEN/CLOSE CONTROLS
+       ============================================================ */
+    window.openAuthModal = function(mode) {
+      mode = mode || 'login';
+      var modal = document.getElementById('auth-modal') || document.querySelector('.auth-modal');
+      if (!modal) return;
+      modal.dataset.mode = mode;
+      var title = modal.querySelector('.auth-title');
+      var subtitle = modal.querySelector('.auth-subtitle');
+      var nameInp = modal.querySelector('#auth-name-input');
+      var submitBtn = modal.querySelector('button[type="submit"], #auth-submit-btn');
+      var switchText = modal.querySelector('.auth-switch');
+
+      if (mode === 'register') {
+        if (title) title.textContent = 'Create Account';
+        if (subtitle) subtitle.textContent = 'Join Ventoura Travel to unlock member discounts & instant vouchers.';
+        if (nameInp) { nameInp.style.display = 'block'; nameInp.required = true; }
+        if (submitBtn) submitBtn.textContent = 'Create Account';
+        if (switchText) switchText.innerHTML = 'Already have an account? <a id="auth-switch-link" href="javascript:void(0)">Log In</a>';
+      } else {
+        if (title) title.textContent = 'Welcome Back';
+        if (subtitle) subtitle.textContent = 'Sign in to access your bookings and exclusive deals.';
+        if (nameInp) { nameInp.style.display = 'none'; nameInp.required = false; }
+        if (submitBtn) submitBtn.textContent = 'Sign In';
+        if (switchText) switchText.innerHTML = 'Don\'t have an account? <a id="auth-switch-link" href="javascript:void(0)">Sign Up</a>';
+      }
+
+      var link = modal.querySelector('#auth-switch-link');
+      if (link) {
+        link.onclick = function(e) {
+          e.preventDefault();
+          window.openAuthModal(modal.dataset.mode === 'login' ? 'register' : 'login');
+        };
+      }
+
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+
+      setTimeout(function() {
+        if (mode === 'register' && nameInp && nameInp.style.display !== 'none') {
+          nameInp.focus();
+        } else {
+          var email = modal.querySelector('#auth-email-input, input[type="email"]');
+          if (email) email.focus();
+        }
+      }, 100);
+    };
+
+    window.closeAuthModal = function() {
+      var modal = document.getElementById('auth-modal') || document.querySelector('.auth-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    };
+  </script>
+
+
+
+  <style>
+    /* Inline critical path styles */
+    .nav-selector-wrap { position: relative; }
+    .nav-selector-wrap .nav-dropdown { left: 0; min-width: 140px; }
+    .auth-modal {
+      position: fixed; inset: 0; z-index: 2000;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden; transition: all 0.3s ease;
+    }
+    .auth-modal.open { opacity: 1; visibility: visible; }
+    .auth-modal-box {
+      background: #111827; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 24px; padding: 40px; width: 100%; max-width: 440px;
+      position: relative;
+    }
+    .auth-modal-close {
+      position: absolute; top: 16px; right: 16px;
+      width: 32px; height: 32px; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #94A3B8; font-size: 16px;
+    }
+    .auth-title { font-size: 26px; font-weight: 800; color: #F0F4FF; margin-bottom: 6px; }
+    .auth-subtitle { font-size: 14px; color: #64748B; margin-bottom: 28px; }
+    .auth-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+    .auth-divider span { font-size: 12px; color: #64748B; }
+    .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08); }
+    .auth-social-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 12px; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+      color: #F0F4FF; font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s ease; margin-bottom: 10px;
+    }
+    .auth-social-btn:hover { background: rgba(255,255,255,0.1); }
+    .auth-switch { text-align: center; font-size: 14px; color: #64748B; margin-top: 20px; }
+    .auth-switch a { color: #38BDF8; cursor: pointer; }
+    .map-popup .leaflet-popup-content-wrapper { background: none !important; border: none !important; box-shadow: none !important; padding: 0 !important; }
+    .map-popup .leaflet-popup-tip { background: #111827 !important; }
+    .map-popup .leaflet-popup-content { margin: 0 !important; }
+    .cruise-track-wrap, .reviews-track-wrap { overflow: hidden; }
+    .cruise-track, .reviews-track { display: flex; gap: 24px; transition: transform 0.5s cubic-bezier(0.4,0,0.2,1); }
+    .section-view-all { text-align: center; margin-top: 48px; }
+    @keyframes heartPop {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.4); }
+      100% { transform: scale(1); }
+    }
+    .dest-dubai-bg { background: linear-gradient(135deg, #1a0533, #2d1b69); }
+    .dest-placeholder {
+      width: 100%; height: 100%; object-fit: cover;
+      background: linear-gradient(135deg, #0D1527, #1E3A5F);
+    }
+    /* ── Hero 4K Fallback Image ── */
+    #lumora-video-container {
+      background: url('https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+    }
+    /* ── Force Dark Mode on all section groups ── */
+    .section-group-discovery, .section-group-experiences, .section-group-ending {
+      background-color: var(--bg-primary, #121619) !important;
+    }
+    body.light-mode .section-group-discovery,
+    body.light-mode .section-group-experiences,
+    body.light-mode .section-group-ending {
+      background-color: #FAF8F5 !important;
+    }
+    /* ── Destination Card 4K Images ── */
+    .destination-img { object-fit: cover; width: 100%; height: 100%; }
+
+    /* ═══════════════════════════════════════════════════
+       FULLSCREEN HERO BACKGROUND-ONLY STYLES
+    ═══════════════════════════════════════════════════ */
+    .hero-bg-only-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      min-height: 100vh;
+      overflow: hidden;
+      /* Rich dark gradient — never plain black while video buffers */
+      background: linear-gradient(135deg, #0a1628 0%, #0d2137 35%, #0a2a3a 65%, #061018 100%);
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    .hero-bg-only-video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 115%;
+      height: 115%;
+      object-fit: cover;
+      object-position: top center;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 1;
+      will-change: transform;
+      animation: heroSlowZoom 25s ease-in-out infinite alternate;
+    }
+
+    .hero-bg-only-video.video-ready {
+      opacity: 1;
+    }
+
+    @keyframes heroSlowZoom {
+      0% {
+        transform: translate(-50%, -50%) scale(1.00);
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1.05);
+      }
+    }
+
+    .hero-bg-only-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.20);
+      pointer-events: none;
+      z-index: 1;
+    }
+  </style>
+</head>
+<body>
+
+
+
+<!-- ═══════════════════════════════════════════════════
+     NAVIGATION BAR
+═══════════════════════════════════════════════════ -->
+<header class="navbar" id="navbar">
+  <div class="container">
+    <nav class="nav-inner">
+
+      <!-- Logo -->
+      <a href="index.html" class="nav-logo" aria-label="Ventoura Travel Home">
+        <img src="assets/images/logo.png" alt="Ventoura Travel Logo" class="brand-logo-img" />
+      </a>
+
+
+      <!-- Base UI Navigation Menu -->
+      <nav class="base-nav-menu" aria-label="Main Navigation">
+        <ul class="base-nav-menu-list">
+
+          <!-- 1. Destinations Item -->
+          <li class="base-nav-menu-item" data-menu="destinations">
+            <button class="base-nav-menu-trigger" aria-expanded="false" aria-controls="nav-destinations-content">
+              Destinations <span class="chevron">▾</span>
+            </button>
+            <div class="base-nav-menu-content" id="nav-destinations-content">
+              <!-- Dynamically populated from CMS/Database -->
+            </div>
+          </li>
+
+          <!-- 2. Packages Item -->
+          <li class="base-nav-menu-item" data-menu="packages">
+            <button class="base-nav-menu-trigger" aria-expanded="false" aria-controls="nav-packages-content">
+              Packages <span class="chevron">▾</span>
+            </button>
+            <div class="base-nav-menu-content" id="nav-packages-content">
+              <!-- Dynamically populated from CMS/Database -->
+            </div>
+          </li>
+
+          <!-- 3. Cruises Link -->
+          <li class="base-nav-menu-item">
+            <a href="#cruises" class="base-nav-menu-link" target="_self">Cruises</a>
+          </li>
+
+          <!-- 4. Blog Link -->
+          <li class="base-nav-menu-item">
+            <a href="#blog" class="base-nav-menu-link" target="_self">Blog</a>
+          </li>
+
+          <!-- 5. Contact Link -->
+          <li class="base-nav-menu-item">
+            <a href="#contact" class="base-nav-menu-link" target="_self">Contact</a>
+          </li>
+
+        </ul>
+
+        <!-- Navigation Menu Indicator -->
+        <div class="base-nav-menu-indicator" aria-hidden="true"></div>
+      </nav>
+
+      <!-- Nav Actions -->
+      <div class="nav-actions">
+        <!-- Language Selector -->
+        <div class="nav-selector-wrap nav-item">
+          <button class="nav-selector" id="lang-selector" onclick="window.toggleLangDropdown(event)" aria-label="Language">
+            🌐 <span class="selector-val">EN</span> <span style="font-size:9px">▾</span>
+          </button>
+          <div class="nav-dropdown" id="lang-dropdown"></div>
+        </div>
+
+        <!-- Currency Selector -->
+        <div class="nav-selector-wrap nav-item">
+          <button class="nav-selector" id="currency-selector" onclick="window.toggleCurrDropdown(event)" aria-label="Currency">
+            💱 <span class="selector-val">₹ INR</span> <span style="font-size:9px">▾</span>
+          </button>
+          <div class="nav-dropdown" id="currency-dropdown"></div>
+        </div>
+
+
+        <!-- Search -->
+        <button class="nav-action-btn" id="search-trigger" aria-label="Search">🔍</button>
+
+        <!-- Wishlist -->
+        <button class="nav-action-btn" id="wishlist-trigger" aria-label="Wishlist">
+          ❤️
+          <span class="badge-count" id="wishlist-count">0</span>
+        </button>
+
+
+        <!-- Login -->
+        <button class="btn btn-ghost btn-sm" id="login-btn" onclick="window.openAuthModal('login')" style="padding: 8px 14px; font-size:13px; cursor:pointer;">Login</button>
+
+        <!-- Register -->
+        <button class="btn btn-primary btn-sm" id="register-btn" onclick="window.openAuthModal('register')" style="padding: 8px 16px; font-size:13px; cursor:pointer;">Register</button>
+
+        <!-- Hamburger -->
+        <button class="hamburger" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </nav>
+  </div>
+</header>
+
+<!-- Mobile Nav Overlay -->
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <div class="mobile-nav-item">
+    <a href="#destinations" class="mobile-nav-link">🌍 Destinations</a>
+  </div>
+  <div class="mobile-nav-item">
+    <a href="#packages" class="mobile-nav-link">📦 Packages</a>
+  </div>
+
+  <div class="mobile-nav-item">
+    <a href="#cruises" class="mobile-nav-link">🚢 Cruises</a>
+  </div>
+  <div class="mobile-nav-item">
+    <a href="#blog" class="mobile-nav-link">📝 Blog</a>
+  </div>
+  <div class="mobile-nav-item">
+    <a href="#contact" class="mobile-nav-link">📞 Contact</a>
+  </div>
+  <div style="margin-top: 32px; display: flex; gap: 12px;">
+    <button class="btn btn-ghost" style="flex:1; cursor:pointer;" id="mobile-login" onclick="window.openAuthModal('login')">Login</button>
+    <button class="btn btn-primary" style="flex:1; cursor:pointer;" id="mobile-register" onclick="window.openAuthModal('register')">Register</button>
+  </div>
+</nav>
+
+<!-- Search Overlay -->
+<div class="search-overlay" role="dialog" aria-label="Search">
+  <div class="search-overlay-box" style="max-width: 720px; width: 90%;">
+    <input
+      type="text"
+      id="global-search-input"
+      class="search-overlay-input"
+      placeholder="Search destinations, countries, hotels, packages, cruises, flights, cities, activities..."
+      aria-label="Search"
+      autocomplete="off"
+    />
+    <button class="search-overlay-close" onclick="document.querySelector('.search-overlay').classList.remove('open')">✕</button>
+    <div style="margin-top:16px; display:flex; gap:8px; flex-wrap:wrap;" id="search-popular-tags">
+      <span class="search-tag" style="cursor:pointer;">🏖️ Maldives</span>
+      <span class="search-tag" style="cursor:pointer;">🗼 Paris</span>
+      <span class="search-tag" style="cursor:pointer;">🌺 Bali</span>
+      <span class="search-tag" style="cursor:pointer;">🏙️ Dubai</span>
+      <span class="search-tag" style="cursor:pointer;">🌸 Japan</span>
+      <span class="search-tag" style="cursor:pointer;">🏛️ Greece</span>
+      <span class="search-tag" style="cursor:pointer;">🦁 Safari</span>
+      <span class="search-tag" style="cursor:pointer;">🚢 Cruise</span>
+    </div>
+    <!-- Instant Live Search Results Container -->
+    <div id="global-search-results" class="search-results-list" style="margin-top:20px; max-height:450px; overflow-y:auto; display:none; border-top:1px solid rgba(255,255,255,0.1); padding-top:16px;"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     FULLSCREEN PREMIUM HERO BACKGROUND ONLY
+═══════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════
+     HERO SECTION — CINEMATIC LUXURY DISCOVERY
+═══════════════════════════════════════════════════ -->
+<section class="hero" id="home" style="position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center; padding:120px 24px 60px; overflow:hidden; background:#071525;">
+
+  <!-- Cinematic Background Video -->
+  <div class="hero-bg" style="position:absolute; inset:0; z-index:0; overflow:hidden;">
+    <video id="hero-bg-video" autoplay muted loop playsinline style="width:100%; height:100%; object-fit:cover; filter:brightness(0.55) contrast(1.1);">
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260329_050842_be71947f-f16e-4a14-810c-06e83d23ddb5.mp4" type="video/mp4" />
+    </video>
+    <div class="hero-bg-overlay" style="position:absolute; inset:0; background:linear-gradient(to bottom, rgba(7,21,37,0.7) 0%, rgba(7,21,37,0.4) 50%, #071525 100%);"></div>
+  </div>
+
+
+
+  <!-- Hero Main Content Box -->
+  <div class="container" style="position:relative; z-index:2; text-align:center; max-width:960px; margin:0 auto;">
+    
+
+
+
+
+
+
+
+
+  </div>
+</section>
+
+<script>
+  // Video plays for 4 seconds then restarts from beginning
+  (function() {
+    var vid = document.getElementById('hero-bg-video');
+    if (!vid) return;
+
+    var loopTimer = null;
+
+    function startLoop() {
+      clearTimeout(loopTimer);
+      vid.currentTime = 0;
+      vid.play().catch(function() {});
+      loopTimer = setTimeout(function() {
+        vid.currentTime = 0;
+        vid.play().catch(function() {});
+        startLoop();
+      }, 4000);
+    }
+
+    vid.addEventListener('canplay', function() {
+      startLoop();
+    }, { once: true });
+
+    // If already ready (cached)
+    if (vid.readyState >= 3) {
+      startLoop();
+    }
+
+    vid.addEventListener('error', function() {
+      vid.style.display = 'none';
+      clearTimeout(loopTimer);
+    });
+  })();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION GROUP 2 — TRAVEL DISCOVERY (ELEGANT LUXURY CREAM)
+═══════════════════════════════════════════════════ -->
+<div class="section-group-discovery">
+
+
+
+<!-- ═══════════════════════════════════════════════════
+     FEATURED DESTINATIONS
+═══════════════════════════════════════════════════ -->
+<section class="section" id="destinations">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="section-header reveal">
+      <div class="section-badge">Top Picks</div>
+      <h2 class="section-title">Featured <span>Destinations</span></h2>
+      <p class="section-subtitle">Handpicked destinations that our travel experts love — each offering unique experiences you'll treasure forever.</p>
+    </div>
+
+    <div class="destinations-grid">
+      <!-- 1. Amalfi Coast Escape -->
+      <div class="destination-card reveal-left" data-dest="Amalfi">
+        <img class="destination-img" src="assets/images/amalfi-view-1.jpg" alt="Amalfi Coast Escape, Italy" loading="lazy" />
+        <div class="destination-overlay"></div>
+        <div class="destination-info">
+          <div class="destination-country">🇮🇹 Italy</div>
+          <div class="destination-name">Amalfi Coast Escape</div>
+          <div class="destination-meta">
+            <span>⭐ 4.96</span>
+            <span>✈️ From ₹2,85,000</span>
+            <span>📅 7 Days / 6 Nights</span>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:6px;line-height:1.5;">Cliffside pastel villages, private yacht charters to Capri &amp; Michelin-starred dining.</div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Amalfi Coast Escape" data-type="destination" data-id="Amalfi" style="flex:1; padding:6px 12px; font-size:12px; justify-content:center;">Explore 🗺️</button>
+            <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Amalfi Coast Escape" data-item-type="destination" data-item-price="₹2,85,000" data-item-duration="7 Days / 6 Nights" style="flex:1; padding:6px 12px; font-size:12px; justify-content:center;">Book Now →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Kyoto Zen Retreat -->
+      <div class="destination-card reveal" data-dest="Kyoto">
+        <img class="destination-img" src="assets/images/kyoto-view-1.jpg" alt="Kyoto Zen Retreat, Japan" loading="lazy" />
+        <div class="destination-overlay"></div>
+        <div class="destination-info">
+          <div class="destination-country">🇯🇵 Japan</div>
+          <div class="destination-name">Kyoto Zen Retreat</div>
+          <div class="destination-meta">
+            <span>⭐ 4.95</span>
+            <span>✈️ From ₹3,20,000</span>
+            <span>📅 7 Days / 6 Nights</span>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:6px;line-height:1.5;">Ancient bamboo groves, private tea master ceremonies &amp; luxury riverfront ryokan onsens.</div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Kyoto Zen Retreat" data-type="destination" data-id="Kyoto" style="flex:1; padding:6px 12px; font-size:12px; justify-content:center;">Explore 🗺️</button>
+            <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Kyoto Zen Retreat" data-item-type="destination" data-item-price="₹3,20,000" data-item-duration="7 Days / 6 Nights" style="flex:1; padding:6px 12px; font-size:12px; justify-content:center;">Book Now →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Maldives Private Haven -->
+      <div class="destination-card reveal" data-dest="Maldives">
+        <img class="destination-img" src="assets/images/maldives-view-1.jpg" alt="Maldives Private Haven" loading="lazy" />
+        <div class="destination-overlay"></div>
+        <div class="destination-info">
+          <div class="destination-country">🇲🇻 Maldives</div>
+          <div class="destination-name">Maldives Private Haven</div>
+          <div class="destination-meta">
+            <span>⭐ 4.99</span>
+            <span>✈️ From ₹4,50,000</span>
+            <span>📅 7 Days / 6 Nights</span>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:6px;line-height:1.5;">Seaplane transfers, luxury overwater pool villas, sea turtle snorkeling &amp; subsea dining.</div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Maldives Private Haven" data-type="destination" data-id="Maldives" style="flex:1; padding:6px 12px; font-size:12px; justify-content:center;">Explore 🗺️</button>
+            <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Maldives Private Haven" data-item-type="destination" data-item-price="₹4,50,000" data-item-duration="7 Days / 6 Nights" style="flex:1; padding:6px 12px; font-size:12px; justify-content:center;">Book Now →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Patagonia Odyssey -->
+      <div class="destination-card reveal" data-dest="Patagonia">
+        <img class="destination-img" src="assets/images/patagonia-view-1.jpg" alt="Patagonia Odyssey, Argentina &amp; Chile" loading="lazy" />
+        <div class="destination-overlay"></div>
+        <div class="destination-info">
+          <div class="destination-country">🇦🇷 Argentina &amp; Chile</div>
+          <div class="destination-name">Patagonia Odyssey</div>
+          <div class="destination-meta">
+            <span>⭐ 4.93</span>
+            <span>✈️ From ₹3,45,000</span>
+            <span>📅 7 Days / 6 Nights</span>
+          </div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:6px;line-height:1.5;">Hike beneath Torres del Paine granite horns, trek blue glacier ice &amp; estancia BBQ feasts.</div>
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Patagonia Odyssey" data-type="destination" data-id="Patagonia" style="flex:1; padding:6px 12px; font-size:12px; justify-content:center;">Explore 🗺️</button>
+            <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Patagonia Odyssey" data-item-type="destination" data-item-price="₹3,45,000" data-item-duration="7 Days / 6 Nights" style="flex:1; padding:6px 12px; font-size:12px; justify-content:center;">Book Now →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-view-all" style="margin-top: 24px; text-align: center;">
+      <a href="services.html?cat=destinations" class="btn btn-outline btn-md" style="padding: 10px 24px;">View All Destinations →</a>
+    </div>
+  </div>
+</section>
+
+<script>
+(function() {
+  function formatINR(price) {
+    let num = Number(price);
+    if (isNaN(num) || num <= 0) return '₹0';
+    if (num < 10000) num = num * 100;
+    return '₹' + num.toLocaleString('en-IN');
+  }
+
+  function formatDuration(item) {
+    if (!item) return '7 Days / 6 Nights';
+    if (item.duration && item.duration.includes('Nights')) return item.duration;
+    let days = item.days || 7;
+    let nights = item.nights || (days > 1 ? days - 1 : 1);
+    return `${days} Days / ${nights} Nights`;
+  }
+
+  async function loadWebsiteDynamicContent() {
+    try {
+      const [destRes, pkgRes, hotelRes, cruiseRes, blogRes, galleryRes, faqRes] = await Promise.all([
+        fetch('/api/destinations').then(r => r.json()).catch(() => null),
+        fetch('/api/packages').then(r => r.json()).catch(() => null),
+        fetch('/api/hotels').then(r => r.json()).catch(() => null),
+        fetch('/api/cruises').then(r => r.json()).catch(() => null),
+        fetch('/api/blogs').then(r => r.json()).catch(() => null),
+        fetch('/api/gallery').then(r => r.json()).catch(() => null),
+        fetch('/api/faqs').then(r => r.json()).catch(() => null)
+      ]);
+
+      // 1. Destinations preview
+      if (destRes && destRes.success && Array.isArray(destRes.data)) {
+        const grid = document.querySelector('#destinations .destinations-grid');
+        if (grid) {
+          const publishedDest = destRes.data.filter(d => !d.status || ['published', 'active', 'approved', 'Active', 'Published'].includes(d.status));
+          const items = publishedDest.slice(0, 8);
+          if (items.length > 0) {
+            window._ventouraDestItems = items;
+            grid.innerHTML = items.map((d, i) => `
+              <div class="destination-card" data-dest="${d.title || d.name}" data-id="${d.id || d._id}">
+                <div class="destination-img-wrap">
+                  <img class="destination-img" src="${d.image || d.heroImg || d.image_url || d.imageUrl || 'assets/images/dest-maldives.jpg'}" alt="${d.title || d.name}" onerror="this.onerror=null;this.src='assets/images/dest-maldives.jpg'" loading="lazy" />
+                  <button type="button" class="card-wishlist-btn package-wishlist btn-wishlist" data-id="${d.id || d._id || d.title}" data-type="destination" aria-label="Save to Wishlist" title="Save to Wishlist">♡</button>
+                </div>
+                <div class="destination-info">
+                  <div>
+                    <div class="destination-country">📍 ${d.city ? d.city.toUpperCase() : (d.country ? d.country.toUpperCase() : 'GLOBAL')}</div>
+                    <div class="destination-name">${d.title || d.name}</div>
+                    <div class="destination-meta">
+                      <span>⭐ ${d.rating || 4.9}</span>
+                      <span>✈️ From ${formatINR(d.startingPrice || d.starting_price || d.price || 180000)}</span>
+                      <span>📅 ${formatDuration(d)}</span>
+                      <span>👥 ${d.includedGuests || d.included_guests || 2} Guests</span>
+                    </div>
+                    <div class="destination-description">${d.description || ''}</div>
+                  </div>
+                  <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px;">
+                    <button type="button" class="btn btn-outline btn-sm btn-explore-dest" onclick="window.VentouraEnquiry.openDetailPage(window._ventouraDestItems[${i}], 'destination')" style="padding:7px 10px; font-size:11px; font-weight:700; border-radius:8px; justify-content:center;">Explore 🗺️</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="window.VentouraEnquiry.openEnquiryModal(window._ventouraDestItems[${i}], 'destination')" style="padding:7px 10px; font-size:11px; font-weight:700; border-radius:8px; justify-content:center; text-align:center;">Book Now →</button>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      }
+
+      // 2. Packages dynamic loading and category filtering
+      if (pkgRes && pkgRes.success && Array.isArray(pkgRes.data)) {
+        window._allVentouraPackages = pkgRes.data;
+        window.renderFilteredPackages(window._currentActivePackageCategory || 'all');
+      }
+
+      // 3. Hotels dynamic loading
+      if (hotelRes && hotelRes.success && Array.isArray(hotelRes.data)) {
+        const grid = document.querySelector('#hotels .hotels-grid');
+        if (grid) {
+          const publishedHotels = hotelRes.data.filter(h => !h.status || ['published', 'active', 'approved', 'Active', 'Published'].includes(h.status));
+          if (publishedHotels.length > 0) {
+            window._ventouraHotelItems = publishedHotels;
+            grid.innerHTML = publishedHotels.slice(0, 6).map((h, i) => `
+              <div class="hotel-card">
+                <div class="hotel-img-wrap">
+                  <img class="hotel-img" src="${h.heroImage || h.heroImg || h.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=3840&q=95'}" alt="${h.name || h.title}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=3840&q=95'" loading="lazy" />
+                  <div class="hotel-category">📍 ${h.location || h.city || h.country || 'Resort Sanctuary'}</div>
+                </div>
+                <div class="hotel-body">
+                  <div class="stars" style="margin-bottom:8px">
+                    <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+                  </div>
+                  <h3 class="hotel-name">${h.name || h.title}</h3>
+                  <div class="hotel-location">📍 ${h.location || h.city || h.country || 'Global Sanctuary'}</div>
+                  <div class="hotel-footer">
+                    <div>
+                      <div class="hotel-price-label">From per night</div>
+                      <div class="hotel-price">${formatINR(h.price || 120000)} <span>/ night</span></div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                      <button type="button" class="btn btn-outline btn-sm btn-explore" onclick="window.VentouraEnquiry.openDetailPage(window._ventouraHotelItems[${i}], 'hotel')" style="padding:8px 14px; font-size:12px; font-weight:700;">Explore Specs 🔍</button>
+                      <button type="button" class="btn btn-primary btn-sm btn-book-now" onclick="window.VentouraEnquiry.openEnquiryModal(window._ventouraHotelItems[${i}], 'hotel')" style="padding:8px 14px; font-size:12px; font-weight:700;">Book Room →</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      }
+
+      // 4. Cruises dynamic loading
+      if (cruiseRes && cruiseRes.success && Array.isArray(cruiseRes.data)) {
+        const track = document.getElementById('cruise-track');
+        if (track) {
+          const publishedCruises = cruiseRes.data.filter(c => !c.status || ['published', 'active', 'approved', 'Active', 'Published'].includes(c.status));
+          if (publishedCruises.length > 0) {
+            window._ventouraCruiseItems = publishedCruises;
+            track.innerHTML = publishedCruises.map((c, i) => `
+              <div class="cruise-card">
+                <img class="cruise-img" src="${c.image || c.heroImg || 'assets/images/mediterranean-magic.jpg'}" alt="${c.title || c.vessel}" onerror="this.onerror=null;this.src='assets/images/mediterranean-magic.jpg'" loading="lazy" />
+                <div class="cruise-body">
+                  <div class="cruise-route">🌊 ${c.route || c.vessel || 'Luxury Cruise Route'}</div>
+                  <h3 class="cruise-name">${c.title || c.vessel || c.name}</h3>
+                  <div class="cruise-details">
+                    <span class="cruise-detail">⛵ ${c.duration || '7 Nights'}</span>
+                    <span class="cruise-detail">🍽️ ${c.dining || 'All Incl.'}</span>
+                  </div>
+                  <div class="cruise-footer">
+                    <div>
+                      <div style="font-size:12px;color:var(--text-muted)">From per person</div>
+                      <div style="font-size:22px;font-weight:800;color:var(--accent)">${formatINR(c.price || 189900)}</div>
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                      <button type="button" class="btn btn-outline btn-sm btn-explore" onclick="window.VentouraEnquiry.openDetailPage(window._ventouraCruiseItems[${i}], 'cruise')" style="padding:6px 12px; font-size:12px; font-weight:700;">Explore 🌊</button>
+                      <button type="button" class="btn btn-primary btn-sm btn-book-now" onclick="window.VentouraEnquiry.openEnquiryModal(window._ventouraCruiseItems[${i}], 'cruise')" style="padding:6px 12px; font-size:12px;">Book Cruise →</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      }
+
+      // 5. Blogs dynamic loading
+      if (blogRes && blogRes.success && Array.isArray(blogRes.data)) {
+        const grid = document.querySelector('#blog .blogs-grid');
+        if (grid) {
+          const publishedBlogs = blogRes.data.filter(b => !b.status || ['published', 'active', 'approved', 'Active', 'Published'].includes(b.status));
+          if (publishedBlogs.length > 0) {
+            grid.innerHTML = publishedBlogs.slice(0, 6).map(b => `
+              <article class="blog-card">
+                <div class="blog-img-wrap">
+                  <img class="blog-img" src="${b.coverImage || b.image || 'assets/images/dest-maldives.jpg'}" alt="${b.title}" onerror="this.onerror=null;this.src='assets/images/dest-maldives.jpg'" loading="lazy" />
+                </div>
+                <div class="blog-body">
+                  <div class="blog-category">${b.category || '🏖️ DESTINATION GUIDE'}</div>
+                  <h3 class="blog-title">${b.title}</h3>
+                  <p class="blog-excerpt">${b.excerpt || (b.content ? b.content.replace(/<[^>]*>/g, '').substring(0, 140) + '...' : 'Explore insider travel tips and destination guides.')}</p>
+                  <div class="blog-meta">
+                    <div class="blog-author">
+                      <span class="blog-author-name">${b.author || 'Emma Watson'}</span>
+                    </div>
+                    <span class="blog-date">${b.date || b.published || 'July 2026'}</span>
+                    <span class="blog-read-time">⏱️ ${b.readTime || '5 min read'}</span>
+                  </div>
+                </div>
+              </article>
+            `).join('');
+          }
+        }
+      }
+
+      // 6. Gallery dynamic loading
+      if (galleryRes && galleryRes.success && Array.isArray(galleryRes.data)) {
+        const grid = document.querySelector('#gallery .gallery-grid');
+        if (grid) {
+          const activeGallery = galleryRes.data.filter(g => !g.status || ['published', 'active', 'approved', 'Active', 'Published'].includes(g.status));
+          if (activeGallery.length > 0) {
+            grid.innerHTML = activeGallery.slice(0, 8).map(g => `
+              <div class="gallery-item" onclick="window.openImageLightbox('${g.url || g.image}', '${g.title || 'Gallery'}')" style="position:relative; height:180px; border-radius:16px; overflow:hidden; cursor:pointer;">
+                <img src="${g.url || g.image}" alt="${g.title || 'Gallery'}" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" loading="lazy" />
+                <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.8) 0%, transparent 60%); padding:12px; display:flex; align-items:flex-end;"><span style="color:#fff; font-size:12px; font-weight:700;">📍 ${g.title || 'Luxury Destination'}</span></div>
+              </div>
+            `).join('');
+          }
+        }
+      }
+
+      // 7. FAQs dynamic loading
+      if (faqRes && faqRes.success && Array.isArray(faqRes.data)) {
+        const grid = document.querySelector('#faq .faq-grid');
+        if (grid) {
+          const activeFaqs = faqRes.data.filter(f => !f.status || ['published', 'active', 'approved', 'Active', 'Published'].includes(f.status));
+          if (activeFaqs.length > 0) {
+            grid.innerHTML = activeFaqs.map((f, i) => `
+              <div class="faq-item ${i===0?'open':''}" id="faq-item-${i}" data-faq-index="${i}">
+                <div class="faq-question" role="button" tabindex="0" onclick="window.toggleFaq(${i})">
+                  <span class="faq-q-text">${f.question || f.q}</span>
+                  <span class="faq-icon">${i===0?'−':'+'}</span>
+                </div>
+                <div class="faq-answer">
+                  <div class="faq-answer-inner">${f.answer || f.a}</div>
+                </div>
+              </div>
+            `).join('');
+          }
+        }
+      }
+
+      if (window.VentouraWishlist && typeof window.VentouraWishlist.attachToCards === 'function') window.VentouraWishlist.attachToCards();
+      if (window.VentouraCurrency && typeof window.VentouraCurrency.updateAllPrices === 'function') window.VentouraCurrency.updateAllPrices();
+      if (window.VentouraI18n && typeof window.VentouraI18n.translatePage === 'function') window.VentouraI18n.translatePage();
+    } catch (e) {
+      console.warn('Dynamic content load error:', e);
+    }
+  }
+
+  window._currentActivePackageCategory = 'all';
+  window._allVentouraPackages = [];
+
+  window.selectPackageCategory = function(targetCategory) {
+    window._currentActivePackageCategory = targetCategory || 'all';
+    
+    // Update active tab button UI
+    const tabs = document.querySelectorAll('.packages-tab');
+    tabs.forEach(tab => {
+      if (tab.dataset.tab === targetCategory) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    // Render filtered packages
+    window.renderFilteredPackages(targetCategory);
+  };
+
+  window.renderFilteredPackages = function(category = 'all', searchQuery = '') {
+    const grid = document.querySelector('#packages .packages-grid');
+    if (!grid) return;
+
+    const allPkgs = window._allVentouraPackages || [];
+    const publishedPkgs = allPkgs.filter(p => !p.status || ['published', 'active', 'approved', 'Active', 'Published'].includes(p.status));
+
+    const matchesCategory = (pkg, cat) => {
+      if (!cat || cat === 'all') return true;
+      const catLower = cat.toLowerCase();
+
+      if (pkg.category && pkg.category.toLowerCase() === catLower) return true;
+      if (Array.isArray(pkg.categories) && pkg.categories.some(c => String(c).toLowerCase() === catLower)) return true;
+      if (pkg.type && pkg.type.toLowerCase() === catLower) return true;
+      if (Array.isArray(pkg.tags) && pkg.tags.some(t => String(t).toLowerCase() === catLower)) return true;
+
+      if (typeof pkg.category === 'string') {
+        const pCat = pkg.category.toLowerCase();
+        if (catLower === 'beach' && (pCat.includes('beach') || pCat.includes('coastal') || pCat.includes('island') || pCat.includes('atoll'))) return true;
+        if (catLower === 'adventure' && (pCat.includes('adventure') || pCat.includes('trek') || pCat.includes('hiking') || pCat.includes('patagonia'))) return true;
+        if (catLower === 'luxury' && (pCat.includes('luxury') || pCat.includes('villa') || pCat.includes('escape'))) return true;
+        if (catLower === 'honeymoon' && (pCat.includes('honeymoon') || pCat.includes('romantic'))) return true;
+        if (catLower === 'family' && (pCat.includes('family') || pCat.includes('all-inclusive'))) return true;
+        if (catLower === 'solo' && (pCat.includes('solo') || pCat.includes('mindfulness') || pCat.includes('zen'))) return true;
+        if (catLower === 'business' && (pCat.includes('business') || pCat.includes('corporate') || pCat.includes('executive'))) return true;
+        if (catLower === 'safari' && (pCat.includes('safari') || pCat.includes('wildlife') || pCat.includes('serengeti'))) return true;
+        if (catLower === 'cruise' && (pCat.includes('cruise') || pCat.includes('voyage') || pCat.includes('yacht') || pCat.includes('sailing'))) return true;
+        if (catLower === 'pilgrimage' && (pCat.includes('pilgrimage') || pCat.includes('zen') || pCat.includes('temple') || pCat.includes('spiritual') || pCat.includes('heritage'))) return true;
+        if (catLower === 'road' && (pCat.includes('road') || pCat.includes('drive') || pCat.includes('panoramic'))) return true;
+        if (catLower === 'camping' && (pCat.includes('camping') || pCat.includes('glamping') || pCat.includes('dome') || pCat.includes('tent'))) return true;
+      }
+      return false;
+    };
+
+    let filtered = publishedPkgs.filter(p => matchesCategory(p, category));
+
+    if (searchQuery && searchQuery.trim() !== '') {
+      const q = searchQuery.toLowerCase().trim();
+      filtered = filtered.filter(p => 
+        (p.title && p.title.toLowerCase().includes(q)) ||
+        (p.destination && p.destination.toLowerCase().includes(q)) ||
+        (p.description && p.description.toLowerCase().includes(q)) ||
+        (p.country && p.country.toLowerCase().includes(q))
+      );
+    }
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="package-empty-state" style="grid-column: 1 / -1; text-align: center; padding: 48px 24px; background: rgba(13, 33, 56, 0.6); border: 1px dashed #20354A; border-radius: 18px; margin: 12px 0;">
+          <div style="font-size: 38px; margin-bottom: 12px;">🏖️</div>
+          <h4 style="font-family: var(--font-sans); font-size: 18px; font-weight: 700; color: #F8FAFC; margin-bottom: 6px;">No packages available in this category yet.</h4>
+          <p style="font-family: var(--font-sans); font-size: 14px; color: #94A3B8; max-width: 440px; margin: 0 auto 16px;">We are curating new bespoke journeys for this theme. Check back soon or browse all available packages.</p>
+          <button type="button" class="btn btn-primary btn-sm" onclick="window.selectPackageCategory('all')" style="padding: 9px 20px; font-size: 12px; font-weight: 700; border-radius: 8px;">Show All Packages →</button>
+        </div>
+      `;
+      return;
+    }
+
+    window._ventouraPkgItems = filtered;
+    grid.innerHTML = filtered.map((p, i) => `
+      <div class="package-card" data-category="${p.category || 'luxury'}" data-id="${p.id || p._id}">
+        <div class="package-img-wrap">
+          <img class="package-img" src="${p.featuredImage || p.image || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e'}" alt="${p.title}" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80'" loading="lazy" />
+          <button type="button" class="card-wishlist-btn package-wishlist btn-wishlist" data-id="${p.id || p._id || p.title}" data-type="package" aria-label="Save to Wishlist" title="Save to Wishlist">♡</button>
+        </div>
+        <div class="package-body">
+          <div class="package-location">📍 ${p.destination || p.country || 'Global Destination'}</div>
+          <h3 class="package-title">${p.title}</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin:6px 0 12px;line-height:1.5;">${p.description || 'Exclusive curated luxury travel package.'}</p>
+          <div class="package-details">
+            <span class="pkg-detail">📅 ${formatDuration(p)}</span>
+            <span class="pkg-detail">👥 ${p.includedGuests || 2} Guests</span>
+          </div>
+          <div class="package-footer">
+            <div>
+              <div class="price-tag">${formatINR(p.price || 285000)} <small>/ person</small></div>
+            </div>
+            <div class="package-rating">
+              <span class="star">★</span>
+              <span class="rating-score">${p.rating || 4.9}</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button type="button" class="btn btn-outline btn-sm view-details-trigger" onclick="window.VentouraEnquiry.openDetailPage(window._ventouraPkgItems[${i}], 'package')" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:600;">View Details 🔍</button>
+            <button type="button" class="btn btn-primary btn-sm btn-book-now" onclick="window.VentouraEnquiry.openEnquiryModal(window._ventouraPkgItems[${i}], 'package')" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:700;">Book Now →</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    if (window.VentouraWishlist && typeof window.VentouraWishlist.attachToCards === 'function') window.VentouraWishlist.attachToCards();
+    if (window.VentouraCurrency && typeof window.VentouraCurrency.updateAllPrices === 'function') window.VentouraCurrency.updateAllPrices();
+    if (window.VentouraI18n && typeof window.VentouraI18n.translatePage === 'function') window.VentouraI18n.translatePage();
+  };
+
+  document.addEventListener('DOMContentLoaded', loadWebsiteDynamicContent);
+})();
+
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     POPULAR PACKAGES
+═══════════════════════════════════════════════════ -->
+<section class="section" id="packages" style="background: var(--bg-secondary);">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="section-header reveal">
+      <div class="section-badge">Best Sellers</div>
+      <h2 class="section-title">Popular <span>Travel Packages</span></h2>
+      <p class="section-subtitle">Our expertly curated packages combine flights, hotels, and experiences for an unforgettable trip at the best value.</p>
+    </div>
+
+    <!-- Package Type Tabs -->
+    <div class="packages-tabs-nav" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:8px; margin-bottom:24px; -webkit-overflow-scrolling:touch; scrollbar-width:none;">
+      <button class="packages-tab active" data-tab="all" onclick="window.selectPackageCategory('all')">🌟 All Packages</button>
+      <button class="packages-tab" data-tab="beach" onclick="window.selectPackageCategory('beach')">🏖️ Beach</button>
+      <button class="packages-tab" data-tab="adventure" onclick="window.selectPackageCategory('adventure')">🧗 Adventure</button>
+      <button class="packages-tab" data-tab="luxury" onclick="window.selectPackageCategory('luxury')">💎 Luxury</button>
+      <button class="packages-tab" data-tab="honeymoon" onclick="window.selectPackageCategory('honeymoon')">💑 Honeymoon</button>
+      <button class="packages-tab" data-tab="family" onclick="window.selectPackageCategory('family')">👨‍👩‍👧 Family</button>
+      <button class="packages-tab" data-tab="solo" onclick="window.selectPackageCategory('solo')">🎒 Solo Travel</button>
+      <button class="packages-tab" data-tab="business" onclick="window.selectPackageCategory('business')">💼 Business</button>
+      <button class="packages-tab" data-tab="safari" onclick="window.selectPackageCategory('safari')">🦁 Safari</button>
+      <button class="packages-tab" data-tab="pilgrimage" onclick="window.selectPackageCategory('pilgrimage')">🕌 Pilgrimage</button>
+      <button class="packages-tab" data-tab="road" onclick="window.selectPackageCategory('road')">🚗 Road Trips</button>
+      <button class="packages-tab" data-tab="camping" onclick="window.selectPackageCategory('camping')">⛺ Camping</button>
+    </div>
+
+    <!-- Packages Grid — 6 Luxury Destination Themes -->
+    <div class="packages-grid packages-panel" data-panel="all">
+
+      <!-- Package 1: Amalfi Coast Escape -->
+      <div class="package-card reveal" data-category="luxury">
+        <div class="package-img-wrap">
+          <img class="package-img" src="assets/images/amalfi-view-1.jpg" alt="Amalfi Coast Escape, Italy" loading="lazy" />
+          <button type="button" class="card-wishlist-btn package-wishlist btn-wishlist" data-id="pkg-amalfi-7d" data-type="package" aria-label="Save Amalfi Coast Escape to Wishlist" title="Save to Wishlist">♡</button>
+        </div>
+        <div class="package-body">
+          <div class="package-location">📍 🇮🇹 Italy · Positano &amp; Amalfi</div>
+          <h3 class="package-title">Amalfi Coast Escape</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin:6px 0 12px;line-height:1.5;">Private speed boat charter to Capri, clifftop villa stays at Le Sirenuse, and Michelin-starred coastal dining.</p>
+          <div class="package-details">
+            <span class="pkg-detail">📅 7 Days / 6 Nights</span>
+            <span class="pkg-detail">👥 2 Adults</span>
+            <span class="pkg-detail">✈️ Flights Incl.</span>
+          </div>
+          <div class="package-includes">
+            <span class="include-chip">🏨 Le Sirenuse</span>
+            <span class="include-chip">⛵ Private Yacht</span>
+            <span class="include-chip">🍋 Cooking Class</span>
+          </div>
+          <div class="package-footer">
+            <div>
+              <div class="price-old">₹3,35,000</div>
+              <div class="price-tag">₹2,85,000 <small>/ person</small></div>
+            </div>
+            <div class="package-rating">
+              <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+              <span class="rating-score">4.96</span>
+              <span class="rating-count">(248)</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Amalfi Coast Escape" data-type="package" data-id="pkg-amalfi-7d" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:600;">View Details 🔍</button>
+            <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Amalfi Coast Escape" data-item-type="package" data-item-price="₹2,85,000" data-item-duration="7 Days / 6 Nights" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:700;">Book Now →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package 2: Kyoto Zen Retreat -->
+      <div class="package-card reveal" data-category="luxury">
+        <div class="package-img-wrap">
+          <img class="package-img" src="assets/images/kyoto-view-1.jpg" alt="Kyoto Zen Retreat, Japan" loading="lazy" />
+          <button type="button" class="card-wishlist-btn package-wishlist btn-wishlist" data-id="pkg-kyoto-8d" data-type="package" aria-label="Save Kyoto Zen Retreat to Wishlist" title="Save to Wishlist">♡</button>
+        </div>
+        <div class="package-body">
+          <div class="package-location">📍 🇯🇵 Japan · Kyoto</div>
+          <h3 class="package-title">Kyoto Zen Retreat</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin:6px 0 12px;line-height:1.5;">Fushimi Inari Torii gates, Arashiyama bamboo forest, riverfront ryokan onsen, and kaiseki multi-course dining.</p>
+          <div class="package-details">
+            <span class="pkg-detail">📅 7 Days / 6 Nights</span>
+            <span class="pkg-detail">👥 2 Adults</span>
+            <span class="pkg-detail">✈️ Flights Incl.</span>
+          </div>
+          <div class="package-includes">
+            <span class="include-chip">🏯 Aman Kyoto</span>
+            <span class="include-chip">♨️ Onsen Bath</span>
+            <span class="include-chip">🍵 Tea Ceremony</span>
+          </div>
+          <div class="package-footer">
+            <div>
+              <div class="price-old">₹3,64,000</div>
+              <div class="price-tag">₹3,20,000 <small>/ person</small></div>
+            </div>
+            <div class="package-rating">
+              <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+              <span class="rating-score">4.95</span>
+              <span class="rating-count">(312)</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Kyoto Zen Retreat" data-type="package" data-id="pkg-kyoto-8d" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:600;">View Details 🔍</button>
+            <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Kyoto Zen Retreat" data-item-type="package" data-item-price="₹3,20,000" data-item-duration="7 Days / 6 Nights" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:700;">Book Now →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package 3: Maldives Private Haven -->
+      <div class="package-card reveal" data-category="beach">
+        <div class="package-img-wrap">
+          <img class="package-img" src="assets/images/maldives-view-1.jpg" alt="Maldives Private Haven" loading="lazy" />
+          <button type="button" class="card-wishlist-btn package-wishlist btn-wishlist" data-id="pkg-maldives-7d" data-type="package" aria-label="Save Maldives Private Haven to Wishlist" title="Save to Wishlist">♡</button>
+        </div>
+        <div class="package-body">
+          <div class="package-location">📍 🇲🇻 Maldives · Baa Atoll</div>
+          <h3 class="package-title">Maldives Private Haven</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin:6px 0 12px;line-height:1.5;">Sunset overwater villa with private infinity pool, glass floor viewing panel, floating villa breakfast &amp; coral diving.</p>
+          <div class="package-details">
+            <span class="pkg-detail">📅 7 Days / 6 Nights</span>
+            <span class="pkg-detail">👥 2 Adults</span>
+            <span class="pkg-detail">🛥️ Seaplane Transfer</span>
+          </div>
+          <div class="package-includes">
+            <span class="include-chip">🏨 Soneva Jani</span>
+            <span class="include-chip">🍽️ Full Board</span>
+            <span class="include-chip">🤿 Reef Diving</span>
+          </div>
+          <div class="package-footer">
+            <div>
+              <div class="price-old">₹5,20,000</div>
+              <div class="price-tag">₹4,50,000 <small>/ person</small></div>
+            </div>
+            <div class="package-rating">
+              <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+              <span class="rating-score">4.99</span>
+              <span class="rating-count">(512)</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Maldives Private Haven" data-type="package" data-id="pkg-maldives-7d" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:600;">View Details 🔍</button>
+            <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Maldives Private Haven" data-item-type="package" data-item-price="₹4,50,000" data-item-duration="7 Days / 6 Nights" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:700;">Book Now →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Package 3: Maldives Private Haven -->
+      <div class="package-card reveal" data-category="beach">
+        <div class="package-img-wrap">
+          <img class="package-img" src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=3840&q=95" alt="Maldives Private Haven" loading="lazy" />
+          <button type="button" class="card-wishlist-btn package-wishlist btn-wishlist" data-id="pkg-maldives-7d-2" data-type="package" aria-label="Save Maldives Private Haven to Wishlist" title="Save to Wishlist">♡</button>
+        </div>
+        <div class="package-body">
+          <div class="package-location">📍 🇲🇻 Maldives · Baa Atoll</div>
+          <h3 class="package-title">Maldives Private Haven</h3>
+          <p style="font-size:13px;color:var(--text-secondary);margin:6px 0 12px;line-height:1.5;">Sunset overwater villa with private infinity pool, glass floor viewing panel, floating villa breakfast &amp; coral diving.</p>
+          <div class="package-details">
+            <span class="pkg-detail">📅 7 Days / 6 Nights</span>
+            <span class="pkg-detail">👥 2 Adults</span>
+            <span class="pkg-detail">🛥️ Seaplane Transfer</span>
+          </div>
+          <div class="package-includes">
+            <span class="include-chip">🏨 Soneva Jani</span>
+            <span class="include-chip">🍽️ Full Board</span>
+            <span class="include-chip">🤿 Reef Diving</span>
+          </div>
+          <div class="package-footer">
+            <div>
+              <div class="price-old">$5,200</div>
+              <div class="price-tag">$4,500 <small>/ person</small></div>
+            </div>
+            <div class="package-rating">
+              <div class="stars"><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span></div>
+              <span class="rating-score">4.99</span>
+              <span class="rating-count">(512)</span>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:14px;">
+            <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Maldives Private Haven" data-type="package" data-id="pkg-maldives-7d" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:600;">View Details 🔍</button>
+            <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Maldives Private Haven" data-item-type="package" data-item-price="₹4,50,000" data-item-duration="7 Days / 6 Nights" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:700;">Book Now →</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     FEATURED HOTELS
+═══════════════════════════════════════════════════ -->
+<section class="section" id="hotels">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="section-header reveal">
+      <div class="section-badge">Stay in Style</div>
+      <h2 class="section-title">Featured <span>Hotels</span></h2>
+      <p class="section-subtitle">Handpicked accommodations that combine exceptional comfort, stunning locations, and unparalleled luxury service.</p>
+    </div>
+
+    <div class="hotels-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:24px;">
+
+      <!-- Hotel 1: Le Sirenuse — Amalfi Coast, Italy -->
+      <div class="hotel-card reveal">
+        <div class="hotel-img-wrap">
+          <img class="hotel-img" src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=3840&q=95" alt="Le Sirenuse, Positano, Italy" loading="lazy" />
+          <div class="hotel-category">🇮🇹 POSITANO CLIFFSIDE</div>
+        </div>
+        <div class="hotel-body">
+          <div class="stars" style="margin-bottom:8px">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <h3 class="hotel-name">Le Sirenuse</h3>
+          <div class="hotel-location">📍 Via Cristoforo Colombo, Positano, Italy</div>
+          <div class="hotel-amenities">
+            <span class="hotel-amenity">🏊 Infinity Pool</span>
+            <span class="hotel-amenity">🍽️ La Sponda</span>
+            <span class="hotel-amenity">💆 Aveda Spa</span>
+            <span class="hotel-amenity">⛵ Yacht Charter</span>
+            <span class="hotel-amenity">🍋 Limoncello Bar</span>
+          </div>
+          <div class="hotel-footer">
+            <div>
+              <div class="hotel-price-label">From per night</div>
+              <div class="hotel-price">₹1,20,000 <span>/ night</span></div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Le Sirenuse" data-type="hotel" data-id="hotel-le-sirenuse" style="padding:8px 14px; font-size:12px; font-weight:700;">Explore Specs 🔍</button>
+              <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Le Sirenuse" data-item-type="hotel" data-item-price="₹1,20,000" data-item-duration="Per Night" style="padding:8px 14px; font-size:12px; font-weight:700;">Book Room →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hotel 2: Aman Kyoto — Japan -->
+      <div class="hotel-card reveal">
+        <div class="hotel-img-wrap">
+          <img class="hotel-img" src="https://images.unsplash.com/photo-1528360983277-13d401cdc186?auto=format&fit=crop&w=3840&q=95" alt="Aman Kyoto, Japan" loading="lazy" />
+          <div class="hotel-category">🇯🇵 KYOTO ZEN RETREAT</div>
+        </div>
+        <div class="hotel-body">
+          <div class="stars" style="margin-bottom:8px">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <h3 class="hotel-name">Aman Kyoto</h3>
+          <div class="hotel-location">📍 Okitayama Undaguchi-cho, Kyoto, Japan</div>
+          <div class="hotel-amenities">
+            <span class="hotel-amenity">♨️ Onsen Bath</span>
+            <span class="hotel-amenity">🍵 Tea House</span>
+            <span class="hotel-amenity">🌸 Zen Garden</span>
+            <span class="hotel-amenity">💆 Aman Spa</span>
+          </div>
+          <div class="hotel-footer">
+            <div>
+              <div class="hotel-price-label">From per night</div>
+              <div class="hotel-price">₹1,80,000 <span>/ night</span></div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Aman Kyoto" data-type="hotel" data-id="hotel-aman-kyoto" style="padding:8px 14px; font-size:12px; font-weight:700;">Explore Specs 🔍</button>
+              <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Aman Kyoto" data-item-type="hotel" data-item-price="₹1,80,000" data-item-duration="Per Night" style="padding:8px 14px; font-size:12px; font-weight:700;">Book Room →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hotel 3: Soneva Jani — Maldives -->
+      <div class="hotel-card reveal">
+        <div class="hotel-img-wrap">
+          <img class="hotel-img" src="https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?auto=format&fit=crop&w=3840&q=95" alt="Soneva Jani, Maldives" loading="lazy" />
+          <div class="hotel-category">🇲🇻 MALDIVES OVERWATER VILLA</div>
+        </div>
+        <div class="hotel-body">
+          <div class="stars" style="margin-bottom:8px">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <h3 class="hotel-name">Soneva Jani</h3>
+          <div class="hotel-location">📍 Noonu Atoll, Maldives</div>
+          <div class="hotel-amenities">
+            <span class="hotel-amenity">🤿 Reef Snorkeling</span>
+            <span class="hotel-amenity">🛥️ Seaplane</span>
+            <span class="hotel-amenity">🍳 Private Butler</span>
+            <span class="hotel-amenity">🌅 Lagoon Pool</span>
+          </div>
+          <div class="hotel-footer">
+            <div>
+              <div class="hotel-price-label">From per night</div>
+              <div class="hotel-price">₹3,50,000 <span>/ night</span></div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Soneva Jani" data-type="hotel" data-id="hotel-soneva-jani" style="padding:8px 14px; font-size:12px; font-weight:700;">Explore Specs 🔍</button>
+              <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Soneva Jani" data-item-type="hotel" data-item-price="₹3,50,000" data-item-duration="Per Night" style="padding:8px 14px; font-size:12px; font-weight:700;">Book Room →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-view-all reveal" style="margin-top:24px; text-align: center;">
+      <a href="services.html?cat=hotels" class="btn btn-outline btn-md" style="padding: 10px 24px;">View All Accommodations →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     DESTINATION GALLERY (60 High-Resolution 4K Images)
+═══════════════════════════════════════════════════ -->
+<section class="section" id="gallery" style="background: var(--bg-secondary);">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="section-header reveal">
+      <div class="section-badge">4K Visual Showcase</div>
+      <h2 class="section-title">Destination <span>Gallery Preview</span></h2>
+      <p class="section-subtitle">Authentic high-resolution photography capturing luxury hotels, resorts, landscapes &amp; activities across our featured destinations.</p>
+    </div>
+
+    <!-- 6 Photo Teaser Grid -->
+    <div class="gallery-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px;">
+      
+      <!-- Amalfi -->
+      <div class="gallery-item" data-category="amalfi" onclick="window.openImageLightbox('https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=1600&q=85', 'Amalfi Coast - Cliffside Panorama')" style="position:relative; height:180px; border-radius:16px; overflow:hidden; cursor:pointer;">
+        <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?auto=format&fit=crop&w=600&q=80" alt="Amalfi Coast" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" loading="lazy" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.8) 0%, transparent 60%); padding:12px; display:flex; align-items:flex-end;"><span style="color:#fff; font-size:12px; font-weight:700;">🇮🇹 Positano Cliffside</span></div>
+      </div>
+
+      <!-- Kyoto -->
+      <div class="gallery-item" data-category="kyoto" onclick="window.openImageLightbox('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1600&q=85', 'Kyoto Zen Temples')" style="position:relative; height:180px; border-radius:16px; overflow:hidden; cursor:pointer;">
+        <img src="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80" alt="Kyoto Zen" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" loading="lazy" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.8) 0%, transparent 60%); padding:12px; display:flex; align-items:flex-end;"><span style="color:#fff; font-size:12px; font-weight:700;">🇯🇵 Kyoto Zen Temples</span></div>
+      </div>
+
+      <!-- Maldives -->
+      <div class="gallery-item" data-category="maldives" onclick="window.openImageLightbox('https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=1600&q=85', 'Maldives Blue Atoll')" style="position:relative; height:180px; border-radius:16px; overflow:hidden; cursor:pointer;">
+        <img src="https://images.unsplash.com/photo-1514282401047-d79a71a590e8?auto=format&fit=crop&w=600&q=80" alt="Maldives Atoll" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" loading="lazy" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.8) 0%, transparent 60%); padding:12px; display:flex; align-items:flex-end;"><span style="color:#fff; font-size:12px; font-weight:700;">🇲🇻 Blue Atoll Haven</span></div>
+      </div>
+
+      <!-- Patagonia -->
+      <div class="gallery-item" data-category="patagonia" onclick="window.openImageLightbox('https://images.unsplash.com/photo-1527004013197-933c4bb611b3?auto=format&fit=crop&w=1600&q=85', 'Patagonia Torres del Paine')" style="position:relative; height:180px; border-radius:16px; overflow:hidden; cursor:pointer;">
+        <img src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?auto=format&fit=crop&w=600&q=80" alt="Torres del Paine" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" loading="lazy" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.8) 0%, transparent 60%); padding:12px; display:flex; align-items:flex-end;"><span style="color:#fff; font-size:12px; font-weight:700;">🇦🇷 Torres del Paine</span></div>
+      </div>
+
+      <!-- St. Moritz -->
+      <div class="gallery-item" data-category="stmoritz" onclick="window.openImageLightbox('https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1600&q=85', 'St. Moritz Alpine Peaks')" style="position:relative; height:180px; border-radius:16px; overflow:hidden; cursor:pointer;">
+        <img src="https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=600&q=80" alt="Swiss Alps" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" loading="lazy" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.8) 0%, transparent 60%); padding:12px; display:flex; align-items:flex-end;"><span style="color:#fff; font-size:12px; font-weight:700;">🇨🇭 Alpine Peaks</span></div>
+      </div>
+
+      <!-- Serengeti -->
+      <div class="gallery-item" data-category="serengeti" onclick="window.openImageLightbox('https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=1600&q=85', 'Serengeti Wildlife Safari')" style="position:relative; height:180px; border-radius:16px; overflow:hidden; cursor:pointer;">
+        <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?auto=format&fit=crop&w=600&q=80" alt="Serengeti Safari" style="width:100%; height:100%; object-fit:cover; transition:transform 0.4s ease;" loading="lazy" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.8) 0%, transparent 60%); padding:12px; display:flex; align-items:flex-end;"><span style="color:#fff; font-size:12px; font-weight:700;">🇹🇿 Great Migration</span></div>
+      </div>
+
+    </div>
+
+    <div class="section-view-all reveal" style="margin-top:24px; text-align:center;">
+      <a href="services.html?cat=gallery" class="btn btn-outline btn-md" style="padding: 10px 24px;">Explore Full 60-Photo Gallery →</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════
+     CRUISE PACKAGES (Requirement 13) - 5 Complete Cruises
+═══════════════════════════════════════════════════ -->
+<section class="section" id="cruises" style="background: var(--bg-secondary);">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="section-header">
+      <div class="section-badge">Set Sail</div>
+      <h2 class="section-title">Cruise <span>Packages</span></h2>
+      <p class="section-subtitle">Explore spectacular coastlines, tropical islands, and historic ocean ports aboard ultra-luxury cruise liners.</p>
+    </div>
+
+    <div class="cruise-carousel">
+      <div class="cruise-track-wrap">
+        <div class="cruise-track" id="cruise-track">
+          
+          <!-- Cruise 1: Mediterranean Magic -->
+          <div class="cruise-card">
+            <img class="cruise-img" src="assets/images/mediterranean-magic.jpg" alt="Mediterranean Magic Cruise" loading="lazy" />
+            <div class="cruise-body">
+              <div class="cruise-route">🌊 Mediterranean Route</div>
+              <h3 class="cruise-name">Mediterranean Magic — 14 Days</h3>
+              <div class="cruise-details">
+                <span class="cruise-detail">⛵ 14 Nights</span>
+                <span class="cruise-detail">🏙️ 8 Ports</span>
+                <span class="cruise-detail">🍽️ Full Board</span>
+              </div>
+              <div class="cruise-footer">
+                <div>
+                  <div style="font-size:12px;color:var(--text-muted)">From per person</div>
+                  <div style="font-size:22px;font-weight:800;color:var(--accent)">₹1,89,900</div>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Mediterranean Magic — 14 Days" data-type="cruise" data-id="cruise-mediterranean" style="padding:6px 12px; font-size:12px; font-weight:700;">Explore 🌊</button>
+                  <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Mediterranean Magic — 14 Days" data-item-type="cruise" data-item-price="₹1,89,900" data-item-duration="14 Nights / 8 Ports" style="padding:6px 12px; font-size:12px;">Book Cruise →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cruise 2: Caribbean Island Hopper -->
+          <div class="cruise-card">
+            <img class="cruise-img" src="assets/images/gallery-1.jpg" alt="Caribbean Island Hopper Cruise" loading="lazy" />
+            <div class="cruise-body">
+              <div class="cruise-route">🌊 Caribbean Route</div>
+              <h3 class="cruise-name">Caribbean Island Hopper — 10 Days</h3>
+              <div class="cruise-details">
+                <span class="cruise-detail">⛵ 10 Nights</span>
+                <span class="cruise-detail">🏝️ 6 Islands</span>
+                <span class="cruise-detail">🌅 All Incl.</span>
+              </div>
+              <div class="cruise-footer">
+                <div>
+                  <div style="font-size:12px;color:var(--text-muted)">From per person</div>
+                  <div style="font-size:22px;font-weight:800;color:var(--accent)">₹1,49,900</div>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Caribbean Island Hopper — 10 Days" data-type="cruise" data-id="cruise-caribbean" style="padding:6px 12px; font-size:12px; font-weight:700;">Explore 🌊</button>
+                  <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Caribbean Island Hopper — 10 Days" data-item-type="cruise" data-item-price="₹1,49,900" data-item-duration="10 Nights / 6 Islands" style="padding:6px 12px; font-size:12px;">Book Cruise →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cruise 3: Greek Isles Discovery -->
+          <div class="cruise-card">
+            <img class="cruise-img" src="assets/images/dest-santorini.jpg" alt="Greek Isles Discovery Cruise" loading="lazy" />
+            <div class="cruise-body">
+              <div class="cruise-route">🌊 Greek Islands Route</div>
+              <h3 class="cruise-name">Greek Isles Discovery — 8 Days</h3>
+              <div class="cruise-details">
+                <span class="cruise-detail">⛵ 8 Nights</span>
+                <span class="cruise-detail">🏛️ 5 Islands</span>
+                <span class="cruise-detail">🍷 Wine & Dine</span>
+              </div>
+              <div class="cruise-footer">
+                <div>
+                  <div style="font-size:12px;color:var(--text-muted)">From per person</div>
+                  <div style="font-size:22px;font-weight:800;color:var(--accent)">₹1,29,900</div>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Greek Isles Discovery — 8 Days" data-type="cruise" data-id="cruise-greek-isles" style="padding:6px 12px; font-size:12px; font-weight:700;">Explore 🌊</button>
+                  <button type="button" class="btn btn-primary btn-sm btn-book-now" data-item-title="Greek Isles Discovery — 8 Days" data-item-type="cruise" data-item-price="₹1,29,900" data-item-duration="8 Nights / 5 Islands" style="padding:6px 12px; font-size:12px;">Book Cruise →</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="section-view-all reveal" style="margin-top:24px; text-align: center;">
+        <a href="services.html?cat=cruises" class="btn btn-outline btn-md" style="padding: 10px 24px;">View All Cruises →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     CUSTOMER REVIEWS (Requirement 17 - Placed Before Travel Videos)
+═══════════════════════════════════════════════════ -->
+<section class="section" id="reviews" style="padding: 44px 0; background: var(--bg-primary);">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    
+    <div class="section-header">
+      <div class="section-badge" style="background: rgba(22, 138, 173, 0.15); color: #168AAD; border: 1px solid rgba(22, 138, 173, 0.3);">
+        ★ 4.98 OUT OF 5.0 (5,000+ VERIFIED REVIEWS)
+      </div>
+      <h2 class="section-title" style="font-size: clamp(26px, 3.5vw, 40px); color: var(--text-primary); text-shadow: 0 2px 8px rgba(0,0,0,0.3);">
+        What Our <span>Travelers Say</span>
+      </h2>
+      <p class="section-subtitle" style="color: var(--text-secondary); max-width: 620px; margin: 0 auto; font-size: 15px;">
+        Real experiences from globetrotters who explored the world with Ventoura Travel.
+      </p>
+    </div>
+
+    <div class="reviews-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+
+      <!-- Review 1 -->
+      <div class="review-card reveal" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.25s ease, box-shadow 0.25s ease;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Sophia Reynolds" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);" />
+              <div>
+                <h4 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">Sophia Reynolds</h4>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">🇺🇸 United States</div>
+              </div>
+            </div>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 9999px;">
+              ✓ Verified Traveler
+            </span>
+          </div>
+          <div style="color: #168AAD; font-size: 14px; margin-bottom: 10px;">★★★★★ <strong style="color: var(--text-primary); font-size: 13px;">5.0</strong></div>
+          <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">
+            "Ventoura Travel created an unforgettable experience! From the moment we landed in Malé to our private overwater villa butler, everything was seamless. Truly a 7-star vacation."
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--glass-border);">
+          🏖️ Trip Completed: Maldives Overwater Sanctuary (7 Days)
+        </div>
+      </div>
+
+      <!-- Review 2 -->
+      <div class="review-card reveal" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.25s ease, box-shadow 0.25s ease;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=300&q=80" alt="Alexander Wright" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);" />
+              <div>
+                <h4 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">Alexander Wright</h4>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">🇬🇧 United Kingdom</div>
+              </div>
+            </div>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 9999px;">
+              ✓ Verified Traveler
+            </span>
+          </div>
+          <div style="color: #168AAD; font-size: 14px; margin-bottom: 10px;">★★★★★ <strong style="color: var(--text-primary); font-size: 13px;">5.0</strong></div>
+          <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">
+            "The sunset balcony views in Oia were breathtaking. The itinerary was perfectly balanced between guided wine tasting tours and private relaxing time on the caldera."
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--glass-border);">
+          🌅 Trip Completed: Santorini Clifftop & Caldera (6 Days)
+        </div>
+      </div>
+
+      <!-- Review 3 -->
+      <div class="review-card reveal" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.25s ease, box-shadow 0.25s ease;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=300&q=80" alt="Elena Rostova" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);" />
+              <div>
+                <h4 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">Elena Rostova</h4>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">🇨🇦 Canada</div>
+              </div>
+            </div>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 9999px;">
+              ✓ Verified Traveler
+            </span>
+          </div>
+          <div style="color: #168AAD; font-size: 14px; margin-bottom: 10px;">★★★★★ <strong style="color: var(--text-primary); font-size: 13px;">5.0</strong></div>
+          <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">
+            "Everything was handled with utmost professionalism. First-class train tickets, luxury alpine lodge stays, and 24/7 concierge support made our trip completely stress-free."
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--glass-border);">
+          🏔️ Trip Completed: Swiss Alps & Glacier Express (8 Days)
+        </div>
+      </div>
+
+      <!-- Review 4 -->
+      <div class="review-card reveal" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.25s ease, box-shadow 0.25s ease;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=300&q=80" alt="David Chen" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);" />
+              <div>
+                <h4 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">David Chen</h4>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">🇸🇬 Singapore</div>
+              </div>
+            </div>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 9999px;">
+              ✓ Verified Traveler
+            </span>
+          </div>
+          <div style="color: #168AAD; font-size: 14px; margin-bottom: 10px;">★★★★★ <strong style="color: var(--text-primary); font-size: 13px;">5.0</strong></div>
+          <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">
+            "Extremely impressed with the personalized service! The VIP desert dune bashing, luxury yacht cruise, and hotel upgrades exceeded all expectations."
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--glass-border);">
+          🏙️ Trip Completed: Dubai Penthouse & Desert Safari (5 Days)
+        </div>
+      </div>
+
+      <!-- Review 5 -->
+      <div class="review-card reveal" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.25s ease, box-shadow 0.25s ease;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=300&q=80" alt="Amara Okafor" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);" />
+              <div>
+                <h4 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">Amara Okafor</h4>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">🇳🇬 Nigeria</div>
+              </div>
+            </div>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 9999px;">
+              ✓ Verified Traveler
+            </span>
+          </div>
+          <div style="color: #168AAD; font-size: 14px; margin-bottom: 10px;">★★★★★ <strong style="color: var(--text-primary); font-size: 13px;">5.0</strong></div>
+          <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">
+            "Our guide in Japan was incredibly knowledgeable. The private tea ceremony and bullet train transfers were smooth and effortless. 10/10 recommendation!"
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--glass-border);">
+          ⛩️ Trip Completed: Tokyo & Kyoto Cultural Tour (10 Days)
+        </div>
+      </div>
+
+      <!-- Review 6 -->
+      <div class="review-card reveal" style="background: var(--bg-card); border: 1px solid var(--glass-border); border-radius: 20px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.25s ease, box-shadow 0.25s ease;">
+        <div>
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <img src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=300&q=80" alt="Lucas Silva" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--accent);" />
+              <div>
+                <h4 style="font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 0;">Lucas Silva</h4>
+                <div style="font-size: 12px; color: var(--text-muted); font-weight: 600;">🇧🇷 Brazil</div>
+              </div>
+            </div>
+            <span style="background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 9999px;">
+              ✓ Verified Traveler
+            </span>
+          </div>
+          <div style="color: #168AAD; font-size: 14px; margin-bottom: 10px;">★★★★★ <strong style="color: var(--text-primary); font-size: 13px;">5.0</strong></div>
+          <p style="font-size: 14px; line-height: 1.6; color: var(--text-secondary); margin: 0 0 14px;">
+            "A journey of a lifetime! 8 Mediterranean ports with zero hassle. The ocean view suite and gourmet dining onboard were world-class."
+          </p>
+        </div>
+        <div style="background: var(--bg-secondary); padding: 8px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; color: var(--accent); border: 1px solid var(--glass-border);">
+          🚢 Trip Completed: Mediterranean Magic 14-Day Cruise
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     TRAVEL EXPERIENCES — CINEMATIC TRAVEL FILMS
+═══════════════════════════════════════════════════ -->
+<section class="section" id="travel-videos" style="background: var(--bg-secondary); padding: 44px 0;">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    
+    <div class="section-header" style="margin-bottom: 28px; text-align: center;">
+      <div class="section-badge">Travel Experiences</div>
+      <h2 class="section-title">Cinematic <span>Travel Films</span></h2>
+      <p class="section-subtitle">Discover the journeys behind our most-loved destinations.</p>
+    </div>
+
+    <!-- Distinct Video Cards (3 per row on Desktop) -->
+    <div class="travel-videos-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+
+
+      <!-- Video 2: Maldives -->
+      <div class="travel-video-card reveal" style="border-radius: 16px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+        <div class="video-container-169" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <video controls preload="auto" playsinline poster="assets/images/dest-maldives.jpg" style="width: 100%; height: 100%; object-fit: cover; background: #000;">
+            <source src="assets/videos/maldives-overwater-paradise.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/vcj7lxnd/video/upload/q_auto:best,vc_auto/v1786801333/WhatsApp_Video_2026-08-15_at_7.02.23_PM_aa7qed.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div style="padding: 16px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #168AAD; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">📍 MALDIVES</div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Maldives Overwater Paradise</h3>
+            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">6 Days / 5 Nights · <strong>₹4,50,000</strong></div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Maldives Private Haven" data-type="package" data-id="pkg-maldives-7d" style="width: 100%; justify-content: center; padding: 8px 14px; font-size: 12px; font-weight: 600;">Explore Package →</button>
+        </div>
+      </div>
+
+      <!-- Video 3: Japan -->
+      <div class="travel-video-card reveal" style="border-radius: 16px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+        <div class="video-container-169" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <video controls preload="auto" playsinline poster="assets/images/dest-tokyo.jpg" style="width: 100%; height: 100%; object-fit: cover; background: #000;">
+            <source src="assets/videos/japan_mov.mov" type="video/quicktime" />
+            <source src="assets/videos/japan-sakura-kyoto.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/vcj7lxnd/video/upload/q_auto:best,vc_auto/v1786801690/d0f66864-88b5-4c2c-9bb8-64f39c92dc90_evhbqj.mov" type="video/quicktime" />
+            <source src="https://res.cloudinary.com/vcj7lxnd/video/upload/q_auto:best,vc_auto/v1786801690/d0f66864-88b5-4c2c-9bb8-64f39c92dc90_evhbqj.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div style="padding: 16px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #168AAD; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">📍 JAPAN</div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Japan Sakura Season &amp; Kyoto</h3>
+            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">7 Days / 6 Nights · <strong>₹3,20,000</strong></div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Kyoto Zen Retreat" data-type="package" data-id="pkg-kyoto-8d" style="width: 100%; justify-content: center; padding: 8px 14px; font-size: 12px; font-weight: 600;">Explore Package →</button>
+        </div>
+      </div>
+
+      <!-- Video 4: Santorini -->
+      <div class="travel-video-card reveal" style="border-radius: 16px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+        <div class="video-container-169" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <video controls preload="auto" playsinline poster="assets/images/dest-santorini.jpg" style="width: 100%; height: 100%; object-fit: cover; background: #000;">
+            <source src="assets/videos/santorini_mov.mov" type="video/quicktime" />
+            <source src="assets/videos/greece-santorini.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/vcj7lxnd/video/upload/q_auto:best,vc_auto/v1786801752/d7ba13f9-4fcc-4017-bcfd-c881de0a54a4_j8b7ma.mov" type="video/quicktime" />
+            <source src="https://res.cloudinary.com/vcj7lxnd/video/upload/q_auto:best,vc_auto/v1786801752/d7ba13f9-4fcc-4017-bcfd-c881de0a54a4_j8b7ma.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div style="padding: 16px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #168AAD; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">📍 GREECE</div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Santorini Sunset Dreams</h3>
+            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">5 Days / 4 Nights · <strong>₹2,85,000</strong></div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Santorini Sunset Dreams" data-type="destination" data-id="Santorini" style="width: 100%; justify-content: center; padding: 8px 14px; font-size: 12px; font-weight: 600;">Explore Destination →</button>
+        </div>
+      </div>
+
+      <!-- Video 5: Bali -->
+      <div class="travel-video-card reveal" style="border-radius: 16px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+        <div class="video-container-169" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <video controls preload="auto" playsinline poster="assets/images/dest-bali.jpg" style="width: 100%; height: 100%; object-fit: cover; background: #000;">
+            <source src="assets/videos/bali_mov.mov" type="video/quicktime" />
+            <source src="assets/videos/indonesia-bali.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/vcj7lxnd/video/upload/q_auto:best,vc_auto/v1786801761/4bff8c64-24f2-49eb-861d-115d7dbfa49a_mxxdze.mov" type="video/quicktime" />
+            <source src="https://res.cloudinary.com/vcj7lxnd/video/upload/q_auto:best,vc_auto/v1786801761/4bff8c64-24f2-49eb-861d-115d7dbfa49a_mxxdze.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div style="padding: 16px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #168AAD; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">📍 INDONESIA</div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Bali Island of the Gods</h3>
+            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">7 Days / 6 Nights · <strong>₹1,49,900</strong></div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Bali Island of the Gods" data-type="destination" data-id="Bali" style="width: 100%; justify-content: center; padding: 8px 14px; font-size: 12px; font-weight: 600;">Explore Destination →</button>
+        </div>
+      </div>
+
+      <!-- Video 6: Amalfi Coast & Positano (Italy) -->
+      <div class="travel-video-card reveal" style="border-radius: 16px; overflow: hidden; background: var(--bg-card); border: 1px solid var(--glass-border); box-shadow: 0 4px 20px rgba(0,0,0,0.08); display: flex; flex-direction: column;">
+        <div class="video-container-169" style="position: relative; width: 100%; aspect-ratio: 16/9; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+          <video controls preload="auto" playsinline poster="assets/images/amalfi-view-1.jpg" style="width: 100%; height: 100%; object-fit: cover; background: #000;">
+            <source src="assets/videos/italy_mov.mov" type="video/quicktime" />
+            <source src="assets/videos/amalfi-positano.mp4" type="video/mp4" />
+            <source src="https://res.cloudinary.com/vcj7lxnd/video/upload/q_auto:best,vc_auto/v1786801773/c93c334e-daaf-4c2c-88a4-cf238b5913d1_fwyh9b.mov" type="video/quicktime" />
+            <source src="https://res.cloudinary.com/vcj7lxnd/video/upload/q_auto:best,vc_auto/v1786801773/c93c334e-daaf-4c2c-88a4-cf238b5913d1_fwyh9b.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div style="padding: 16px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+          <div>
+            <div style="font-size: 11px; font-weight: 700; color: #168AAD; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;">📍 ITALY</div>
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Amalfi Coast &amp; Positano</h3>
+            <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">7 Days / 6 Nights · <strong>₹2,85,000</strong></div>
+          </div>
+          <button type="button" class="btn btn-outline btn-sm btn-explore" data-title="Amalfi Coast Escape" data-type="package" data-id="pkg-amalfi-7d" style="width: 100%; justify-content: center; padding: 8px 14px; font-size: 12px; font-weight: 600;">Explore Package →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+</div><!-- end section-group-discovery -->
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION GROUP 3 — PREMIUM EXPERIENCES
+═══════════════════════════════════════════════════ -->
+<div class="section-group-experiences">
+
+<!-- ═══════════════════════════════════════════════════
+     LATEST BLOGS
+═══════════════════════════════════════════════════ -->
+<section class="section" id="blog" style="background: var(--bg-secondary);">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="section-header">
+      <div class="section-badge">Travel Insights</div>
+      <h2 class="section-title">Latest <span>Blog Posts</span></h2>
+      <p class="section-subtitle">Expert travel tips, destination guides, and insider secrets from our team of seasoned globetrotters.</p>
+    </div>
+
+    <div class="blogs-grid">
+
+      <article class="blog-card reveal">
+        <div class="blog-img-wrap">
+          <img class="blog-img" src="assets/images/dest-maldives.jpg" alt="Maldives Guide" loading="lazy" />
+        </div>
+        <div class="blog-body">
+          <div class="blog-category">🏖️ DESTINATION GUIDE</div>
+          <h3 class="blog-title">The Ultimate Maldives Travel Guide: Everything You Need to Know for 2026</h3>
+          <p class="blog-excerpt">Planning a trip to the Maldives? We cover everything from choosing the right atoll, overwater vs. beach villas, best time to visit, and how to find the best deals on this tropical paradise.</p>
+          <div class="blog-meta">
+            <div class="blog-author">
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0EA5E9,#7C3AED);flex-shrink:0"></div>
+              <span class="blog-author-name">Emma Watson</span>
+            </div>
+            <span class="blog-date">July 10, 2026</span>
+            <span class="blog-read-time">⏱️ 8 min read</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="blog-card reveal">
+        <div class="blog-img-wrap">
+          <img class="blog-img" src="assets/images/dest-tokyo.jpg" alt="Japan Guide" loading="lazy" />
+        </div>
+        <div class="blog-body">
+          <div class="blog-category">🌸 TRAVEL TIPS</div>
+          <h3 class="blog-title">Japan Cherry Blossom Season 2027: Best Spots, Timing & Travel Tips</h3>
+          <p class="blog-excerpt">Discover the magic of Japan's iconic sakura season. We share the most beautiful viewing spots, best hotels near the parks, and practical tips to make the most of this fleeting natural wonder.</p>
+          <div class="blog-meta">
+            <div class="blog-author">
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#EF4444);flex-shrink:0"></div>
+              <span class="blog-author-name">Kenji Mori</span>
+            </div>
+            <span class="blog-date">July 15, 2026</span>
+            <span class="blog-read-time">⏱️ 6 min read</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="blog-card reveal">
+        <div class="blog-img-wrap">
+          <img class="blog-img" src="assets/images/gallery-1.jpg" alt="Africa Safari" loading="lazy" />
+        </div>
+        <div class="blog-body">
+          <div class="blog-category">🦁 ADVENTURE</div>
+          <h3 class="blog-title">First-Time Safari Guide: What to Expect on an African Wildlife Safari</h3>
+          <p class="blog-excerpt">Going on your first African safari? Our expert guide covers what animals to expect, the best parks and reserves, what to pack, and how to choose between lodge and camping safari experiences.</p>
+          <div class="blog-meta">
+            <div class="blog-author">
+              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#10B981,#0EA5E9);flex-shrink:0"></div>
+              <span class="blog-author-name">Amara Osei</span>
+            </div>
+            <span class="blog-date">July 20, 2026</span>
+            <span class="blog-read-time">⏱️ 10 min read</span>
+          </div>
+        </div>
+      </article>
+    </div>
+
+    <div class="section-view-all reveal">
+      <button type="button" class="btn btn-outline btn-lg" id="btn-read-all-blogs">Read All Articles →</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     NEWSLETTER
+═══════════════════════════════════════════════════ -->
+<section class="section" id="newsletter">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="newsletter-section">
+      <div class="newsletter-orb"></div>
+      <div class="newsletter-inner">
+        <div class="newsletter-content">
+          <div class="section-badge">Stay Updated</div>
+          <h2 class="newsletter-title">Get Exclusive <span class="text-gradient">Travel Deals</span> Straight to Your Inbox</h2>
+          <p class="newsletter-desc">Join 120,000+ savvy travelers who receive our weekly newsletter packed with early-bird deals, destination spotlights, and travel hacks.</p>
+          <div class="newsletter-benefits">
+            <div class="newsletter-benefit"><span>✅</span> Early access to flash sales (up to 60% off)</div>
+            <div class="newsletter-benefit"><span>✅</span> Exclusive subscriber-only packages</div>
+            <div class="newsletter-benefit"><span>✅</span> Free destination guides & travel tips</div>
+            <div class="newsletter-benefit"><span>✅</span> No spam, unsubscribe anytime</div>
+          </div>
+        </div>
+
+        <div class="newsletter-form-wrap">
+          <form class="newsletter-form" onsubmit="return false;">
+            <div style="margin-bottom:16px">
+              <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">FIRST NAME</div>
+              <div class="newsletter-input-group">
+                <input type="text" class="newsletter-input" placeholder="Your first name" />
+              </div>
+            </div>
+            <div>
+              <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">EMAIL ADDRESS</div>
+              <div class="newsletter-input-group">
+                <input type="email" class="newsletter-input" placeholder="your@email.com" required />
+                <button type="submit" class="newsletter-submit">Subscribe 🚀</button>
+              </div>
+            </div>
+            <p class="newsletter-privacy" style="margin-top:14px">🔒 We respect your privacy. Unsubscribe at any time.</p>
+          </form>
+
+          <div style="margin-top:28px;padding:20px;background:var(--glass);border:1px solid var(--glass-border);border-radius:16px;text-align:center;">
+            <div style="font-size:32px;margin-bottom:8px">🎁</div>
+            <div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">Welcome Gift</div>
+            <div style="font-size:13px;color:var(--text-secondary)">Get a <strong style="color:var(--accent)">$50 travel voucher</strong> when you subscribe today!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+</div><!-- end section-group-experiences -->
+
+<!-- ═══════════════════════════════════════════════════
+     SECTION GROUP 4 — PREMIUM ENDING (LUXURY BLACK & GOLD)
+═══════════════════════════════════════════════════ -->
+<div class="section-group-ending">
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="section-header">
+      <div class="section-badge">Got Questions?</div>
+      <h2 class="section-title">Frequently Asked <span>Questions</span></h2>
+      <p class="section-subtitle">Find answers to the most common travel questions. Can't find what you're looking for? Chat with our team 24/7.</p>
+    </div>
+
+    <!-- Compact FAQ Search Bar -->
+    <div style="max-width: 580px; margin: 0 auto 36px; position: relative;">
+      <span style="position: absolute; left: 18px; top: 50%; transform: translateY(-50%); font-size: 16px; color: #94A3B8; pointer-events: none;">🔍</span>
+      <input type="text" id="faq-search-input" placeholder="Search FAQs (e.g. refund, visa, insurance, payment, booking)..." oninput="window.filterFaqs(this.value)" style="width: 100%; padding: 13px 20px 13px 46px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 9999px; color: #FFFFFF; font-size: 14px; font-family: var(--font-sans, Inter, sans-serif); outline: none; transition: border-color 0.2s, box-shadow 0.2s;" onfocus="this.style.borderColor='rgba(56,189,248,0.5)'; this.style.boxShadow='0 0 16px rgba(56,189,248,0.15)';" onblur="this.style.borderColor='rgba(255,255,255,0.15)'; this.style.boxShadow='none';" />
+    </div>
+
+    <!-- FAQ Accordion Grid -->
+    <div class="faq-grid">
+      <div class="faq-item open" id="faq-item-0" data-faq-index="0">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="true" onclick="window.toggleFaq(0)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFaq(0);}">
+          <span class="faq-q-text">How do I book a travel package with Ventoura Travel?</span>
+          <span class="faq-icon" aria-hidden="true">−</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Booking is simple! Browse our available tour packages and click "Book Now" or "Explore Itinerary". You can customize dates, travelers, and luxury add-ons. Alternatively, call our 24/7 concierge at +1 800 555 1234. We accept major credit cards, wire transfers, and PayPal.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-item-1" data-faq-index="1">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" onclick="window.toggleFaq(1)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFaq(1);}">
+          <span class="faq-q-text">What is your cancellation and refund policy?</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            We offer flexible cancellation terms: Cancel 30+ days prior to departure for a 100% full refund; 15–29 days for a 75% refund; 7–14 days for a 50% refund. We also provide optional "Cancel For Any Reason" coverage for maximum flexibility. Full policy details are shown at checkout for each package.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-item-2" data-faq-index="2">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" onclick="window.toggleFaq(2)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFaq(2);}">
+          <span class="faq-q-text">Do you offer travel insurance?</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Yes! We partner with leading global insurers to provide comprehensive coverage including trip disruption, medical emergencies, emergency medical evacuation, lost baggage, and flight delays. Insurance can be added seamlessly during checkout at a small additional cost.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-item-3" data-faq-index="3">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" onclick="window.toggleFaq(3)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFaq(3);}">
+          <span class="faq-q-text">Can you help with visa applications?</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Absolutely! Our dedicated visa team handles tourist, business, and e-visa documentation for over 150 countries worldwide with a 99% approval rate. We guide you through the documentation process, fill out forms on your behalf, and track the status. Most visas are processed within 2–7 business days.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-item-4" data-faq-index="4">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" onclick="window.toggleFaq(4)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFaq(4);}">
+          <span class="faq-q-text">Is there a best price guarantee?</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Yes! If you find the same package cheaper elsewhere within 24 hours of booking, we'll match the price and give you an additional 5% discount. We work directly with airlines and luxury hotels to negotiate exclusive rates not available elsewhere.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-item-5" data-faq-index="5">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" onclick="window.toggleFaq(5)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFaq(5);}">
+          <span class="faq-q-text">What types of payment do you accept?</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            We accept all major credit and debit cards (Visa, Mastercard, Amex, Discover), PayPal, Apple Pay, Google Pay, bank wire transfers, and installment plans through Klarna and Afterpay. For bookings over $5,000, we offer 0% interest installment plans up to 12 months.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-item-6" data-faq-index="6">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" onclick="window.toggleFaq(6)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFaq(6);}">
+          <span class="faq-q-text">Do you offer group booking discounts?</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Yes! Groups of 8 or more receive an automatic 10% discount. Groups of 15+ get 15% off plus a dedicated group coordinator assigned to your booking. We specialize in corporate retreats, destination weddings, and bespoke private tours.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item" id="faq-item-7" data-faq-index="7">
+        <div class="faq-question" role="button" tabindex="0" aria-expanded="false" onclick="window.toggleFaq(7)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.toggleFaq(7);}">
+          <span class="faq-q-text">How do I contact support during my trip?</span>
+          <span class="faq-icon" aria-hidden="true">+</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-inner">
+            Our 24/7 travel hotline (+1 800 555 1234) is available around the clock, 365 days a year. You can also reach us via WhatsApp, live chat on our website, email, or through the Ventoura mobile portal. Our average response time is under 2 minutes.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     NEED HELP PLANNING YOUR TRIP? (CALLBACK REQUEST)
+═══════════════════════════════════════════════════ -->
+<section class="section" id="travel-assistance" style="background: #FFFFFF; color: #17212B; padding: 48px 0;">
+  <div class="container">
+    <div style="background: #F7F5F0; border: 1px solid #D9E1E8; border-radius: 20px; padding: 36px 32px; display: flex; align-items: center; justify-content: space-between; gap: 32px; flex-wrap: wrap; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+      <div style="max-width: 440px;">
+        <div class="section-badge" style="background: rgba(22, 138, 173, 0.1); border-color: #D9E1E8; color: #168AAD; margin-bottom: 12px;">Need Help Planning Your Trip?</div>
+        <h3 style="font-size: 24px; font-weight: 800; color: #17212B; margin-bottom: 8px;">Speak with a Ventoura Travel Expert</h3>
+        <p style="font-size: 14px; color: #64748B; margin: 0; line-height: 1.5;">Provide your details below and our travel advisor will call you back within 2 hours with customized recommendations.</p>
+      </div>
+
+      <form id="callback-request-form" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; flex: 1; min-width: 320px;" onsubmit="if(window.handleCallbackSubmit){window.handleCallbackSubmit(event);}else{event.preventDefault();showToast('Callback request submitted! Our travel expert will call you shortly.','📞');}">
+        <div style="flex: 1; min-width: 130px;">
+          <label style="font-size: 11px; font-weight: 700; color: #17212B; margin-bottom: 4px; display: block; text-transform: uppercase;">Full Name</label>
+          <input type="text" id="cb-name" placeholder="John Doe" required style="width:100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #D9E1E8; background: #FFFFFF; color: #17212B; font-size: 13px;" />
+        </div>
+        <div style="flex: 1; min-width: 130px;">
+          <label style="font-size: 11px; font-weight: 700; color: #17212B; margin-bottom: 4px; display: block; text-transform: uppercase;">Mobile Number</label>
+          <input type="tel" id="cb-phone" placeholder="+91 98765 43210" required style="width:100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #D9E1E8; background: #FFFFFF; color: #17212B; font-size: 13px;" />
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <label style="font-size: 11px; font-weight: 700; color: #17212B; margin-bottom: 4px; display: block; text-transform: uppercase;">Email Address</label>
+          <input type="email" id="cb-email" placeholder="john@example.com" required style="width:100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #D9E1E8; background: #FFFFFF; color: #17212B; font-size: 13px;" />
+        </div>
+        <div style="flex: 1; min-width: 140px;">
+          <label style="font-size: 11px; font-weight: 700; color: #17212B; margin-bottom: 4px; display: block; text-transform: uppercase;">Travel Interest</label>
+          <select id="cb-interest" style="width:100%; padding: 10px 14px; border-radius: 10px; border: 1px solid #D9E1E8; background: #FFFFFF; color: #17212B; font-size: 13px;">
+            <option>Honeymoon Package</option>
+            <option>Family Tour</option>
+            <option>Luxury Package</option>
+            <option>Cruise Experience</option>
+            <option>Visa Assistance</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary" style="padding: 11px 22px; font-size: 13px; font-weight: 700; white-space: nowrap; height: 42px;">Request a Callback →</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     CONTACT
+═══════════════════════════════════════════════════ -->
+<section class="section" id="contact" style="background: var(--bg-secondary);">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="section-header">
+      <div class="section-badge">Get in Touch</div>
+      <h2 class="section-title">Contact <span>Our Team</span></h2>
+      <p class="section-subtitle">Have a question or ready to book? Our travel experts are here to help craft your perfect journey.</p>
+    </div>
+
+    <div class="contact-layout">
+      <div class="contact-info reveal-left">
+        <div class="contact-info-card">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-info-title">Phone Support</div>
+            <div class="contact-info-value">+1 800 555 1234</div>
+            <div class="contact-info-value" style="font-size:12px;color:var(--text-muted);margin-top:2px">Available 24/7, 365 days</div>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <div class="contact-icon">✉️</div>
+          <div>
+            <div class="contact-info-title">Email Us</div>
+            <div class="contact-info-value">hello@wanderlux.travel</div>
+            <div class="contact-info-value" style="font-size:12px;color:var(--text-muted);margin-top:2px">Response within 2 hours</div>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-info-title">Visit Our Office</div>
+            <div class="contact-info-value">1250 Avenue of the Americas</div>
+            <div class="contact-info-value">New York, NY 10020, USA</div>
+          </div>
+        </div>
+        <div class="contact-info-card">
+          <div class="contact-icon">💬</div>
+          <div>
+            <div class="contact-info-title">Live Chat & WhatsApp</div>
+            <div class="contact-info-value">+1 646 555 8000</div>
+            <div class="contact-info-value" style="font-size:12px;color:var(--text-muted);margin-top:2px">Average response: &lt; 2 min</div>
+          </div>
+        </div>
+
+        <!-- Map embed -->
+        <div style="border-radius:16px;overflow:hidden;border:1px solid var(--glass-border);height:200px;background:var(--bg-card);display:flex;align-items:center;justify-content:center;">
+          <iframe
+            src="https://www.openstreetmap.org/export/embed.html?bbox=-74.018%2C40.753%2C-73.980%2C40.770&layer=mapnik&marker=40.761%2C-73.999"
+            style="width:100%;height:100%;border:none"
+            title="Ventoura Travel Office Location"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </div>
+
+      <div class="contact-form-wrap reveal-right">
+        <div class="form-title">Send Us a Message</div>
+        <div class="form-subtitle">Fill out the form and a travel expert will contact you within 2 hours.</div>
+
+        <form id="contact-form" onsubmit="window.handleContactSubmit(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="cf-first">First Name</label>
+              <input type="text" id="cf-first" class="form-control" placeholder="John" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="cf-last">Last Name</label>
+              <input type="text" id="cf-last" class="form-control" placeholder="Doe" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cf-email">Email Address</label>
+            <input type="email" id="cf-email" class="form-control" placeholder="john@email.com" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cf-phone">Phone Number</label>
+            <input type="tel" id="cf-phone" class="form-control" placeholder="+1 234 567 8900" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cf-interest">I'm Interested In</label>
+            <select id="cf-interest" class="form-control" required>
+              <option value="">Select category</option>
+              <option value="Tour Packages">Tour Packages</option>
+              <option value="Top Destinations">Top Destinations</option>
+              <option value="Luxury Cruises">Luxury Cruises</option>
+              <option value="5-Star Hotels & Resorts">5-Star Hotels & Resorts</option>
+              <option value="Flights & Private Charters">Flights & Private Charters</option>
+              <option value="Chauffeur & Car Rental">Chauffeur & Car Rental</option>
+              <option value="Visa Assistance">Visa Assistance</option>
+              <option value="Travel Insurance">Travel Insurance</option>
+              <option value="General Enquiry">General Enquiry</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="cf-message">Your Message</label>
+            <textarea id="cf-message" class="form-control" placeholder="Tell us about your dream trip..." rows="4" required></textarea>
+          </div>
+          <button type="submit" id="cf-submit-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:16px;font-size:16px;border-radius:14px;">
+            Send Message ✉️
+          </button>
+          <div id="contact-form-feedback" style="display:none;"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- ═══════════════════════════════════════════════════
+     WHY CHOOSE US (OUR PROMISE - BOTTOM POSITION)
+═══════════════════════════════════════════════════ -->
+<section class="section" id="why-us" style="background: #121619 !important; color: #FAF8F5 !important; padding: 40px 0;">
+  <div class="container" style="position:relative;">
+    <a href="#home" class="section-close-btn" aria-label="Back to Home" title="Back to Home">✕</a>
+    <div class="section-header" style="margin-bottom: 24px; text-align: center;">
+      <div class="section-badge" style="color: #C5A059; font-size: 11px; letter-spacing: 0.2em; font-weight: 700;">• OUR PROMISE</div>
+      <h2 class="section-title" style="color: #FFFFFF; font-size: 28px; margin-top: 6px;">Why Choose <span style="color: #C5A059;">Ventoura Travel?</span></h2>
+      <p class="section-subtitle" style="color: #94A3B8; font-size: 13px; margin-top: 4px;">We go beyond ordinary travel booking — we design seamless, ultra-luxury journeys tailored to your every wish.</p>
+    </div>
+
+    <div class="why-us-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+      <!-- 1. Private Luxury Tours -->
+      <div class="why-card reveal" style="background: rgba(30, 36, 43, 0.85); border: 1px solid rgba(197, 160, 89, 0.2); padding: 18px 18px; border-radius: 14px; transition: transform 0.3s ease;">
+        <div class="why-icon" style="font-size: 24px; margin-bottom: 8px;">🥂</div>
+        <h3 class="why-title" style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">Private Luxury Tours</h3>
+        <p class="why-desc" style="font-size: 12px; color: #94A3B8; line-height: 1.5; margin: 0;">Exclusive tailor-made itineraries with private chauffeured cars, private yachts, and VIP access.</p>
+      </div>
+
+      <!-- 2. Personal Travel Designer -->
+      <div class="why-card reveal" style="background: rgba(30, 36, 43, 0.85); border: 1px solid rgba(197, 160, 89, 0.2); padding: 18px 18px; border-radius: 14px; transition: transform 0.3s ease;">
+        <div class="why-icon" style="font-size: 24px; margin-bottom: 8px;">🧭</div>
+        <h3 class="why-title" style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">Personal Travel Designer</h3>
+        <p class="why-desc" style="font-size: 12px; color: #94A3B8; line-height: 1.5; margin: 0;">Dedicated senior travel specialist paired with you to curate bespoke itineraries matching your exact style.</p>
+      </div>
+
+      <!-- 3. 24×7 Concierge -->
+      <div class="why-card reveal" style="background: rgba(30, 36, 43, 0.85); border: 1px solid rgba(197, 160, 89, 0.2); padding: 18px 18px; border-radius: 14px; transition: transform 0.3s ease;">
+        <div class="why-icon" style="font-size: 24px; margin-bottom: 8px;">🛎️</div>
+        <h3 class="why-title" style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">24×7 Concierge</h3>
+        <p class="why-desc" style="font-size: 12px; color: #94A3B8; line-height: 1.5; margin: 0;">Around-the-clock live concierge assistance via WhatsApp, phone, and app for instant reservations.</p>
+      </div>
+
+      <!-- 4. Luxury Hotels -->
+      <div class="why-card reveal" style="background: rgba(30, 36, 43, 0.85); border: 1px solid rgba(197, 160, 89, 0.2); padding: 18px 18px; border-radius: 14px; transition: transform 0.3s ease;">
+        <div class="why-icon" style="font-size: 24px; margin-bottom: 8px;">🏨</div>
+        <h3 class="why-title" style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">Luxury Hotels</h3>
+        <p class="why-desc" style="font-size: 12px; color: #94A3B8; line-height: 1.5; margin: 0;">Handpicked 5-Star &amp; 7-Star luxury hotels, overwater villas, and heritage palazzos with room upgrades.</p>
+      </div>
+
+      <!-- 5. VIP Airport Transfers -->
+      <div class="why-card reveal" style="background: rgba(30, 36, 43, 0.85); border: 1px solid rgba(197, 160, 89, 0.2); padding: 18px 18px; border-radius: 14px; transition: transform 0.3s ease;">
+        <div class="why-icon" style="font-size: 24px; margin-bottom: 8px;">🚘</div>
+        <h3 class="why-title" style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">VIP Airport Transfers</h3>
+        <p class="why-desc" style="font-size: 12px; color: #94A3B8; line-height: 1.5; margin: 0;">Fast-track customs clearance, tarmac escort, and private Mercedes or seaplane transfers to your hotel.</p>
+      </div>
+
+      <!-- 6. Private Guides -->
+      <div class="why-card reveal" style="background: rgba(30, 36, 43, 0.85); border: 1px solid rgba(197, 160, 89, 0.2); padding: 18px 18px; border-radius: 14px; transition: transform 0.3s ease;">
+        <div class="why-icon" style="font-size: 24px; margin-bottom: 8px;">🎓</div>
+        <h3 class="why-title" style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">Private Guides</h3>
+        <p class="why-desc" style="font-size: 12px; color: #94A3B8; line-height: 1.5; margin: 0;">Certified expert local historians, naturalists, and translators fluent in your language for enriching tours.</p>
+      </div>
+
+      <!-- 7. Secure Payments -->
+      <div class="why-card reveal" style="background: rgba(30, 36, 43, 0.85); border: 1px solid rgba(197, 160, 89, 0.2); padding: 18px 18px; border-radius: 14px; transition: transform 0.3s ease;">
+        <div class="why-icon" style="font-size: 24px; margin-bottom: 8px;">🔐</div>
+        <h3 class="why-title" style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">Secure Payments</h3>
+        <p class="why-desc" style="font-size: 12px; color: #94A3B8; line-height: 1.5; margin: 0;">256-bit SSL encrypted transactions with flexible installment options and financial protection.</p>
+      </div>
+
+      <!-- 8. Worldwide Support -->
+      <div class="why-card reveal" style="background: rgba(30, 36, 43, 0.85); border: 1px solid rgba(197, 160, 89, 0.2); padding: 18px 18px; border-radius: 14px; transition: transform 0.3s ease;">
+        <div class="why-icon" style="font-size: 24px; margin-bottom: 8px;">🌍</div>
+        <h3 class="why-title" style="font-size: 15px; font-weight: 700; color: #FFFFFF; margin-bottom: 4px;">Worldwide Support</h3>
+        <p class="why-desc" style="font-size: 12px; color: #94A3B8; line-height: 1.5; margin: 0;">On-the-ground support teams across 150+ countries to ensure your peace of mind wherever you travel.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     BOTTOM CONTACT BAR (DARK LUXURY BAR)
+═══════════════════════════════════════════════════ -->
+<div class="bottom-contact-bar" id="bottom-contact-bar" style="background: #0d1013 !important; border-top: 1px solid rgba(197, 160, 89, 0.2); color: #FAF8F5 !important; padding: 12px 0;">
+  <div class="container">
+    <div class="top-bar-inner" style="display: flex; align-items: center; justify-content: space-between;">
+      <div class="top-bar-left" style="display: flex; gap: 24px; align-items: center; font-size: 13px; color: #E2E8F0;">
+        <a href="tel:+18005551234" class="bottom-bar-item" style="color: #E2E8F0; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+          <span>📞</span> +1 800 555 1234
+        </a>
+        <a href="mailto:hello@wanderlux.travel" class="bottom-bar-item" style="color: #E2E8F0; text-decoration: none; display: flex; align-items: center; gap: 6px;">
+          <span>✉️</span> hello@wanderlux.travel
+        </a>
+        <span class="bottom-bar-item" style="color: #94A3B8; display: flex; align-items: center; gap: 6px;">
+          <span>🕐</span> Mon–Sat 9am–8pm EST
+        </span>
+      </div>
+      <div class="top-bar-right">
+        <div class="top-bar-social" style="display: flex; gap: 10px;">
+          <a href="https://facebook.com" target="_blank" class="social-link-dark" style="color: #C5A059; text-decoration: none;" title="Facebook">f</a>
+          <a href="https://instagram.com" target="_blank" class="social-link-dark" style="color: #C5A059; text-decoration: none;" title="Instagram">in</a>
+          <a href="https://twitter.com" target="_blank" class="social-link-dark" style="color: #C5A059; text-decoration: none;" title="Twitter">𝕏</a>
+          <a href="https://youtube.com" target="_blank" class="social-link-dark" style="color: #C5A059; text-decoration: none;" title="YouTube">▶</a>
+          <a href="https://pinterest.com" target="_blank" class="social-link-dark" style="color: #C5A059; text-decoration: none;" title="Pinterest">P</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<footer class="footer" id="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <!-- Brand Col -->
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <a href="index.html" class="nav-logo" style="margin-bottom:16px">
+            <img src="assets/images/logo.png" alt="Ventoura Travel Logo" class="brand-logo-img" style="height: 56px;" />
+          </a>
+        </div>
+
+        <p class="footer-desc">Creating unforgettable travel experiences for 15 years. Your trusted partner for exploring the world's most beautiful destinations — in luxury and style.</p>
+      </div>
+
+      <!-- Destinations Col -->
+      <div>
+        <div class="footer-col-title">Destinations</div>
+        <ul class="footer-links">
+          <li><a href="javascript:void(0)" onclick="window.openTravelExperienceModal('Maldives')" class="footer-link">🇲🇻 Maldives</a></li>
+          <li><a href="javascript:void(0)" onclick="window.openTravelExperienceModal('Santorini')" class="footer-link">🇬🇷 Santorini</a></li>
+          <li><a href="javascript:void(0)" onclick="window.openTravelExperienceModal('Bali')" class="footer-link">🇮🇩 Bali</a></li>
+          <li><a href="javascript:void(0)" onclick="window.openTravelExperienceModal('Paris')" class="footer-link">🇫🇷 Paris</a></li>
+          <li><a href="javascript:void(0)" onclick="window.openTravelExperienceModal('Tokyo')" class="footer-link">🇯🇵 Tokyo</a></li>
+          <li><a href="javascript:void(0)" onclick="window.openTravelExperienceModal('Dubai')" class="footer-link">🇦🇪 Dubai</a></li>
+          <li><a href="javascript:void(0)" onclick="window.openTravelExperienceModal('Phuket')" class="footer-link">🇹🇭 Phuket</a></li>
+          <li><a href="services.html?cat=destinations" class="footer-link">View All →</a></li>
+        </ul>
+      </div>
+
+      <!-- Packages Col -->
+      <div>
+        <div class="footer-col-title">Packages</div>
+        <ul class="footer-links">
+          <li><a href="#packages" class="footer-link">🏖️ Beach Holidays</a></li>
+          <li><a href="#packages" class="footer-link">💑 Honeymoon</a></li>
+          <li><a href="#packages" class="footer-link">💎 Luxury Tours</a></li>
+          <li><a href="#packages" class="footer-link">🧗 Adventure</a></li>
+          <li><a href="#packages" class="footer-link">👨‍👩‍👧 Family Tours</a></li>
+          <li><a href="#cruises" class="footer-link">🚢 Cruises</a></li>
+          <li><a href="#packages" class="footer-link">🦁 Safari</a></li>
+        </ul>
+      </div>
+
+      <!-- Services Col -->
+      <div>
+        <div class="footer-col-title">Services</div>
+        <ul class="footer-links">
+          <li><a href="services.html?cat=flights" class="footer-link">✈️ Flight Booking</a></li>
+          <li><a href="services.html?cat=hotels" class="footer-link">🏨 Hotels</a></li>
+          <li><a href="services.html?cat=visa" class="footer-link">📋 Visa Services</a></li>
+          <li><a href="services.html?cat=transport" class="footer-link">🚗 Car Rentals</a></li>
+          <li><a href="services.html?cat=insurance" class="footer-link">🛡️ Travel Insurance</a></li>
+          <li><a href="services.html?cat=packages" class="footer-link">💼 Corporate Travel</a></li>
+          <li><a href="services.html?cat=packages" class="footer-link">🎯 Custom Packages</a></li>
+        </ul>
+      </div>
+
+      <!-- Company Col -->
+      <div>
+        <div class="footer-col-title">Company</div>
+        <ul class="footer-links">
+          <li><a href="services.html" class="footer-link">About Us</a></li>
+          <li><a href="user-dashboard.html" class="footer-link">User Dashboard</a></li>
+          <li><a href="#blog" class="footer-link">Travel Blog</a></li>
+          <li><a href="#faq" class="footer-link">FAQ & Support</a></li>
+          <li><a href="#contact" class="footer-link">Contact Us</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+      <p class="footer-copyright">© 2026 Ventoura Travel Agency. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="javascript:void(0)" onclick="showToast('Privacy Policy: 256-Bit SSL Encrypted & Data Protected','🔒')" class="footer-bottom-link">Privacy Policy</a>
+        <a href="javascript:void(0)" onclick="showToast('Terms of Service: Full Booking Protection & Flexible Cancellation','📜')" class="footer-bottom-link">Terms of Service</a>
+        <a href="javascript:void(0)" onclick="showToast('Cookie Preferences Saved','🍪')" class="footer-bottom-link">Cookie Policy</a>
+        <a href="javascript:void(0)" onclick="showToast('Accessibility: WCAG 2.1 AA Compliant','♿')" class="footer-bottom-link">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+</div><!-- end section-group-ending -->
+
+<!-- Back to Top Button -->
+<button class="back-to-top" aria-label="Back to top">↑</button>
+
+<!-- Auth Modal -->
+<div class="auth-modal" id="auth-modal" role="dialog" aria-label="Login" onclick="if(event.target===this) window.closeAuthModal()">
+  <div class="auth-modal-box">
+    <button type="button" class="auth-modal-close" onclick="window.closeAuthModal()">✕</button>
+    <div class="auth-title">Welcome Back</div>
+    <div class="auth-subtitle">Sign in to access your bookings and exclusive deals.</div>
+
+    <button type="button" class="auth-social-btn" data-provider="google">
+      <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+      <span>Continue with Google</span>
+    </button>
+    <button type="button" class="auth-social-btn" data-provider="facebook">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" style="margin-right:8px"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      <span>Continue with Facebook</span>
+    </button>
+    <button type="button" class="auth-social-btn" data-provider="apple">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff" style="margin-right:8px"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.86c.66-.8 1.11-1.91.99-3.03-.96.04-2.12.64-2.8 1.44-.59.69-1.12 1.83-.98 2.92 1.07.08 2.15-.55 2.79-1.33z"/></svg>
+      <span>Continue with Apple</span>
+    </button>
+
+    <div class="auth-divider"><span>or sign in with email</span></div>
+
+    <form id="auth-form" style="display:flex;flex-direction:column;gap:12px">
+      <input type="text" id="auth-name-input" class="form-control" placeholder="Full Name" style="display:none;" />
+      <input type="email" id="auth-email-input" class="form-control" placeholder="Email address" required />
+      <input type="password" id="auth-password-input" class="form-control" placeholder="Password" required />
+      <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">Sign In</button>
+    </form>
+
+    <div class="auth-switch">Don't have an account? <a id="auth-switch-link" href="javascript:void(0)">Sign Up</a></div>
+  </div>
+</div>
+<!-- DETAILS MODAL -->
+<div class="details-modal" role="dialog" aria-label="Item Details">
+  <div class="details-modal-box">
+    <button class="details-modal-close" aria-label="Close Modal">✕</button>
+    <div id="details-modal-container"></div>
+  </div>
+</div>
+
+<!-- COMPARISON MATRIX MODAL -->
+<div class="comparison-modal" id="comparison" role="dialog" aria-label="Trip Comparison">
+  <div class="comparison-modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div>
+        <div class="section-badge">Side-by-Side Analysis</div>
+        <h2 class="section-title" style="font-size:24px;margin:0">Trip <span>Comparison</span> ⚖️</h2>
+      </div>
+      <button class="comparison-modal-close" onclick="document.getElementById('comparison').classList.remove('open')" aria-label="Close">✕</button>
+    </div>
+    <div id="comparison-matrix-container"></div>
+  </div>
+</div>
+<!-- GLOBAL SEARCH MODAL -->
+<div class="search-modal" id="search-modal" role="dialog" aria-label="Global Search">
+  <div class="search-modal-box">
+    <div class="search-header-bar">
+      <div class="search-input-wrap">
+        <span class="search-input-icon">🔍</span>
+        <input type="text" id="modal-search-input-second" class="global-search-input" placeholder="Search countries, cities, packages, hotels, cruises, islands..." autofocus />
+
+      </div>
+      <button class="search-modal-close" id="search-modal-close">✕</button>
+    </div>
+    
+    <div class="search-quick-tags" id="search-quick-tags">
+      <span class="search-tag active" data-filter="all">All Results</span>
+      <span class="search-tag" data-filter="dest">🌍 Destinations</span>
+      <span class="search-tag" data-filter="pkg">📦 Packages</span>
+      <span class="search-tag" data-filter="hotel">🏨 Hotels</span>
+      <span class="search-tag" data-filter="cruise">🚢 Cruises</span>
+    </div>
+
+    <div class="search-results-container" id="search-results-container">
+      <div class="search-empty-state">
+        <p>Type to search 100+ destinations, luxury packages, hotels & cruises...</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WISHLIST MODAL -->
+<div class="wishlist-modal" id="wishlist-modal" role="dialog" aria-label="My Wishlist">
+  <div class="wishlist-modal-box">
+    <div class="modal-header-flex">
+      <div>
+        <div class="section-badge">Saved Favorites</div>
+        <h2 class="section-title" style="font-size:24px;margin:0">My <span>Wishlist</span> ❤️</h2>
+      </div>
+      <button class="wishlist-modal-close" id="wishlist-modal-close">✕</button>
+    </div>
+
+    <div id="wishlist-items-container" class="wishlist-grid">
+      <!-- Items dynamically populated -->
+    </div>
+
+    <div class="wishlist-footer-bar" id="wishlist-footer-bar">
+      <button class="btn btn-ghost btn-sm" id="clear-wishlist-btn">Clear All</button>
+      <button class="btn btn-primary" id="book-all-wishlist-btn">Book Saved Items →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════ -->
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+
+<!-- App Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+<script src="js/database.js" defer></script>
+<script src="js/main.js" defer></script>
+<script src="js/weather.js" defer></script>
+<script src="js/map.js" defer></script>
+<script src="js/carousel.js" defer></script>
+<script src="js/ai-planner.js" defer></script>
+<script src="js/comparison.js" defer></script>
+<script src="js/services.js" defer></script>
+<script src="js/timeline.js" defer></script>
+
+<script>
+  // Init carousels after DOM ready
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set default date values for search
+    const today = new Date();
+    const nextWeek = new Date(today);
+    nextWeek.setDate(today.getDate() + 7);
+    const twoWeeks = new Date(today);
+    twoWeeks.setDate(today.getDate() + 14);
+
+    const fromDate = document.getElementById('date-from');
+    const toDate = document.getElementById('date-to');
+    if (fromDate) fromDate.value = nextWeek.toISOString().split('T')[0];
+    if (toDate) toDate.value = twoWeeks.toISOString().split('T')[0];
+
+    // Mobile login button
+    document.getElementById('mobile-login')?.addEventListener('click', () => {
+      document.querySelector('.auth-modal')?.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+</script>
+
+<!-- DESTINATION & PACKAGE DETAILS MODAL -->
+<div class="details-modal" id="destination-modal" style="position:fixed; inset:0; z-index:10000; background:rgba(5,10,24,0.85); backdrop-filter:blur(16px); display:flex; align-items:center; justify-content:center; padding:20px; opacity:0; visibility:hidden; transition:all 0.3s ease;">
+  <div class="details-modal-box" style="background:#0f172a; border:1px solid rgba(255,255,255,0.15); border-radius:24px; width:100%; max-width:850px; max-height:90vh; overflow-y:auto; position:relative; box-shadow:0 25px 50px -12px rgba(0,0,0,0.6);">
+    <button class="details-modal-close" id="destination-modal-close" style="position:absolute; top:16px; right:16px; z-index:100; width:38px; height:38px; border-radius:50%; background:rgba(0,0,0,0.7); border:1px solid rgba(255,255,255,0.2); color:#fff; font-size:18px; display:flex; align-items:center; justify-content:center; cursor:pointer;" aria-label="Close Modal">✕</button>
+    <div id="destination-modal-content"></div>
+  </div>
+</div>
+
+<script>
+
+  // ── Prompt Video Custom JavaScript Fade System (NO CSS transitions) ──
+  document.addEventListener('DOMContentLoaded', function() {
+    const video = document.getElementById('hero-bg-video');
+    const searchInput = document.getElementById('prompt-hero-search-input');
+    const charCount = document.getElementById('prompt-char-count');
+
+    if (searchInput && charCount) {
+      searchInput.addEventListener('input', function() {
+        const len = searchInput.value.length;
+        charCount.textContent = len.toLocaleString() + '/3,000';
+      });
+    }
+
+    if (!video) return;
+
+    let animFrameId = null;
+    let fadingOutRef = false;
+
+    function fadeToOpacity(targetOpacity, durationMs, onComplete) {
+      if (animFrameId !== null) {
+        cancelAnimationFrame(animFrameId);
+        animFrameId = null;
+      }
+
+      const startOpacity = parseFloat(video.style.opacity || '0');
+      const opacityDiff = targetOpacity - startOpacity;
+      if (Math.abs(opacityDiff) < 0.001) {
+        video.style.opacity = targetOpacity.toString();
+        if (onComplete) onComplete();
+        return;
+      }
+
+      const startTime = performance.now();
+
+      function step(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(elapsed / durationMs, 1);
+        const currentOpacity = startOpacity + (opacityDiff * progress);
+        video.style.opacity = currentOpacity.toFixed(4);
+
+        if (progress < 1) {
+          animFrameId = requestAnimationFrame(step);
+        } else {
+          animFrameId = null;
+          if (onComplete) onComplete();
+        }
+      }
+
+      animFrameId = requestAnimationFrame(step);
+    }
+
+    function startFadeIn() {
+      fadingOutRef = false;
+      fadeToOpacity(1, 250);
+    }
+
+    function startFadeOut() {
+      if (fadingOutRef) return;
+      fadingOutRef = true;
+      fadeToOpacity(0, 250);
+    }
+
+    video.addEventListener('loadeddata', function() {
+      const p = video.play();
+      if (p !== undefined) {
+        p.then(() => {
+          if (video.style.opacity !== '1') startFadeIn();
+        }).catch(function() {});
+      }
+    });
+
+    video.addEventListener('timeupdate', function() {
+      if (video.duration && !isNaN(video.duration)) {
+        const remainingTime = video.duration - video.currentTime;
+        if (remainingTime <= 0.45 && !fadingOutRef) {
+          startFadeOut();
+        }
+      }
+    });
+
+    video.addEventListener('ended', function() {
+      fadingOutRef = false;
+      setTimeout(function() {
+        video.currentTime = 0;
+        const p = video.play();
+        if (p !== undefined) {
+          p.then(startFadeIn).catch(function() {});
+        }
+      }, 50);
+    });
+
+    if (video.readyState >= 2) {
+      const p = video.play();
+      if (p !== undefined) {
+        p.then(() => {
+          video.style.opacity = '1';
+        }).catch(function() {});
+      }
+    }
+
+    let ticking = false;
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        window.requestAnimationFrame(function() {
+          const scrollY = window.scrollY;
+          if (scrollY <= window.innerHeight) {
+            const translateY = (scrollY * 0.25).toFixed(2);
+            video.style.transform = `translate3d(-50%, calc(-50% + ${translateY}px), 0)`;
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    }, { passive: true });
+  });
+</script>
+
+<script src="js/enquiry.js"></script>
+<script src="js/faq.js"></script>
+<script src="js/contact.js"></script>
+<script src="js/fold-text.js"></script>
+<script src="js/base-navigation-menu.js"></script>
+</body>
+</html>
+
+

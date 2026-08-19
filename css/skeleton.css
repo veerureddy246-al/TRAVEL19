@@ -1,0 +1,94 @@
+/* ============================================================
+   SKELETON SCREENS & PERFORMANCE STYLES — Phase 5
+   ============================================================ */
+
+/* ─── Skeleton Base & Shimmer Animation ─── */
+.skeleton {
+  background: var(--bg-card, #0F172A);
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.09) 37%,
+    rgba(255, 255, 255, 0.04) 63%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-loading 1.4s ease infinite;
+  border-radius: var(--radius-md, 8px);
+  display: block;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ─── Skeleton Variants ─── */
+.skeleton-text {
+  height: 14px;
+  margin-bottom: 8px;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.skeleton-text.short { width: 60%; }
+.skeleton-text.heading { height: 24px; width: 80%; margin-bottom: 14px; }
+.skeleton-title { height: 32px; width: 45%; margin-bottom: 20px; }
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-card {
+  height: 340px;
+  border-radius: var(--radius-lg, 16px);
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.08));
+  overflow: hidden;
+}
+
+.skeleton-image {
+  height: 180px;
+  width: 100%;
+}
+
+.skeleton-button {
+  height: 42px;
+  width: 130px;
+  border-radius: var(--radius-full, 9999px);
+}
+
+.skeleton-table-row {
+  height: 48px;
+  width: 100%;
+  margin-bottom: 8px;
+  border-radius: 6px;
+}
+
+/* ─── Accessibility & Focus Indicators (WCAG 2.1 AA) ─── */
+:focus-visible {
+  outline: 2px solid var(--primary-light, #38BDF8);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: rgba(255, 255, 255, 0.05);
+  }
+}

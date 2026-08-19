@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ventoura Travel Services — Explore our complete catalog of travel services, including tour packages, flight bookings, luxury hotels, cruises, visa assistance, car rentals, AI trip planning, and more." />
+  <title>Luxury Services Catalog | Ventoura Travel</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css?v=clean2026_v3" />
+  <link rel="stylesheet" href="css/dark-light.css?v=clean2026_v3" />
+  <link rel="stylesheet" href="css/services.css?v=clean2026_v3" />
+  <link rel="stylesheet" href="css/enquiry.css?v=clean2026_v3" />
+
+
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER & NAVBAR
+═══════════════════════════════════════════════════ -->
+<header class="navbar" id="navbar">
+  <div class="container">
+    <nav class="nav-inner">
+
+      <!-- Logo -->
+      <a href="index.html" class="nav-logo" aria-label="Ventoura Travel Home">
+        <img src="assets/images/logo.png" alt="Ventoura Travel Logo" class="brand-logo-img" />
+      </a>
+
+
+      <!-- Nav Menu -->
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="services.html" class="nav-link active">Services</a></li>
+        <li class="nav-item"><a href="index.html#destinations" class="nav-link">Destinations</a></li>
+        <li class="nav-item"><a href="index.html#blog" class="nav-link">Blog</a></li>
+        <li class="nav-item"><a href="index.html#contact" class="nav-link">Contact</a></li>
+      </ul>
+
+      <!-- Nav Actions -->
+      <div class="nav-actions">
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <span class="theme-toggle-thumb">🌙</span>
+        </button>
+
+        <!-- Search -->
+        <button class="nav-action-btn" id="search-trigger" aria-label="Search">🔍</button>
+
+        <!-- Wishlist -->
+        <button class="nav-action-btn" id="wishlist-trigger" aria-label="Wishlist">
+          ❤️
+          <span class="badge-count" id="wishlist-count">0</span>
+        </button>
+
+        <!-- Login -->
+        <button class="btn btn-ghost btn-sm" id="login-btn" onclick="window.openAuthModal('login')" style="padding:8px 14px;font-size:13px;cursor:pointer;">Login</button>
+
+        <!-- Register -->
+        <button class="btn btn-primary btn-sm" id="register-btn" onclick="window.openAuthModal('register')" style="padding:8px 16px;font-size:13px;cursor:pointer;">Register</button>
+
+        <!-- Hamburger -->
+        <button class="hamburger" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </nav>
+  </div>
+</header>
+
+<!-- Mobile Nav Overlay -->
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <div class="mobile-nav-item"><a href="index.html" class="mobile-nav-link">🏠 Home</a></div>
+  <div class="mobile-nav-item"><a href="services.html" class="mobile-nav-link">🌟 Services</a></div>
+  <div class="mobile-nav-item"><a href="index.html#destinations" class="mobile-nav-link">🌍 Destinations</a></div>
+  <div class="mobile-nav-item"><a href="index.html#blog" class="mobile-nav-link">📝 Blog</a></div>
+  <div class="mobile-nav-item"><a href="index.html#contact" class="mobile-nav-link">📞 Contact</a></div>
+  <div style="margin-top:32px;display:flex;gap:12px">
+    <button class="btn btn-ghost" style="flex:1" id="mobile-login">Login</button>
+    <button class="btn btn-primary" style="flex:1" id="mobile-register">Register</button>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════════
+     STICKY SERVICES FILTER CHIPS
+═══════════════════════════════════════════════════ -->
+<div class="services-nav-bar" id="all-services">
+  <div class="container">
+    <div class="services-chips-track">
+      <button class="service-chip" data-category="all">🌟 All Services (30+)</button>
+      <button class="service-chip" data-category="packages">📦 Tour Packages</button>
+      <button class="service-chip" data-category="destinations">🌍 Destinations</button>
+      <button class="service-chip" data-category="cruises">🚢 Cruises</button>
+      <button class="service-chip" data-category="transport">🚗 Car & Transfers</button>
+      <button class="service-chip" data-category="insurance">🛡️ Travel Insurance</button>
+      <button class="service-chip" data-category="specialty">💎 Specialty Tours</button>
+      <button class="service-chip" data-category="experiences">🎟️ Experiences & Guides</button>
+      <button class="service-chip" data-category="gallery">📸 Photo Gallery</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TOUR PACKAGES 14 SUB-CATEGORY FILTER BAR
+═══════════════════════════════════════════════════ -->
+<div class="package-sub-categories-bar" id="package-sub-categories" style="display:none; padding:14px 0; background:rgba(15,23,42,0.95); border-bottom:1px solid var(--glass-border); position:sticky; top:128px; z-index:89;">
+  <div class="container">
+    <div style="font-size:12px; font-weight:800; color:var(--accent); margin-bottom:8px; text-transform:uppercase; letter-spacing:1px; display:flex; align-items:center; gap:6px;">
+      <span>📦 FILTER TOUR PACKAGES BY CATEGORY (14 CATEGORIES):</span>
+    </div>
+    <div class="services-chips-track" style="gap:8px; overflow-x:auto; padding-bottom:4px;">
+      <button class="pkg-sub-chip active" data-pkg-cat="all" style="padding:6px 14px; font-size:12px; font-weight:700; border-radius:9999px; background:var(--accent); color:#0f172a; border:none; cursor:pointer; white-space:nowrap;">🌟 All Categories</button>
+      <button class="pkg-sub-chip" data-pkg-cat="beach" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">🏖️ Beach Holidays</button>
+      <button class="pkg-sub-chip" data-pkg-cat="luxury" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">💎 Luxury Tours</button>
+      <button class="pkg-sub-chip" data-pkg-cat="honeymoon" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">💑 Honeymoon Packages</button>
+      <button class="pkg-sub-chip" data-pkg-cat="family" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">👨‍👩‍👧‍👦 Family Tours</button>
+      <button class="pkg-sub-chip" data-pkg-cat="adventure" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">🧗 Adventure Tours</button>
+      <button class="pkg-sub-chip" data-pkg-cat="safari" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">🦁 Wildlife Safari</button>
+      <button class="pkg-sub-chip" data-pkg-cat="island" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">🏝️ Island Escapes</button>
+      <button class="pkg-sub-chip" data-pkg-cat="road" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">🚗 Road Trips</button>
+      <button class="pkg-sub-chip" data-pkg-cat="religious" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">🕌 Religious Tours</button>
+      <button class="pkg-sub-chip" data-pkg-cat="business" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">💼 Business Tours</button>
+      <button class="pkg-sub-chip" data-pkg-cat="weekend" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">🌅 Weekend Getaways</button>
+      <button class="pkg-sub-chip" data-pkg-cat="mountain" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">🏔️ Mountain Adventures</button>
+      <button class="pkg-sub-chip" data-pkg-cat="city" style="padding:6px 14px; font-size:12px; font-weight:600; border-radius:9999px; background:rgba(255,255,255,0.06); color:#cbd5e1; border:1px solid rgba(255,255,255,0.12); cursor:pointer; white-space:nowrap;">🏙️ City Breaks</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SERVICES CATALOG GRID
+═══════════════════════════════════════════════════ -->
+<section class="section" style="min-height: 60vh;">
+  <div class="container">
+    <div class="grid-3" id="services-hub-grid" style="min-height: 300px;">
+      <!-- Services are loaded dynamically by services.js -->
+      <div style="grid-column:1/-1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:80px 20px; color:#94a3b8;">
+        <div style="font-size:40px; margin-bottom:12px;">🌟</div>
+        <div style="font-size:16px; font-weight:600;">Loading services...</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════
+     DETAILS MODAL (Destinations, Packages, Hotels, Flights)
+═══════════════════════════════════════════════════ -->
+<div class="details-modal" role="dialog" aria-label="Item Details">
+  <div class="details-modal-box">
+    <button class="details-modal-close" style="position:absolute;top:20px;right:20px;z-index:10;width:36px;height:36px;border-radius:50%;background:rgba(5,10,24,0.8);border:1px solid var(--glass-border);color:#fff;cursor:pointer">✕</button>
+    <div id="details-modal-container"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     COMPARISON MATRIX MODAL
+═══════════════════════════════════════════════════ -->
+<div class="comparison-modal" id="comparison" role="dialog" aria-label="Trip Comparison">
+  <div class="comparison-modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div>
+        <div class="section-badge">Side-by-Side Analysis</div>
+        <h2 class="section-title" style="font-size:26px;margin:0">Trip <span>Comparison Matrix</span></h2>
+      </div>
+      <button class="comparison-modal-close" style="width:36px;height:36px;border-radius:50%;background:var(--glass);border:1px solid var(--glass-border);color:var(--text-primary);cursor:pointer">✕</button>
+    </div>
+
+    <div id="comparison-table-container"></div>
+  </div>
+</div>
+
+<!-- WISHLIST MODAL -->
+<div class="wishlist-modal" id="wishlist-modal" role="dialog" aria-label="My Wishlist">
+  <div class="wishlist-modal-box">
+    <div class="modal-header-flex" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+      <div>
+        <div class="section-badge">Saved Favorites</div>
+        <h2 class="section-title" style="font-size:24px;margin:0">My <span>Wishlist</span> ❤️</h2>
+      </div>
+      <button class="wishlist-modal-close" id="wishlist-modal-close" style="width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;cursor:pointer">✕</button>
+    </div>
+
+    <div id="wishlist-items-container" class="wishlist-grid">
+      <!-- Items dynamically populated -->
+    </div>
+
+    <div class="wishlist-footer-bar" id="wishlist-footer-bar" style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding-top:14px; border-t:1px solid rgba(255,255,255,0.1);">
+      <button class="btn btn-ghost btn-sm" id="clear-wishlist-btn">Clear All</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="auth-modal" id="auth-modal" role="dialog" aria-label="Login" onclick="if(event.target===this) window.closeAuthModal()">
+  <div class="auth-modal-box">
+    <button type="button" class="auth-modal-close" onclick="window.closeAuthModal()">✕</button>
+    <div class="auth-title">Welcome Back</div>
+    <div class="auth-subtitle">Sign in to access your bookings and exclusive deals.</div>
+
+    <button type="button" class="auth-social-btn" data-provider="google">
+      <svg width="18" height="18" viewBox="0 0 24 24" style="margin-right:8px"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/></svg>
+      <span>Continue with Google</span>
+    </button>
+    <button type="button" class="auth-social-btn" data-provider="facebook">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2" style="margin-right:8px"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+      <span>Continue with Facebook</span>
+    </button>
+    <button type="button" class="auth-social-btn" data-provider="apple">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="#ffffff" style="margin-right:8px"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.86c.66-.8 1.11-1.91.99-3.03-.96.04-2.12.64-2.8 1.44-.59.69-1.12 1.83-.98 2.92 1.07.08 2.15-.55 2.79-1.33z"/></svg>
+      <span>Continue with Apple</span>
+    </button>
+
+    <div class="auth-divider"><span>or sign in with email</span></div>
+
+    <form id="auth-form" style="display:flex;flex-direction:column;gap:12px">
+      <input type="text" id="auth-name-input" class="form-control" placeholder="Full Name" style="display:none;" />
+      <input type="email" id="auth-email-input" class="form-control" placeholder="Email address" required />
+      <input type="password" id="auth-password-input" class="form-control" placeholder="Password" required />
+      <button type="submit" id="auth-submit-btn" class="btn btn-primary" style="width:100%;justify-content:center;padding:14px;">Sign In</button>
+    </form>
+
+    <div class="auth-switch">Don't have an account? <a id="auth-switch-link" href="javascript:void(0)">Sign Up</a></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div style="padding:24px 0;text-align:center;color:var(--text-muted);font-size:13px">
+      © 2026 Ventoura Travel Agency. Multi-Service Travel Catalog & Booking System.
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-client.js?v=2026_clean_v5"></script>
+<script src="js/wishlist.js?v=2026_clean_v5"></script>
+<script src="js/database.js?v=2026_clean_v5"></script>
+<script src="js/main.js?v=2026_clean_v5"></script>
+<script src="js/ai-planner.js?v=2026_clean_v5"></script>
+<script src="js/comparison.js?v=2026_clean_v5"></script>
+<script src="js/services.js?v=2026_clean_v5"></script>
+<script src="js/enquiry.js?v=2026_clean_v5"></script>
+<script src="js/fold-text.js"></script>
+
+</body>
+</html>

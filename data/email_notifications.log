@@ -1,0 +1,28 @@
+====================================================
+TIMESTAMP: 2026-08-11 22:18:47
+TO: admin@ventoura.com
+SUBJECT: New Customer Inquiry Received #INQ-1786466927276
+PAYLOAD: {
+  "id": "INQ-1786466927276",
+  "name": "Test Customer QA",
+  "email": "testqa@ventoura.com",
+  "phone": "+1 555-0199",
+  "destination": "Santorini Sunset Honeymoon",
+  "message": "QA automated end-to-end test submission for email dispatch and inquiry persistence.",
+  "status": "New",
+  "date": "Aug 11, 2026"
+}
+STATUS: DISPATCHED / SENT SUCCESS (200 OK)
+====================================================
+
+====================================================
+TIMESTAMP: 2026-08-11 22:18:47
+TO: testqa@ventoura.com
+SUBJECT: Ventoura Travel — Inquiry Received #INQ-1786466927276
+PAYLOAD: {
+  "message": "Thank you for reaching out! A luxury travel advisor will contact you within 24 hours.",
+  "referenceNumber": "INQ-1786466927276"
+}
+STATUS: DISPATCHED / SENT SUCCESS (200 OK)
+====================================================
+

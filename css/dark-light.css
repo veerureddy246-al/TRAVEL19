@@ -1,0 +1,273 @@
+/* ============================================================
+   DARK / LIGHT MODE TOKEN OVERRIDES & HIGH-CONTRAST ACCESSIBILITY
+   ============================================================ */
+
+/* Light Mode Neutral Luxury Overrides */
+body.light-mode {
+  --bg-primary: #F8FAF9;
+  --bg-secondary: #F1F5F9;
+  --bg-card: #FFFFFF;
+  --bg-surface: #F8FAFC;
+  --bg-elevated: #E2E8F0;
+
+  --glass: rgba(255, 255, 255, 0.95);
+  --glass-border: #CBD5E1;
+  --glass-hover: #FFFFFF;
+
+  --text-primary: #0F172A;   /* Deep Slate 900 */
+  --text-secondary: #334155; /* High Contrast Slate 700 */
+  --text-muted: #475569;     /* High Contrast Slate 600 */
+
+  --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-md: 0 8px 30px rgba(0,0,0,0.08);
+  --shadow-lg: 0 16px 45px rgba(0,0,0,0.10);
+  --shadow-primary: 0 8px 24px rgba(43,43,43,0.12);
+
+  --gradient-hero: linear-gradient(180deg, #121212 0%, #1A1A1A 100%);
+}
+
+body.light-mode .navbar {
+  background: rgba(250, 248, 245, 0.96);
+  border-bottom-color: #E2E8F0;
+}
+
+body.light-mode .navbar.scrolled {
+  background: #FFFFFF;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+body.light-mode .top-bar {
+  background: #FFFFFF;
+  border-bottom-color: #E2E8F0;
+}
+
+body.light-mode .announcement-bar {
+  background: #0F172A;
+  color: #FFFFFF;
+}
+
+body.light-mode .hero-bg img {
+  opacity: 0.35;
+}
+
+body.light-mode .hero-bg-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(18,18,18,0.4) 0%,
+    rgba(18,18,18,0.7) 100%
+  );
+}
+
+body.light-mode .hero-title-line1 {
+  color: #FFFFFF;
+}
+
+body.light-mode .hero-subtitle {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+body.light-mode .hero-stat-pill {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.25);
+  color: #FFFFFF;
+}
+
+body.light-mode .search-tag {
+  background: #FFFFFF;
+  border-color: #CBD5E1;
+  color: #0F172A;
+}
+
+body.light-mode .hero-orb {
+  opacity: 0.12;
+}
+
+body.light-mode .cloud {
+  background: rgba(14,165,233,0.06);
+}
+
+body.light-mode .search-box {
+  background: #FFFFFF;
+  border-color: rgba(197,160,89,0.3);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+body.light-mode .search-field-inner {
+  background: var(--bg-secondary);
+  border-color: #CBD5E1;
+}
+
+body.light-mode .search-field-inner input,
+body.light-mode .search-field-inner select {
+  color: var(--text-primary);
+}
+
+body.light-mode .package-card,
+body.light-mode .hotel-card,
+body.light-mode .blog-card,
+body.light-mode .cruise-card,
+body.light-mode .experience-card {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+}
+
+body.light-mode .why-card,
+body.light-mode .category-card,
+body.light-mode .service-item,
+body.light-mode .faq-item,
+body.light-mode .map-dest-card,
+body.light-mode .app-feature,
+body.light-mode .contact-info-card,
+body.light-mode .newsletter-benefit,
+body.light-mode .mega-link,
+body.light-mode .review-card {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  color: var(--text-primary);
+}
+
+body.light-mode .footer {
+  background: #FFFFFF;
+  border-top-color: #E2E8F0;
+}
+
+body.light-mode .footer-link {
+  color: var(--text-secondary);
+}
+
+body.light-mode .footer-link:hover {
+  color: var(--primary);
+}
+
+body.light-mode .airlines-section {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+body.light-mode .airline-logo {
+  background: rgba(240,244,255,0.8);
+  border-color: #CBD5E1;
+}
+
+body.light-mode .newsletter-section {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+body.light-mode .mega-menu,
+body.light-mode .nav-dropdown {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+body.light-mode .mega-col-title {
+  border-bottom-color: #E2E8F0;
+  color: var(--text-primary);
+}
+
+body.light-mode .dropdown-item,
+body.light-mode .mega-link {
+  color: var(--text-primary) !important;
+}
+
+body.light-mode .dropdown-item:hover,
+body.light-mode .mega-link:hover {
+  background: #F1F5F9;
+}
+
+body.light-mode .mega-menu-footer {
+  background: #F8FAFC;
+  border-top: 1px solid #E2E8F0;
+}
+
+body.light-mode .mega-menu-footer p {
+  color: var(--text-primary) !important;
+}
+
+body.light-mode .mega-menu-footer a {
+  color: var(--text-primary) !important;
+  border-color: #CBD5E1 !important;
+}
+
+body.light-mode .contact-form-wrap {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+body.light-mode .form-control {
+  background: var(--bg-secondary);
+  border-color: #CBD5E1;
+  color: var(--text-primary);
+}
+
+body.light-mode .newsletter-input-group {
+  background: var(--bg-secondary);
+  border-color: #CBD5E1;
+}
+
+body.light-mode .newsletter-input { color: var(--text-primary); }
+
+body.light-mode .weather-card {
+  background: #FFFFFF;
+  border-color: #E2E8F0;
+}
+
+body.light-mode .social-link {
+  background: #F1F5F9;
+  color: var(--text-primary);
+}
+
+body.light-mode ::-webkit-scrollbar-track { background: var(--bg-secondary); }
+
+/* Force High Contrast Text for Headings, Titles & Subtitles in Light Mode */
+body.light-mode .section-title,
+body.light-mode .section-subtitle,
+body.light-mode h1, body.light-mode h2, body.light-mode h3,
+body.light-mode h4, body.light-mode h5, body.light-mode h6 {
+  color: var(--text-primary) !important;
+}
+
+body.light-mode .section-badge {
+  color: #168AAD;
+  border-color: rgba(22, 138, 173, 0.4);
+}
+
+/* Transition for smooth mode switching */
+body,
+body * {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* Prevent transitions on specific elements */
+body img,
+body video,
+body .marquee-track,
+body .airlines-track,
+body .cruise-track,
+body .reviews-track,
+body * > canvas {
+  transition: none !important;
+}
+
+/* Force disable all cursor glows & orb circles in both light and dark mode */
+body.light-mode .cursor-glow-overlay,
+body.light-mode .floating-cloud-layer,
+body.light-mode .hero-orb,
+body.light-mode .hero-orb-1,
+body.light-mode .hero-orb-2,
+body.light-mode .hero-orb-3,
+body.light-mode .newsletter-orb,
+body.light-mode .theme-ambient-overlay,
+body.light-mode [class*="cursor-glow"],
+body.light-mode [class*="hero-orb"] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: none !important;
+}
+

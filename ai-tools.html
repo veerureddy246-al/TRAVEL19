@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ventoura Travel AI Travel Suite — AI Budget Planner, AI Packing List Generator, Live Currency Converter, Time Zone Converter, and 3D Interactive World Globe." />
+  <title>AI Travel Planner Suite | Ventoura Travel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/dark-light.css" />
+  <link rel="stylesheet" href="css/skeleton.css" />
+  <link rel="stylesheet" href="css/ai-tools.css" />
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header class="navbar" id="navbar">
+  <div class="container">
+    <nav class="nav-inner">
+
+      <!-- Logo -->
+      <a href="index.html" class="nav-logo" aria-label="Ventoura Travel Home">
+        <img src="assets/images/logo.png" alt="Ventoura Travel Logo" class="brand-logo-img" />
+      </a>
+
+
+      <!-- Nav Menu -->
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="services.html" class="nav-link">Services</a></li>
+        <li class="nav-item"><a href="ai-tools.html" class="nav-link active">🤖 AI Tools</a></li>
+        <li class="nav-item"><a href="index.html#destinations" class="nav-link">Destinations</a></li>
+        <li class="nav-item"><a href="index.html#blog" class="nav-link">Blog</a></li>
+        <li class="nav-item"><a href="index.html#contact" class="nav-link">Contact</a></li>
+      </ul>
+
+      <!-- Nav Actions -->
+      <div class="nav-actions">
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <span class="theme-toggle-thumb">🌙</span>
+        </button>
+
+        <!-- Search -->
+        <button class="nav-action-btn" id="search-trigger" aria-label="Search">🔍</button>
+
+        <!-- Wishlist -->
+        <button class="nav-action-btn" id="wishlist-trigger" aria-label="Wishlist">
+          ❤️
+          <span class="badge-count" id="wishlist-count">0</span>
+        </button>
+
+        <!-- Login -->
+        <button class="btn btn-ghost btn-sm" id="login-btn" onclick="window.openAuthModal('login')" style="padding:8px 14px;font-size:13px;cursor:pointer;">Login</button>
+
+        <!-- Register -->
+        <button class="btn btn-primary btn-sm" id="register-btn" onclick="window.openAuthModal('register')" style="padding:8px 16px;font-size:13px;cursor:pointer;">Register</button>
+
+        <!-- Hamburger -->
+        <button class="hamburger" aria-label="Menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+
+    </nav>
+  </div>
+</header>
+
+<!-- Mobile Nav Overlay -->
+<nav class="mobile-nav" aria-label="Mobile Navigation">
+  <div class="mobile-nav-item"><a href="index.html" class="mobile-nav-link">🏠 Home</a></div>
+  <div class="mobile-nav-item"><a href="services.html" class="mobile-nav-link">🌟 Services</a></div>
+  <div class="mobile-nav-item"><a href="ai-tools.html" class="mobile-nav-link">🤖 AI Tools</a></div>
+  <div class="mobile-nav-item"><a href="index.html#destinations" class="mobile-nav-link">🌍 Destinations</a></div>
+  <div class="mobile-nav-item"><a href="index.html#blog" class="mobile-nav-link">📝 Blog</a></div>
+  <div class="mobile-nav-item"><a href="index.html#contact" class="mobile-nav-link">📞 Contact</a></div>
+  <div style="margin-top:32px;display:flex;gap:12px">
+    <button class="btn btn-ghost" style="flex:1" id="mobile-login">Login</button>
+    <button class="btn btn-primary" style="flex:1" id="mobile-register">Register</button>
+  </div>
+</nav>
+
+<!-- ═══ HERO SECTION ═══ -->
+<section class="section hero-compact" style="background:linear-gradient(180deg, #0A0F1E 0%, #030712 100%);padding-top:120px;padding-bottom:40px;text-align:center">
+  <div class="container">
+    <div class="section-badge" style="margin-bottom:12px">🤖 Powered by Advanced AI</div>
+    <h1 class="section-title" style="font-size:38px;margin-bottom:12px">Smart Travel <span>AI Suite</span></h1>
+    <p class="section-subtitle" style="max-width:650px;margin:0 auto">Plan your perfect trip with smart budget estimation, personalized packing lists, real-time currency &amp; timezone converters, and interactive 3D world navigation.</p>
+  </div>
+</section>
+
+<!-- ═══ MAIN UTILITIES CONTAINER ═══ -->
+<main class="section" style="padding-top:20px">
+  <div class="container">
+
+    <!-- ─── 3D GLOBE NAVIGATOR ─── -->
+    <div style="margin-bottom:40px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div>
+          <div class="section-badge" style="margin-bottom:6px">Interactive Navigation</div>
+          <h2 style="font-size:22px;font-weight:800;color:var(--text-primary);margin:0">🌍 3D World Globe &amp; Hotspots</h2>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted)">Drag to rotate globe · Hover pin for weather</div>
+      </div>
+      <div class="globe-container">
+        <canvas id="globe-canvas"></canvas>
+        <div class="globe-hotspot-card">
+          <div style="font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase">Featured Hotspot</div>
+          <div style="font-size:16px;font-weight:800;margin-top:2px">🇲🇻 Maldives Atolls</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px">Tropical Paradise · 28°C · Perfect Beach Season</div>
+          <a href="checkout.html" class="btn btn-primary btn-sm" style="margin-top:10px;width:100%;justify-content:center">Book Maldives →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── AI BUDGET PLANNER & AI PACKING LIST (2 Columns) ─── -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-bottom:40px">
+
+      <!-- AI BUDGET PLANNER -->
+      <div class="glass-card" style="padding:28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="font-size:28px">💰</span>
+          <div>
+            <h2 style="font-size:20px;font-weight:800;color:var(--text-primary);margin:0">AI Budget Planner</h2>
+            <div style="font-size:12px;color:var(--text-muted)">Smart cost breakdown algorithm</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Destination</label>
+          <select class="form-control" id="budget-dest">
+            <option>Maldives</option><option>Santorini</option><option>Tokyo</option>
+            <option>Bali</option><option>Paris</option><option>Kenya Safari</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Total Budget (USD)</label>
+            <input type="number" class="form-control" id="budget-total" value="3000" step="100" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Travelers</label>
+            <input type="number" class="form-control" id="budget-travelers" value="2" min="1" max="10" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Travel Style</label>
+          <select class="form-control" id="budget-style">
+            <option>Luxury</option><option>Balanced Comfort</option><option>Budget Backpacker</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" id="calc-budget-btn" style="width:100%;justify-content:center">Calculate AI Budget Breakdown 🤖</button>
+        <div id="budget-results-container"></div>
+      </div>
+
+      <!-- AI PACKING LIST -->
+      <div class="glass-card" style="padding:28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="font-size:28px">🎒</span>
+          <div>
+            <h2 style="font-size:20px;font-weight:800;color:var(--text-primary);margin:0">AI Packing List Generator</h2>
+            <div style="font-size:12px;color:var(--text-muted)">Tailored checklist for your destination</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Destination Climate</label>
+          <select class="form-control" id="packing-climate">
+            <option>Tropical / Warm</option><option>Cold / Snow</option><option>Temperate / Mild</option><option>Desert / Arid</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Trip Duration (Days)</label>
+            <input type="number" class="form-control" id="packing-days" value="7" min="1" max="30" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Trip Type</label>
+            <select class="form-control" id="packing-type">
+              <option>Beach & Resort</option><option>Adventure & Hiking</option><option>City & Sightseeing</option><option>Business</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary" id="generate-packing-btn" style="width:100%;justify-content:center;margin-top:16px">Generate AI Packing Checklist 🎒</button>
+        <div id="packing-results-container"></div>
+      </div>
+
+    </div>
+
+    <!-- ─── CURRENCY & TIMEZONE TOOLS (2 Columns) ─── -->
+    <div style="display:grid;grid-template-columns:1fr 2fr;gap:28px;margin-bottom:40px">
+
+      <!-- CURRENCY CONVERTER -->
+      <div class="glass-card" style="padding:28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="font-size:28px">💱</span>
+          <div>
+            <h2 style="font-size:20px;font-weight:800;color:var(--text-primary);margin:0">Live Currency</h2>
+            <div style="font-size:12px;color:var(--text-muted)">Real-time exchange rates</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount</label>
+          <input type="number" class="form-control" id="curr-amount" value="1000" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">From</label>
+            <select class="form-control" id="curr-from">
+              <option value="USD">USD ($)</option><option value="EUR">EUR (€)</option>
+              <option value="GBP">GBP (£)</option><option value="JPY">JPY (¥)</option>
+              <option value="AED">AED (د.إ)</option><option value="INR">INR (₹)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">To</label>
+            <select class="form-control" id="curr-to">
+              <option value="EUR">EUR (€)</option><option value="USD">USD ($)</option>
+              <option value="GBP">GBP (£)</option><option value="JPY">JPY (¥)</option>
+              <option value="AED">AED (د.إ)</option><option value="INR">INR (₹)</option>
+            </select>
+          </div>
+        </div>
+        <div style="background:rgba(14,165,233,0.1);border:1px solid rgba(14,165,233,0.2);padding:16px;border-radius:12px;text-align:center;margin-top:12px">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase">Converted Value</div>
+          <div id="curr-result-val" style="font-size:24px;font-weight:900;color:var(--primary-light);margin-top:4px">920.00 EUR</div>
+        </div>
+      </div>
+
+      <!-- TIMEZONE CONVERTER -->
+      <div class="glass-card" style="padding:28px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+          <span style="font-size:28px">🕒</span>
+          <div>
+            <h2 style="font-size:20px;font-weight:800;color:var(--text-primary);margin:0">Global Time Zone Clock</h2>
+            <div style="font-size:12px;color:var(--text-muted)">Live local times across major travel destinations</div>
+          </div>
+        </div>
+        <div class="grid-3" id="timezone-grid" style="gap:12px"></div>
+      </div>
+
+    </div>
+
+    <!-- ─── OFFLINE ITINERARY VAULT ─── -->
+    <div class="glass-card" style="padding:28px;text-align:center;background:linear-gradient(135deg, rgba(14,165,233,0.1), rgba(168,85,247,0.1))">
+      <div style="font-size:36px;margin-bottom:8px">📲</div>
+      <h2 style="font-size:22px;font-weight:800;color:var(--text-primary);margin-bottom:6px">Offline Itinerary Vault</h2>
+      <p style="font-size:14px;color:var(--text-secondary);max-width:550px;margin:0 auto 16px">Cache your bookings, hotel vouchers, and flight tickets directly to your browser for offline access during flights and remote locations.</p>
+      <div style="display:flex;gap:12px;justify-content:center">
+        <button class="btn btn-primary" onclick="window.VentouraSecurity ? window.VentouraSecurity.logAuditEvent('OFFLINE_SYNC','Itineraries synced to offline cache'):null;showToast('Itineraries saved to offline cache! 📲','✅')">Sync Offline Copy</button>
+        <button class="btn btn-outline" onclick="window.print()">Download Printable PDF 📄</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Scripts -->
+<script src="js/main.js"></script>
+<script src="js/security.js"></script>
+<script src="js/ai-tools.js"></script>
+<script src="js/fold-text.js"></script>
+</body>
+</html>

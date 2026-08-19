@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ventoura Travel Agency Commercial CMS Admin Portal — Manage bookings, users, revenue, destinations, and system settings." />
+  <title>CMS Admin Portal | Ventoura Travel</title>
+  <link rel="icon" type="image/png" href="assets/images/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/admin.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- ═══════════ SIDEBAR ═══════════ -->
+  <aside class="admin-sidebar">
+    <div class="admin-sidebar-logo" style="padding: 16px;">
+      <a href="index.html" style="text-decoration:none;">
+        <img src="assets/images/logo.png" alt="Ventoura Travel Logo" style="height: 48px; width: auto; object-fit: contain;" />
+      </a>
+    </div>
+
+
+    <div class="admin-sidebar-nav">
+      <div class="admin-section-label">Overview</div>
+      <div class="admin-nav-item active" data-panel="p-dashboard">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
+        <span class="admin-nav-label">Dashboard</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-revenue">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        <span class="admin-nav-label">Revenue</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-reports">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+        <span class="admin-nav-label">Reports</span>
+      </div>
+
+      <div class="admin-section-label">People</div>
+      <div class="admin-nav-item" data-panel="p-users">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="admin-nav-label">Users</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-staff">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        <span class="admin-nav-label">Staff</span>
+      </div>
+
+      <div class="admin-section-label">Services</div>
+      <div class="admin-nav-item" data-panel="p-destinations">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        <span class="admin-nav-label">Destinations</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-packages">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="6" rx="2"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M12 12v.01"/></svg>
+        <span class="admin-nav-label">Packages</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-hotels">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2Z"/><path d="m9 16 .348-.24c1.465-1.013 3.84-1.013 5.304 0L15 16"/><path d="M8 7h.01"/><path d="M16 7h.01"/><path d="M12 7h.01"/><path d="M12 11h.01"/><path d="M16 11h.01"/><path d="M8 11h.01"/></svg>
+        <span class="admin-nav-label">Hotels &amp; Resorts</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-flights">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+        <span class="admin-nav-label">Flights</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-cars">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9C2.1 11.2 2 11.6 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg>
+        <span class="admin-nav-label">Car Rental</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-cruises">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 21c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1 .6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/><path d="M19.38 20A11.6 11.6 0 0 0 21 14l-9-4-9 4c0 2.9.94 5.34 2.81 7.23"/><path d="M12 10V4"/><path d="M8 6h8"/></svg>
+        <span class="admin-nav-label">Cruises</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-visa">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h6"/></svg>
+        <span class="admin-nav-label">Visa Requests</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-insurance">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="admin-nav-label">Insurance</span>
+      </div>
+
+      <div class="admin-section-label">Commerce</div>
+      <div class="admin-nav-item" data-panel="p-bookings">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+        <span class="admin-nav-label">Bookings</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-payments">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+        <span class="admin-nav-label">Payments</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-refunds">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+        <span class="admin-nav-label">Refunds</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-coupons">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/></svg>
+        <span class="admin-nav-label">Coupons</span>
+      </div>
+
+      <div class="admin-section-label">Content</div>
+      <div class="admin-nav-item" data-panel="p-blogs">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+        <span class="admin-nav-label">Blog Posts</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-reviews">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        <span class="admin-nav-label">Reviews</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-gallery">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+        <span class="admin-nav-label">Gallery</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-notifications">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="admin-nav-label">Notifications</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-cms">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></svg>
+        <span class="admin-nav-label">CMS Editor</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-inquiries">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <span class="admin-nav-label">Customer Enquiries</span>
+        <span id="admin-new-enquiry-badge" style="display:none; margin-left:auto; background:#38BDF8; color:#0F172A; font-weight:800; font-size:10px; padding:2px 6px; border-radius:9999px;">NEW</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-faqs">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span class="admin-nav-label">FAQs</span>
+      </div>
+
+      <div class="admin-section-label">System</div>
+      <div class="admin-nav-item" data-panel="p-roles">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span class="admin-nav-label">Roles & Permissions</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-settings">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0 2.73-.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span class="admin-nav-label">System Settings</span>
+      </div>
+      <div class="admin-nav-item" data-panel="p-audit">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
+        <span class="admin-nav-label">Security & Audit Logs</span>
+      </div>
+
+      <div style="padding:16px 12px;margin-top:16px;border-top:1px solid var(--border-color)">
+        <a href="user-dashboard.html" class="admin-nav-item" style="padding:6px 8px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span style="font-size:12px">User Dashboard</span>
+        </a>
+        <a href="index.html" class="admin-nav-item" style="padding:6px 8px">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" x2="22" y1="12" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span style="font-size:12px">Main Website</span>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══════════ MAIN CONTENT ═══════════ -->
+  <main class="admin-main">
+
+    <!-- Top Navigation Header Bar -->
+    <div class="admin-topbar">
+      <div>
+        <div class="breadcrumb">
+          <span>Admin Portal</span>
+          <span>/</span>
+          <span class="current" id="admin-breadcrumb-current">Dashboard</span>
+        </div>
+        <h1 id="admin-panel-title" class="card-heading" style="font-size:18px;font-weight:700">Dashboard Analytics</h1>
+      </div>
+      <div class="admin-topbar-right">
+        <div class="status-indicator">
+          <div class="status-dot"></div>
+          <span>Live Data Sync</span>
+        </div>
+        <div class="user-badge">
+          <div class="user-avatar">SA</div>
+          <span class="user-role-text">Super Admin</span>
+        </div>
+        <a href="index.html" class="exit-link">← Exit Portal</a>
+      </div>
+    </div>
+
+    <!-- Page Content Container -->
+    <div class="admin-content">
+
+      <!-- ════ DASHBOARD ════ -->
+      <div class="admin-panel active" id="p-dashboard">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Executive Dashboard</h1>
+            <p>Real-time overview of revenue performance, bookings, and traveler growth.</p>
+          </div>
+        </div>
+
+        <!-- Primary KPIs -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div class="kpi-label">Total Revenue</div>
+            <div class="kpi-value" id="stat-total-revenue">$1.52M</div>
+            <div class="kpi-change up">▲ 18.4% vs last month</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            </div>
+            <div class="kpi-label">Active Bookings</div>
+            <div class="kpi-value" id="stat-active-bookings">1,840</div>
+            <div class="kpi-change up">▲ 12.1% this week</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="kpi-label">Registered Travelers</div>
+            <div class="kpi-value" id="stat-total-travelers">52,301</div>
+            <div class="kpi-change up">▲ 8.3% this month</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-icon-box">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <div class="kpi-label">Customer Rating</div>
+            <div class="kpi-value" id="stat-avg-rating">4.92 ★</div>
+            <div class="kpi-change up">▲ 99.4% Satisfaction</div>
+          </div>
+        </div>
+
+        <!-- Secondary Operational KPIs -->
+        <div class="secondary-kpi-grid">
+          <div class="mini-kpi-card">
+            <div class="mini-kpi-value">48</div>
+            <div class="mini-kpi-label">Pending Refunds</div>
+          </div>
+          <div class="mini-kpi-card">
+            <div class="mini-kpi-value">12</div>
+            <div class="mini-kpi-label">Visa Applications</div>
+          </div>
+          <div class="mini-kpi-card">
+            <div class="mini-kpi-value">7</div>
+            <div class="mini-kpi-label">Support Tickets</div>
+          </div>
+          <div class="mini-kpi-card">
+            <div class="mini-kpi-value">3</div>
+            <div class="mini-kpi-label">Flagged Reviews</div>
+          </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Monthly Revenue Performance</div>
+                <div class="text-small">Gross transaction value (USD)</div>
+              </div>
+            </div>
+            <canvas id="revenue-chart" height="220"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Top Booked Destinations</div>
+            </div>
+            <canvas id="destinations-chart" height="220"></canvas>
+          </div>
+        </div>
+
+        <div class="charts-grid" style="grid-template-columns:1fr 1fr">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Booking Volume Growth</div>
+                <div class="text-small">Monthly confirmed travel package volume</div>
+              </div>
+            </div>
+            <canvas id="bookings-chart" height="200"></canvas>
+          </div>
+          <div class="chart-card">
+            <div class="chart-header">
+              <div class="chart-title">Recent System Activity</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:14px;margin-top:8px">
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div class="abadge abadge-info" style="padding:6px">📅</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-primary)">New Booking WL-884921</div>
+                  <div class="text-small">Maldives Overwater Haven — Sarah A. · 2 mins ago</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div class="abadge abadge-warning" style="padding:6px">🛂</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Visa Application VR-0091</div>
+                  <div class="text-small">Japan Tourist Visa — James K. · 18 mins ago</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div class="abadge abadge-error" style="padding:6px">↩️</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-primary)">Refund Requested RF-0238</div>
+                  <div class="text-small">Patagonia Expedition cancellation · 1 hr ago</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:12px;align-items:flex-start">
+                <div class="abadge abadge-success" style="padding:6px">👤</div>
+                <div>
+                  <div style="font-size:13px;font-weight:600;color:var(--text-primary)">New VIP Traveler Registration</div>
+                  <div class="text-small">Ana Kowalska (Poland) registered · 2 hrs ago</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Records Structured Table (Dashboard) -->
+        <div class="admin-table-wrap" style="margin-top:8px">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count">Recent Bookings &amp; Inquiries</div>
+            <button class="btn btn-secondary btn-sm" onclick="document.querySelector('[data-panel=\'p-bookings\']')?.click()">View All Bookings →</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Booking Ref</th>
+                  <th>Customer / Guest</th>
+                  <th>Destination / Service</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-recent-bookings-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ REVENUE ════ -->
+      <div class="admin-panel" id="p-revenue">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Revenue Management</h1>
+            <p>Track monthly revenue ledgers, agency commissions, and supplier payouts.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count">Financial Ledger (2026 YTD)</div>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Financial Summary Exported','📥')">📥 Export CSV</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Month</th><th>Bookings</th><th>Gross Revenue</th><th>Commission (15%)</th><th>Partner Payouts</th><th>Net Revenue</th><th>Growth Rate</th></tr></thead>
+              <tbody>
+                <tr><td><strong>January 2026</strong></td><td>42</td><td>$62,000</td><td>$9,300</td><td>$37,200</td><td>$52,700</td><td><span class="abadge abadge-success">+12%</span></td></tr>
+                <tr><td><strong>February 2026</strong></td><td>55</td><td>$74,000</td><td>$11,100</td><td>$44,400</td><td>$62,900</td><td><span class="abadge abadge-success">+19%</span></td></tr>
+                <tr><td><strong>March 2026</strong></td><td>70</td><td>$89,000</td><td>$13,350</td><td>$53,400</td><td>$75,650</td><td><span class="abadge abadge-success">+20%</span></td></tr>
+                <tr><td><strong>April 2026</strong></td><td>88</td><td>$101,000</td><td>$15,150</td><td>$60,600</td><td>$85,850</td><td><span class="abadge abadge-success">+13%</span></td></tr>
+                <tr><td><strong>May 2026</strong></td><td>102</td><td>$118,000</td><td>$17,700</td><td>$70,800</td><td>$100,300</td><td><span class="abadge abadge-success">+17%</span></td></tr>
+                <tr><td><strong>June 2026</strong></td><td>118</td><td>$134,000</td><td>$20,100</td><td>$80,400</td><td>$113,900</td><td><span class="abadge abadge-success">+14%</span></td></tr>
+                <tr><td><strong>July 2026</strong></td><td>140</td><td>$152,000</td><td>$22,800</td><td>$91,200</td><td>$129,200</td><td><span class="abadge abadge-success">+13%</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ REPORTS ════ -->
+      <div class="admin-panel" id="p-reports">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Executive Reports &amp; Analytics</h1>
+            <p>Generate, filter, and export comprehensive operational data reports across agency modules.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="window.exportAllReportsCSV()">📥 Export All Reports (CSV)</button>
+          </div>
+        </div>
+
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="reports-count-label">6 Standard Reports Available</div>
+            <div class="toolbar-controls">
+              <input type="text" class="admin-search-bar" id="reports-search-input" placeholder="🔍 Search reports..." oninput="window.filterReportsTable()" />
+              <select class="admin-search-bar" id="reports-category-filter" style="min-width:140px" onchange="window.filterReportsTable()">
+                <option value="ALL">All Categories</option>
+                <option value="Finance">Finance &amp; Revenue</option>
+                <option value="Commerce">Commerce &amp; Bookings</option>
+                <option value="Customers">Customers &amp; Demographics</option>
+                <option value="Operations">Operations &amp; Claims</option>
+                <option value="Feedback">Feedback &amp; Reviews</option>
+              </select>
+              <input type="date" class="admin-search-bar" id="reports-date-filter" style="min-width:140px" onchange="window.filterReportsTable()" />
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Report Title</th>
+                  <th>Category</th>
+                  <th>Total Records</th>
+                  <th>Date Coverage</th>
+                  <th>Generated Date</th>
+                  <th>Format</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="reports-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ USERS ════ -->
+      <div class="admin-panel" id="p-users">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">User Accounts</h1>
+            <p>Manage customer profiles, VIP status tiers, and account permissions.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count">52,301 Registered Travelers</div>
+            <div class="toolbar-controls">
+              <input type="text" class="admin-search-bar" data-table="users-table-body" placeholder="🔍 Search travelers by name or email..." />
+              <button class="btn btn-primary btn-sm" onclick="openUserModal()">+ Add User</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>User Profile</th><th>Country</th><th>Tier</th><th>Total Bookings</th><th>Status</th><th>Joined Date</th><th>Actions</th></tr></thead>
+              <tbody id="users-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ STAFF ════ -->
+      <div class="admin-panel" id="p-staff">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Staff & Personnel</h1>
+            <p>Internal team directory, assigned departments, and access roles.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="staff-count-label">24 Team Members</div>
+            <button class="btn btn-primary btn-sm" onclick="openStaffModal()">+ Add Staff Member</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Staff Name</th><th>Assigned Role</th><th>Department</th><th>Account Status</th><th>Actions</th></tr></thead>
+              <tbody id="staff-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ DESTINATIONS ════ -->
+      <div class="admin-panel" id="p-destinations">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Travel Destinations</h1>
+            <p>Configure travel locations, regional categories, and package associations.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="dest-count-label">Loading Destinations...</div>
+            <button class="btn btn-primary btn-sm" onclick="openDestinationModal()">+ Add Destination</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Image</th><th>Destination Name</th><th>Country / Location</th><th>Category</th><th>Starting Price</th><th>Duration</th><th>Status</th><th>Updated</th><th>Actions</th></tr></thead>
+              <tbody id="destinations-table-body">
+                <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-muted)">Loading destinations from CMS database...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ PACKAGES ════ -->
+      <div class="admin-panel" id="p-packages">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Tour Packages</h1>
+            <p>Manage curated itineraries, slot availability, and pricing models.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="pkg-count-label">Loading Packages...</div>
+            <button class="btn btn-primary btn-sm" onclick="openPackageModal()">+ Add Tour Package</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Image</th><th>Package Name</th><th>Destination</th><th>Category</th><th>Price</th><th>Duration</th><th>Guests</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="packages-table-body">
+                <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-muted)">Loading tour packages from CMS database...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ HOTELS & RESORTS ════ -->
+      <div class="admin-panel" id="p-hotels">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">5-Star Hotels &amp; Luxury Resorts</h1>
+            <p>Manage exclusive hotel partners, suites, nightly rates, and concierge amenities.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="openHotelModal()">+ Add Luxury Hotel</button>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="hotels-count-label">Loading Hotels...</div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Property</th><th>Location</th><th>Rating</th><th>Starting Price</th><th>Rooms / Availability</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="hotels-table-body">
+                <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">Loading luxury hotels from database...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ FLIGHTS ════ -->
+      <div class="admin-panel" id="p-flights">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Flight Inventory &amp; Routes</h1>
+            <p>Manage international airlines, route schedules, cabin classes, and seat availability.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="openFlightModal()">+ Add Flight Route</button>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="flights-count-label">Loading Flights...</div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Airline &amp; Code</th><th>From</th><th>To</th><th>Departure</th><th>Arrival</th><th>Price</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="flights-table-body">
+                <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-muted)">Loading flights from database...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ CARS ════ -->
+      <div class="admin-panel" id="p-cars">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Car Rental Fleet</h1>
+            <p>Vehicle fleet options across destinations, daily rates, and status.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="cars-count-label">320 Vehicles</div>
+            <button class="btn btn-primary btn-sm" onclick="openCarModal()">+ Add Vehicle</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Vehicle</th><th>Location</th><th>Type</th><th>Price</th><th>Availability</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="cars-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ CRUISES ════ -->
+      <div class="admin-panel" id="p-cruises">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Cruise Packages</h1>
+            <p>Luxury ocean cruise itineraries, vessels, duration, and stateroom rates.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="cruises-count-label">64 Cruise Packages</div>
+            <button class="btn btn-primary btn-sm" onclick="openCruiseModal()">+ Add Cruise</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Cruise Name</th><th>Destination</th><th>Duration</th><th>Starting Price</th><th>Availability</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="cruises-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ VISA REQUESTS ════ -->
+      <div class="admin-panel" id="p-visa">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Visa Applications &amp; Consular Requests</h1>
+            <p>Adjudicate tourist and business visa applications, documents, and issuance statuses.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="openVisaModal()">+ Add Visa Application</button>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="visa-count-label">Visa Applications</div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Customer</th><th>Country</th><th>Visa Type</th><th>Travel Date</th><th>Submitted Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="visa-table-body">
+                <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">Loading visa applications...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ INSURANCE ════ -->
+      <div class="admin-panel" id="p-insurance">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Insurance &amp; Claims</h1>
+            <p>Travel protection policies, coverage limits, premiums, and claim adjudication.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="insurance-count-label">842 Active Policies</div>
+            <button class="btn btn-primary btn-sm" onclick="openInsuranceModal()">+ Add Policy</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Customer</th><th>Plan</th><th>Destination</th><th>Coverage</th><th>Start Date</th><th>End Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="insurance-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ BOOKINGS ════ -->
+      <div class="admin-panel" id="p-bookings">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Booking Ledger &amp; Reservations</h1>
+            <p>Comprehensive record of traveler bookings, dates, group sizes, total pricing, and status management.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary" onclick="renderBookingsTable()">🔄 Refresh Bookings</button>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="bookings-count-label">Loading Bookings...</div>
+            <div class="toolbar-controls">
+              <input type="text" class="admin-search-bar" data-table="bookings-table-body" placeholder="🔍 Search by guest, ref, destination..." />
+              <select class="admin-search-bar" id="bookings-status-filter" style="min-width:140px" onchange="window.filterBookingsByStatus(this.value)">
+                <option value="ALL">All Statuses</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Pending">Pending</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Customer</th>
+                  <th>Service / Package</th>
+                  <th>Travel Date</th>
+                  <th>Travelers</th>
+                  <th>Amount</th>
+                  <th>Payment Status</th>
+                  <th>Booking Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bookings-table-body">
+                <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-muted)">Loading real-time bookings from database...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ PAYMENTS ════ -->
+      <div class="admin-panel" id="p-payments">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Payment Gateway Transactions</h1>
+            <p>Transaction records processed via Stripe, PayPal, and Apple Pay integrations.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count">$730,000 Total Collected YTD</div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Transaction ID</th><th>Customer</th><th>Booking</th><th>Amount</th><th>Payment Method</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="payments-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ REFUNDS ════ -->
+      <div class="admin-panel" id="p-refunds">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Refund Processing</h1>
+            <p>Manage customer refund applications and automated reversal disbursements.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count">48 Refund Requests</div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Refund ID</th><th>Booking ID</th><th>Customer</th><th>Amount</th><th>Reason</th><th>Requested Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="refunds-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ COUPONS ════ -->
+      <div class="admin-panel" id="p-coupons">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Coupons &amp; Promotional Discounts</h1>
+            <p>Create and manage discount promo codes, percentage or fixed amounts, minimum booking amounts, validity dates, and usage limits.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary" onclick="renderCouponsTable()">🔄 Refresh Coupons</button>
+            <button class="btn btn-primary" onclick="openCouponModal()">+ Create New Coupon</button>
+          </div>
+        </div>
+        <div class="admin-card" style="margin-bottom:24px;">
+          <div class="card-heading" style="margin-bottom:14px; font-weight:800; font-size:15px; color:var(--navy-primary);">⚡ Quick Coupon Creator</div>
+          <form id="quick-coupon-form" onsubmit="window.handleQuickCouponCreate(event)" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; align-items:flex-end;">
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700;">Coupon Code *</label>
+              <input type="text" class="form-control" id="new-coupon-code" placeholder="e.g. VENTOURA15" style="text-transform:uppercase; font-weight:700;" required />
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700;">Discount Type *</label>
+              <select class="form-control" id="new-coupon-type" required>
+                <option value="percentage">Percentage (%)</option>
+                <option value="fixed">Fixed Amount (₹)</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700;">Discount Value *</label>
+              <input type="number" class="form-control" id="new-coupon-value" placeholder="e.g. 15 or 25000" min="1" step="any" required />
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700;">Min. Booking (₹)</label>
+              <input type="number" class="form-control" id="new-coupon-min-amount" placeholder="0 = None" min="0" value="0" />
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700;">Start Date</label>
+              <input type="date" class="form-control" id="new-coupon-start-date" />
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700;">Expiry Date *</label>
+              <input type="date" class="form-control" id="new-coupon-expiry" required />
+            </div>
+            <div>
+              <label class="form-label" style="font-size:11px; font-weight:700;">Usage Limit</label>
+              <input type="number" class="form-control" id="new-coupon-limit" placeholder="500" value="500" min="1" />
+            </div>
+            <div>
+              <button type="submit" id="btn-create-coupon" class="btn btn-primary" style="width:100%; justify-content:center; padding:10px 14px; font-weight:700;">+ Save Coupon</button>
+            </div>
+          </form>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="coupons-count-label">Loading Promotional Codes...</div>
+            <div class="toolbar-controls">
+              <input type="text" class="admin-search-bar" data-table="coupons-table-body" placeholder="🔍 Search coupons by code, type..." />
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Promo Code</th>
+                  <th>Discount Rate</th>
+                  <th>Min Booking</th>
+                  <th>Uses / Limit</th>
+                  <th>Validity Dates</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="coupons-table-body">
+                <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-muted)">Loading promotional coupons...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ BLOGS ════ -->
+      <div class="admin-panel" id="p-blogs">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Blog Posts &amp; Articles</h1>
+            <p>Publish travel guides, destination tips, and editorial content.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count" id="blogs-count-label">42 Published Articles</div>
+            <button class="btn btn-primary btn-sm" onclick="openBlogModal()">+ Write New Article</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Thumbnail</th><th>Title</th><th>Category</th><th>Author</th><th>Published Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="blogs-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ REVIEWS ════ -->
+      <div class="admin-panel" id="p-reviews">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Customer Reviews Moderation</h1>
+            <p>Moderate trip ratings, approve genuine reviews, and flag inappropriate feedback.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count">1,820 Customer Reviews</div>
+            <input type="text" class="admin-search-bar" data-table="reviews-table-body" placeholder="🔍 Search reviews by traveler or destination..." />
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Customer</th><th>Destination / Package</th><th>Rating</th><th>Review Preview</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="reviews-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ GALLERY ════ -->
+      <div class="admin-panel" id="p-gallery">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Image Media Gallery</h1>
+            <p>Manage photography assets displayed across destinations and tour pages.</p>
+          </div>
+        </div>
+        <div class="admin-card" style="padding:16px 24px;margin-bottom:24px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="table-title-count" id="gallery-count-label">124 High-Resolution Assets</div>
+            <button class="btn btn-primary btn-sm" onclick="openGalleryModal()">+ Upload Media Asset</button>
+          </div>
+        </div>
+        <div class="gallery-grid" id="gallery-grid-container"></div>
+      </div>
+
+      <!-- ════ NOTIFICATIONS ════ -->
+      <div class="admin-panel" id="p-notifications">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Broadcast Notifications</h1>
+            <p>Send marketing updates, itinerary alerts, or system broadcasts to travelers.</p>
+          </div>
+        </div>
+        <div class="admin-card" style="max-width:720px">
+          <div class="form-group">
+            <label class="form-label">Recipient Segment</label>
+            <select class="form-control">
+              <option>All Registered Travelers (52,301)</option>
+              <option>Gold Tier Members</option>
+              <option>Platinum VIP Members</option>
+              <option>Travelers with Upcoming Trips</option>
+              <option>Inactive Users (Past 30 days)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Notification Channel</label>
+            <select class="form-control">
+              <option>Push Notification</option>
+              <option>Email Broadcast</option>
+              <option>SMS Text Message</option>
+              <option>Multichannel (Push + Email + SMS)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Broadcast Headline</label>
+            <input type="text" class="form-control" placeholder="e.g. Exclusive Flash Offer — 20% Off Maldives Trips!" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Message Content</label>
+            <textarea class="form-control" id="broadcast-message" rows="4" placeholder="Compose your announcement message here..."></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="sendBroadcast()">📢 Dispatch Broadcast</button>
+        </div>
+      </div>
+
+      <!-- ════ CMS EDITOR ════ -->
+      <div class="admin-panel" id="p-cms">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">CMS Homepage Content Editor</h1>
+            <p>Update homepage announcements, hero text, static page sections, and copy.</p>
+          </div>
+        </div>
+        <div class="admin-card">
+          <div class="form-group">
+            <label class="form-label">Target Section to Edit</label>
+            <select class="form-control" onchange="showToast('Section copy loaded','📄')">
+              <option>Homepage Hero Headline &amp; Tagline</option>
+              <option>About Ventoura Travel Section</option>
+              <option>Global Announcement Banner</option>
+              <option>Footer Organization Info</option>
+              <option>Frequently Asked Questions (FAQ)</option>
+              <option>Why Choose Ventoura Advantage</option>
+            </select>
+          </div>
+          <div class="cms-editor-toolbar">
+            <button class="cms-tool-btn" data-cmd="bold"><b>B</b></button>
+            <button class="cms-tool-btn" data-cmd="italic"><i>I</i></button>
+            <button class="cms-tool-btn" data-cmd="underline"><u>U</u></button>
+            <button class="cms-tool-btn" data-cmd="insertUnorderedList">• Bullet List</button>
+            <button class="cms-tool-btn" data-cmd="insertOrderedList">1. Numbered List</button>
+            <button class="cms-tool-btn" data-cmd="justifyLeft">Align Left</button>
+            <button class="cms-tool-btn" data-cmd="justifyCenter">Center</button>
+            <button class="cms-tool-btn" data-cmd="justifyRight">Align Right</button>
+            <button class="cms-tool-btn" data-cmd="removeFormat">Clear Formatting</button>
+            <button class="cms-tool-btn" data-cmd="save" style="background:var(--navy-primary);color:#fff">💾 Save Content</button>
+          </div>
+          <div id="cms-editor-body" class="cms-editor-body" contenteditable="true">
+            <h2 style="margin-top:0;color:var(--navy-primary)">Explore the Extraordinary with Ventoura Travel</h2>
+            <p>Your premier luxury travel partner providing tailor-made journeys to over 150 worldwide destinations. Experience uncompromised comfort, authentic cultural immersion, and 24/7 concierge support.</p>
+            <ul>
+              <li>✈️ 52,000+ Satisfied International Travelers</li>
+              <li>🌍 150+ Handpicked Destinations &amp; Resorts</li>
+              <li>⭐ 4.92 / 5 Average Verified Rating</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ CUSTOMER CONTACT ENQUIRIES ════ -->
+      <div class="admin-panel" id="p-inquiries">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Customer Contact Enquiries</h1>
+            <p>Real-time customer enquiries and messages submitted via the website contact forms.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-secondary" onclick="window.fetchAndRenderInquiries()">🔄 Refresh Enquiries</button>
+          </div>
+        </div>
+
+        <!-- Metric Stat Cards -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+          <div class="admin-card" style="padding:18px;">
+            <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Total Enquiries</div>
+            <div id="stat-enq-total" style="font-size:26px; font-weight:800; color:var(--navy-primary); margin-top:4px;">0</div>
+          </div>
+          <div class="admin-card" style="padding:18px; border-left:4px solid #38BDF8;">
+            <div style="font-size:12px; font-weight:700; color:#0284C7; text-transform:uppercase;">New Messages</div>
+            <div id="stat-enq-new" style="font-size:26px; font-weight:800; color:#0284C7; margin-top:4px;">0</div>
+          </div>
+          <div class="admin-card" style="padding:18px; border-left:4px solid #F59E0B;">
+            <div style="font-size:12px; font-weight:700; color:#D97706; text-transform:uppercase;">In Progress</div>
+            <div id="stat-enq-progress" style="font-size:26px; font-weight:800; color:#D97706; margin-top:4px;">0</div>
+          </div>
+          <div class="admin-card" style="padding:18px; border-left:4px solid #10B981;">
+            <div style="font-size:12px; font-weight:700; color:#059669; text-transform:uppercase;">Replied &amp; Resolved</div>
+            <div id="stat-enq-replied" style="font-size:26px; font-weight:800; color:#059669; margin-top:4px;">0</div>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <h3 style="margin:0; font-size:16px; color:var(--navy-primary)">All Customer Enquiries</h3>
+              <span id="inquiry-count-label" style="font-size:12px; font-weight:700; color:var(--text-muted)">0 Enquiries</span>
+            </div>
+            <div class="toolbar-controls" style="display:flex; gap:10px;">
+              <input type="text" class="admin-search-bar" data-table="inquiries-table-body" placeholder="🔍 Search enquiries..." style="min-width:220px" />
+              <select class="admin-search-bar" id="inquiries-status-filter" style="min-width:140px" onchange="window.filterInquiriesByStatus(this.value)">
+                <option value="ALL">All Statuses</option>
+                <option value="NEW">New</option>
+                <option value="IN PROGRESS">In Progress</option>
+                <option value="REPLIED">Replied</option>
+                <option value="RESOLVED">Resolved</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Reference ID</th>
+                  <th>Customer Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Interested In</th>
+                  <th>Message Preview</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inquiries-table-body">
+                <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-muted)">Loading enquiries...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ FAQs MANAGEMENT (ACCORDION + EDITOR) ════ -->
+      <div class="admin-panel" id="p-faqs">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">FAQs Knowledge Base</h1>
+            <p>Manage frequently asked questions displayed on the website with accordion viewer &amp; editor.</p>
+          </div>
+          <div class="page-header-actions">
+            <button class="btn btn-primary" onclick="openFaqModal()">+ Add New FAQ</button>
+          </div>
+        </div>
+
+        <div class="admin-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+            <h3 style="margin:0; font-size:16px; color:var(--navy-primary)">Frequently Asked Questions</h3>
+            <span id="faq-count-label" style="font-size:12px; font-weight:700; color:var(--text-muted)">8 FAQs</span>
+          </div>
+          <div id="faqs-accordion-container" style="display:flex; flex-direction:column; gap:12px;">
+            <!-- Rendered as clean accordion items -->
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ ROLES & PERMISSIONS ════ -->
+      <div class="admin-panel" id="p-roles">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Roles &amp; Access Permissions</h1>
+            <p>Configure granular staff access controls across admin modules and capabilities.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap perm-matrix">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count">Access Control Permission Matrix</div>
+            <button class="btn btn-primary btn-sm" onclick="showToast('Permission matrix saved successfully','💾')">Save Permissions</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th style="width:200px">System Permission</th>
+                  <th>Super Admin</th>
+                  <th>Visa Manager</th>
+                  <th>Hotel Coordinator</th>
+                  <th>Travel Specialist</th>
+                  <th>Support Agent</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td style="font-weight:600">View Executive Dashboard</td><td><input type="checkbox" class="perm-check" data-role="Super Admin" data-perm="View Dashboard" checked /></td><td><input type="checkbox" class="perm-check" data-role="Visa Mgr" data-perm="View Dashboard" checked /></td><td><input type="checkbox" class="perm-check" data-role="Hotel Coord" data-perm="View Dashboard" checked /></td><td><input type="checkbox" class="perm-check" data-role="Travel Expert" data-perm="View Dashboard" checked /></td><td><input type="checkbox" class="perm-check" data-role="Support" data-perm="View Dashboard" /></td></tr>
+                <tr><td style="font-weight:600">Manage Booking Ledger</td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" checked /></td></tr>
+                <tr><td style="font-weight:600">Process Financial Payments</td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td></tr>
+                <tr><td style="font-weight:600">Adjudicate Visa Requests</td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td></tr>
+                <tr><td style="font-weight:600">Edit Hotel Inventory</td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td></tr>
+                <tr><td style="font-weight:600">Create Tour Packages</td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td></tr>
+                <tr><td style="font-weight:600">Publish Editorial Content</td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td></tr>
+                <tr><td style="font-weight:600">Moderate Customer Reviews</td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" checked /></td></tr>
+                <tr><td style="font-weight:600">Manage User Accounts</td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td></tr>
+                <tr><td style="font-weight:600">System Infrastructure Config</td><td><input type="checkbox" class="perm-check" checked /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td><td><input type="checkbox" class="perm-check" /></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SYSTEM SETTINGS ════ -->
+      <div class="admin-panel" id="p-settings">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">System Settings</h1>
+            <p>Global agency preferences, email gateways, payment APIs, and maintenance controls.</p>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="admin-card">
+            <div class="admin-card-title">🌐 Platform Identity</div>
+            <div class="form-group">
+              <label class="form-label">Agency Name</label>
+              <input type="text" class="form-control" value="Ventoura Travel" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Support Email Address</label>
+              <input type="email" class="form-control" value="support@ventoura.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Base Operating Currency</label>
+              <select class="form-control">
+                <option>USD ($)</option>
+                <option>EUR (€)</option>
+                <option>GBP (£)</option>
+                <option>INR (₹)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Primary Portal Language</label>
+              <select class="form-control">
+                <option>English (US)</option>
+                <option>French</option>
+                <option>Spanish</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('Platform settings saved!','💾')">Save Identity Settings</button>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-title">📧 SMTP Email Gateway</div>
+            <div class="form-group">
+              <label class="form-label">SMTP Hostname</label>
+              <input type="text" class="form-control" value="smtp.sendgrid.net" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">SMTP Port</label>
+              <input type="number" class="form-control" value="587" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">SMTP Username</label>
+              <input type="text" class="form-control" value="apikey" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">SMTP Secret Password</label>
+              <input type="password" class="form-control" value="SG.••••••••••••••••••••" />
+            </div>
+            <button class="btn btn-primary" onclick="showToast('SMTP configuration saved!','📧')">Save SMTP Settings</button>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-title">💳 Payment Gateway API Keys</div>
+            <div class="form-group">
+              <label class="form-label">Stripe Publishable Key</label>
+              <input type="text" class="form-control" value="pk_live_••••••••••••••••••••••••••••" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Stripe Restricted Secret Key</label>
+              <input type="password" class="form-control" value="sk_live_••••••••••••••••••••••••••••" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">PayPal Client ID</label>
+              <input type="text" class="form-control" value="AZA••••••••••••••••••••••••••••••••••" />
+            </div>
+            <button class="btn btn-primary" onclick="showToast('Payment gateway keys updated!','💳')">Save Gateway Keys</button>
+          </div>
+
+          <div class="admin-card">
+            <div class="admin-card-title">🔧 Maintenance &amp; Cache Controls</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-light)">
+              <div>
+                <div style="font-weight:600">Maintenance Mode</div>
+                <div class="text-small">Direct site visitors to maintenance landing page</div>
+              </div>
+              <div class="toggle-switch" onclick="this.classList.toggle('on');showToast('Maintenance mode updated','🔧')" style="cursor:pointer;width:44px;height:24px;background:var(--input-border);border-radius:20px;position:relative"><div class="toggle-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform 0.2s"></div></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--border-light)">
+              <div>
+                <div style="font-weight:600">Public Registrations</div>
+                <div class="text-small">Allow new travelers to create accounts</div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on');showToast('Registration toggled','👥')" style="cursor:pointer;width:44px;height:24px;background:var(--success-main);border-radius:20px;position:relative"><div class="toggle-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform 0.2s;transform:translateX(20px)"></div></div>
+            </div>
+            <div style="margin-top:20px">
+              <button class="btn btn-danger btn-sm" onclick="showToast('System cache purged!','🗑️')">Purge Cache</button>
+              <button class="btn btn-secondary btn-sm" style="margin-left:8px" onclick="showToast('System logs exported','📥')">Download System Logs</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════ SECURITY & AUDIT LOGS ════ -->
+      <div class="admin-panel" id="p-audit">
+        <div class="page-header">
+          <div class="page-header-info">
+            <h1 class="page-title">Security &amp; Audit Logs</h1>
+            <p>Real-time security telemetry, administrative actions, and IP tracking.</p>
+          </div>
+        </div>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar">
+            <div class="table-title-count">Security Event Telemetry</div>
+            <button class="btn btn-primary btn-sm" onclick="renderAuditLogs()">🔄 Refresh Event Logs</button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="admin-table">
+              <thead><tr><th>Date / Time</th><th>User</th><th>Action</th><th>Module</th><th>IP / Device</th><th>Result</th><th>Details</th></tr></thead>
+              <tbody id="audit-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end admin-content -->
+  </main><!-- end admin-main -->
+</div><!-- end admin-layout -->
+
+<!-- CMS Edit / Create Modal -->
+<div id="cms-modal-overlay" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:9990;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#FFFFFF;border:1px solid #E4E7EC;border-radius:12px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 40px rgba(0,0,0,0.15);padding:24px;position:relative">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #E4E7EC;padding-bottom:12px">
+      <h3 id="cms-modal-title" style="margin:0;font-size:18px;font-weight:700;color:var(--navy-primary)">Edit Item</h3>
+      <button onclick="closeCmsModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-muted)">&times;</button>
+    </div>
+    <form id="cms-modal-form" onsubmit="handleCmsModalSubmit(event)">
+      <div id="cms-modal-fields" style="display:flex;flex-direction:column;gap:14px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:24px;border-top:1px solid #E4E7EC;padding-top:16px">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeCmsModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-sm" id="cms-save-btn">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- CMS Delete Confirmation Modal -->
+<div id="cms-delete-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,23,42,0.6);backdrop-filter:blur(4px);z-index:9995;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#FFFFFF;border:1px solid #E4E7EC;border-radius:12px;width:100%;max-width:440px;box-shadow:0 20px 40px rgba(0,0,0,0.15);padding:24px">
+    <h3 style="margin:0 0 8px;font-size:18px;font-weight:700;color:var(--navy-primary)">Confirm Deletion</h3>
+    <p id="cms-delete-msg" style="font-size:14px;color:var(--text-secondary);margin-bottom:20px">Are you sure you want to delete this record? This action will remove it from the CMS and public website.</p>
+    <div style="display:flex;justify-content:flex-end;gap:12px">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="closeCmsDeleteModal()">Cancel</button>
+      <button type="button" class="btn btn-danger btn-sm" id="cms-confirm-delete-btn">Delete Record</button>
+    </div>
+  </div>
+</div>
+
+<!-- Enquiry Detail & Reply Modal -->
+<div id="enquiry-reply-modal" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(4px); z-index:9992; align-items:center; justify-content:center; padding:20px;">
+  <div style="background:#FFFFFF; border:1px solid #E4E7EC; border-radius:14px; width:100%; max-width:640px; max-height:90vh; overflow-y:auto; box-shadow:0 24px 48px rgba(0,0,0,0.2); padding:28px; position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; border-bottom:1px solid #E4E7EC; padding-bottom:14px;">
+      <div>
+        <h3 id="enq-modal-title" style="margin:0; font-size:18px; font-weight:700; color:var(--navy-primary);">Customer Enquiry Details</h3>
+        <span id="enq-modal-ref" style="font-size:12px; font-weight:700; color:#0284C7; font-family:monospace;">VT-000000</span>
+      </div>
+      <button type="button" onclick="closeEnquiryModal()" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--text-muted);">&times;</button>
+    </div>
+
+    <!-- Customer Information Grid -->
+    <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; padding:16px; margin-bottom:18px; display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:13px;">
+      <div>
+        <span style="color:#64748B; font-weight:600; display:block; font-size:11px; text-transform:uppercase;">Customer Name</span>
+        <strong id="enq-modal-name" style="color:#0F172A; font-size:14px;">John Doe</strong>
+      </div>
+      <div>
+        <span style="color:#64748B; font-weight:600; display:block; font-size:11px; text-transform:uppercase;">Email Address</span>
+        <a id="enq-modal-email" href="#" style="color:#0284C7; font-weight:600; text-decoration:none;">john@example.com</a>
+      </div>
+      <div>
+        <span style="color:#64748B; font-weight:600; display:block; font-size:11px; text-transform:uppercase;">Phone Number</span>
+        <span id="enq-modal-phone" style="color:#0F172A; font-weight:600;">+1 234 567 8900</span>
+      </div>
+      <div>
+        <span style="color:#64748B; font-weight:600; display:block; font-size:11px; text-transform:uppercase;">Interested Service</span>
+        <span id="enq-modal-category" class="abadge" style="background:#E0F2FE; color:#0369A1; font-weight:700;">Luxury Packages</span>
+      </div>
+      <div style="grid-column:1/-1;">
+        <span style="color:#64748B; font-weight:600; display:block; font-size:11px; text-transform:uppercase;">Submitted Date &amp; Time</span>
+        <span id="enq-modal-date" style="color:#475569;">Aug 15, 2026</span>
+      </div>
+    </div>
+
+    <!-- Customer Message Block -->
+    <div style="margin-bottom:18px;">
+      <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:6px; text-transform:uppercase;">Customer Message</label>
+      <div id="enq-modal-message" style="background:#FFFFFF; border:1px solid #CBD5E1; border-radius:8px; padding:14px 16px; font-size:13.5px; line-height:1.6; color:#1E293B; max-height:180px; overflow-y:auto; white-space:pre-wrap;">
+        Message content here...
+      </div>
+    </div>
+
+    <!-- Existing Admin Reply (if any) -->
+    <div id="enq-modal-existing-reply-wrap" style="display:none; margin-bottom:18px; background:#F0FDF4; border:1px solid #86EFAC; border-radius:8px; padding:12px 16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <strong style="color:#166534; font-size:12px;">🌟 Previous Admin Reply:</strong>
+        <span id="enq-modal-reply-date" style="font-size:11px; color:#15803D;">Aug 15, 2026</span>
+      </div>
+      <div id="enq-modal-existing-reply" style="font-size:13px; color:#14532D; line-height:1.5; white-space:pre-wrap;"></div>
+    </div>
+
+    <!-- Reply & Status Form -->
+    <form id="enquiry-reply-form" onsubmit="window.handleSendEnquiryReply(event)">
+      <div style="margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label style="font-size:12px; font-weight:700; color:#475569; margin:0; text-transform:uppercase;">Status &amp; Quick Actions</label>
+          <div style="display:flex; gap:6px;">
+            <button type="button" class="btn btn-sm" onclick="window.setModalEnquiryStatus('IN PROGRESS')" style="padding:4px 10px; font-size:11.5px; background:rgba(245,158,11,0.12); color:#D97706; border:1px solid rgba(245,158,11,0.35); font-weight:700; border-radius:6px; cursor:pointer;">Mark In Progress</button>
+            <button type="button" class="btn btn-sm" onclick="window.setModalEnquiryStatus('REPLIED')" style="padding:4px 10px; font-size:11.5px; background:rgba(16,185,129,0.12); color:#059669; border:1px solid rgba(16,185,129,0.35); font-weight:700; border-radius:6px; cursor:pointer;">Mark Replied</button>
+            <button type="button" class="btn btn-sm" onclick="window.setModalEnquiryStatus('RESOLVED')" style="padding:4px 10px; font-size:11.5px; background:rgba(99,102,241,0.12); color:#4F46E5; border:1px solid rgba(99,102,241,0.35); font-weight:700; border-radius:6px; cursor:pointer;">Mark Resolved</button>
+          </div>
+        </div>
+        <select id="enq-modal-status-select" style="width:100%; padding:10px 14px; border:1px solid #CBD5E1; border-radius:6px; font-size:13px; font-weight:600;">
+          <option value="NEW">New (Awaiting Review)</option>
+          <option value="IN PROGRESS">In Progress</option>
+          <option value="REPLIED">Replied</option>
+          <option value="RESOLVED">Resolved</option>
+        </select>
+      </div>
+
+      <div style="margin-bottom:18px;">
+        <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:4px; text-transform:uppercase;">Reply to Customer *</label>
+        <textarea id="enq-modal-reply-text" rows="4" placeholder="Type your response to the customer (e.g. Thank you for contacting Ventoura Travel. Our team can help you plan your journey...)" required style="width:100%; padding:12px 14px; border:1px solid #CBD5E1; border-radius:8px; font-size:13.5px; line-height:1.5; font-family:var(--font-sans, Inter, sans-serif);"></textarea>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:10px;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="closeEnquiryModal()">Cancel</button>
+        <button type="submit" id="enq-modal-submit-btn" class="btn btn-primary btn-sm" style="padding:10px 22px; font-weight:700;">Send Reply →</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ════ BOOKING DETAILS & ADJUDICATION MODAL ════ -->
+<div id="booking-detail-modal" class="modal-overlay" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.65); backdrop-filter:blur(4px); z-index:9999; justify-content:center; align-items:center;">
+  <div style="background:#FFFFFF; border-radius:12px; max-width:620px; width:92%; max-height:90vh; overflow-y:auto; padding:28px; box-shadow:0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); position:relative; border:1px solid #E2E8F0;">
+    <button onclick="window.closeBookingDetailModal()" style="position:absolute; top:18px; right:18px; border:none; background:#F1F5F9; color:#64748B; width:32px; height:32px; border-radius:50%; font-size:16px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center;">✕</button>
+
+    <div style="margin-bottom:20px;">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+        <span class="abadge ab-confirmed" id="bk-modal-status-badge">CONFIRMED</span>
+        <span style="font-size:12px; color:#64748B;" id="bk-modal-booked-date">Aug 16, 2026</span>
+      </div>
+      <h2 style="font-size:20px; font-weight:800; color:#0F172A; margin:0;" id="bk-modal-title">Booking Details</h2>
+      <p style="font-size:13px; color:#64748B; margin:4px 0 0;">Reference ID: <strong id="bk-modal-ref" style="color:#0284C7; font-family:monospace;">BK-2026-0001</strong></p>
+    </div>
+
+    <!-- CUSTOMER PROFILE CARD -->
+    <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; padding:16px; margin-bottom:16px;">
+      <h3 style="font-size:12px; font-weight:800; color:#475569; text-transform:uppercase; margin:0 0 10px; letter-spacing:0.05em;">Customer Information</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:13px;">
+        <div><span style="color:#64748B; display:block; font-size:11px;">Guest Name</span><strong id="bk-modal-guest-name" style="color:#0F172A;">-</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Phone Number</span><strong id="bk-modal-guest-phone" style="color:#0F172A;">-</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Email Address</span><strong id="bk-modal-guest-email" style="color:#0F172A;">-</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Group Size</span><strong id="bk-modal-guest-count" style="color:#0F172A;">2 Travellers</strong></div>
+      </div>
+    </div>
+
+    <!-- BOOKED SERVICE & FINANCIALS -->
+    <div style="background:#F8FAFC; border:1px solid #E2E8F0; border-radius:10px; padding:16px; margin-bottom:20px;">
+      <h3 style="font-size:12px; font-weight:800; color:#475569; text-transform:uppercase; margin:0 0 10px; letter-spacing:0.05em;">Reservation Specifications</h3>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:13px; margin-bottom:10px;">
+        <div><span style="color:#64748B; display:block; font-size:11px;">Booking Type</span><strong id="bk-modal-type" style="color:#0284C7;">-</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Item ID</span><strong id="bk-modal-item-id" style="color:#475569; font-family:monospace;">-</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Item / Service Name</span><strong id="bk-modal-item-title" style="color:#0F172A;">-</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Selected Plan / Category</span><strong id="bk-modal-plan" style="color:#0F172A;">-</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Destination / Route</span><strong id="bk-modal-destination" style="color:#0F172A;">-</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Travel Date</span><strong id="bk-modal-travel-date" style="color:#0284C7;">-</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Total Price / Amount</span><strong id="bk-modal-price" style="color:#059669; font-size:15px;">₹0</strong></div>
+        <div><span style="color:#64748B; display:block; font-size:11px;">Payment Status</span><strong id="bk-modal-payment-status" style="color:#D97706;">Pending</strong></div>
+      </div>
+      <div id="bk-modal-notes-wrap" style="display:none; border-top:1px solid #E2E8F0; padding-top:8px; font-size:12.5px; color:#475569;">
+        <strong>Special Notes:</strong> <span id="bk-modal-notes">None</span>
+      </div>
+    </div>
+
+    <!-- STATUS CHANGER & QUICK ACTIONS -->
+    <div style="margin-bottom:24px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <label style="font-size:12px; font-weight:700; color:#475569; margin:0; text-transform:uppercase;">Update Booking Status</label>
+        <div style="display:flex; gap:6px;">
+          <button type="button" class="btn btn-sm" onclick="window.setBookingModalStatus('Confirmed')" style="padding:4px 10px; font-size:11.5px; background:rgba(16,185,129,0.12); color:#059669; border:1px solid rgba(16,185,129,0.35); font-weight:700; border-radius:6px; cursor:pointer;">✓ Confirm</button>
+          <button type="button" class="btn btn-sm" onclick="window.setBookingModalStatus('In Progress')" style="padding:4px 10px; font-size:11.5px; background:rgba(245,158,11,0.12); color:#D97706; border:1px solid rgba(245,158,11,0.35); font-weight:700; border-radius:6px; cursor:pointer;">⏳ In Progress</button>
+          <button type="button" class="btn btn-sm" onclick="window.setBookingModalStatus('Cancelled')" style="padding:4px 10px; font-size:11.5px; background:rgba(239,68,68,0.12); color:#DC2626; border:1px solid rgba(239,68,68,0.35); font-weight:700; border-radius:6px; cursor:pointer;">✕ Cancel</button>
+        </div>
+      </div>
+      <select id="bk-modal-status-select" style="width:100%; padding:10px 14px; border:1px solid #CBD5E1; border-radius:6px; font-size:13px; font-weight:600;">
+        <option value="Confirmed">Confirmed (Reserved &amp; Active)</option>
+        <option value="In Progress">In Progress (Concierge Review)</option>
+        <option value="Pending">Pending (Awaiting Payment / Info)</option>
+        <option value="Cancelled">Cancelled (Revoked)</option>
+      </select>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+      <a id="bk-modal-wa-btn" href="#" target="_blank" class="btn btn-sm" style="background:#25D366; color:#FFFFFF; border:none; padding:10px 16px; font-weight:700; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">💬 Chat on WhatsApp</a>
+      <div style="display:flex; gap:10px;">
+        <button type="button" class="btn btn-secondary btn-sm" onclick="window.closeBookingDetailModal()">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="window.saveBookingModalChanges()" style="padding:10px 20px; font-weight:700;">Save Status Changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toast-container" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px"></div>
+
+<script>
+function showToast(msg, icon = '✅') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.style.cssText = 'background:#FFFFFF;border:1px solid #E4E7EC;color:#172033;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:0 4px 16px rgba(16,24,40,0.12);max-width:320px;transition:all 0.3s ease';
+  toast.innerHTML = `<span style="font-size:16px">${icon}</span><span>${msg}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity='0'; toast.style.transform='translateY(10px)'; setTimeout(() => toast.remove(), 300); }, 3500);
+}
+</script>
+<script src="js/security.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

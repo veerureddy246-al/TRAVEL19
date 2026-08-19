@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Explore luxury travel details with Ventoura Travel." />
+  <title>Travel Experience Details | Ventoura Travel</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css?v=clean2026" />
+  <link rel="stylesheet" href="css/dark-light.css?v=clean2026" />
+  <link rel="stylesheet" href="css/enquiry.css?v=clean2026" />
+
+</head>
+<body style="background:#050a18; color:#f8fafc; font-family:'Inter', sans-serif; min-height:100vh; display:flex; flex-direction:column;">
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER & NAVIGATION
+═══════════════════════════════════════════════════ -->
+<header class="navbar" id="navbar">
+  <div class="container">
+    <nav class="nav-inner">
+      <!-- Logo -->
+      <a href="index.html" class="nav-logo" aria-label="Ventoura Travel Home">
+        <img src="assets/images/logo.png" alt="Ventoura Travel Logo" class="brand-logo-img" />
+      </a>
+
+
+      <!-- Nav Menu -->
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+        <li class="nav-item"><a href="services.html?cat=destinations" class="nav-link">Destinations</a></li>
+        <li class="nav-item"><a href="services.html?cat=packages" class="nav-link">Packages</a></li>
+        <li class="nav-item"><a href="services.html?cat=cruises" class="nav-link">Cruises</a></li>
+        <li class="nav-item"><a href="services.html?cat=hotels" class="nav-link">Hotels</a></li>
+      </ul>
+
+      <!-- Back Action -->
+      <div class="nav-actions">
+        <a href="javascript:history.back()" class="btn btn-outline btn-sm" style="border-radius:9999px;">← Back to Catalog</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN ITEM DETAIL VIEW
+═══════════════════════════════════════════════════ -->
+<main style="flex:1; padding-top:100px; padding-bottom:60px;">
+  <div class="container">
+
+    <!-- Loading Spinner -->
+    <div id="detail-loading" style="text-align:center; padding:60px 0;">
+      <div style="font-size:32px; margin-bottom:16px;">🌐</div>
+      <h3 style="color:#fff; font-size:20px;">Fetching Experience Details...</h3>
+    </div>
+
+    <!-- Error State -->
+    <div id="detail-error" style="display:none; text-align:center; padding:60px 0; background:#0f172a; border-radius:20px; border:1px solid rgba(255,255,255,0.1);">
+      <div style="font-size:36px; margin-bottom:12px;">🗺️</div>
+      <h2 style="color:#fff; font-size:24px; margin-bottom:8px;">Experience Not Found</h2>
+      <p style="color:#94a3b8; font-size:14px; margin-bottom:20px;">The requested travel item could not be loaded from our CMS repository.</p>
+      <a href="services.html" class="btn btn-primary">Browse All Destinations</a>
+    </div>
+
+    <!-- Main Content Container -->
+    <div id="detail-content" style="display:none;">
+
+      <!-- Hero Banner Image -->
+      <div style="position:relative; width:100%; height:380px; border-radius:20px; overflow:hidden; margin-bottom:16px; border:1px solid rgba(255,255,255,0.1);">
+        <img id="detail-hero-img" src="" alt="Travel Experience" style="width:100%; height:100%; object-fit:cover; transition:opacity 0.3s ease;" />
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(5,10,24,0.95) 0%, rgba(5,10,24,0.3) 60%, transparent 100%);"></div>
+
+        <div style="position:absolute; bottom:28px; left:28px; right:28px; z-index:2;">
+          <div id="detail-category-badge" style="display:inline-block; padding:4px 12px; font-size:11px; font-weight:800; color:#38bdf8; background:rgba(56,189,248,0.2); border:1px solid rgba(56,189,248,0.4); border-radius:20px; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px; backdrop-filter:blur(6px);">
+            DESTINATION
+          </div>
+          <h1 id="detail-title" style="font-size:40px; font-weight:800; color:#ffffff !important; font-family:'Manrope', sans-serif; line-height:1.2; margin:0 0 6px; text-shadow:0 4px 20px rgba(0,0,0,0.95); text-transform:capitalize;">
+            Loading Experience...
+          </h1>
+          <div id="detail-location-sub" style="font-size:16px; color:#f1f5f9 !important; font-weight:700; text-shadow:0 2px 10px rgba(0,0,0,0.9);">
+            📍 Location
+          </div>
+        </div>
+      </div>
+
+      <!-- Package Image Gallery Navigation (VIEW 1 / VIEW 2 / VIEW 3) -->
+      <div id="detail-views-wrapper" style="margin-bottom:32px; display:flex; align-items:center; gap:12px; flex-wrap:wrap; background:#0D2138; padding:12px 18px; border-radius:14px; border:1px solid #20354A;">
+        <span style="font-size:12px; font-weight:700; color:#94A3B8; text-transform:uppercase; letter-spacing:0.8px; margin-right:6px;">📸 Package Views:</span>
+        <div id="detail-views-list" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <!-- VIEW 1, VIEW 2, VIEW 3 buttons rendered dynamically -->
+        </div>
+      </div>
+
+      <!-- Two-Column Layout -->
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:32px; align-items:start;">
+
+        <!-- Left: Detailed Content -->
+        <div>
+          <!-- Quick Meta Stats Row -->
+          <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:28px;">
+            <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.08); padding:16px; border-radius:14px; text-align:center;">
+              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">Starting Price</div>
+              <div id="detail-price" style="font-size:20px; font-weight:900; color:#fbbf24;">₹0</div>
+            </div>
+            <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.08); padding:16px; border-radius:14px; text-align:center;">
+              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">Duration</div>
+              <div id="detail-duration" style="font-size:16px; font-weight:800; color:#38bdf8;">7 Days / 6 Nights</div>
+            </div>
+            <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.08); padding:16px; border-radius:14px; text-align:center;">
+              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">Included Guests</div>
+              <div id="detail-guests" style="font-size:18px; font-weight:800; color:#38bdf8;">👥 2 Guests</div>
+            </div>
+            <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.08); padding:16px; border-radius:14px; text-align:center;">
+              <div style="font-size:11px; color:#94a3b8; text-transform:uppercase; margin-bottom:4px;">Rating Score</div>
+              <div id="detail-rating" style="font-size:20px; font-weight:900; color:#10b981;">★ 4.9</div>
+            </div>
+          </div>
+
+          <!-- Description Card -->
+          <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.08); padding:28px; border-radius:20px; margin-bottom:28px;">
+            <h3 style="font-size:20px; font-weight:800; color:#fff; margin:0 0 14px;">Experience Overview</h3>
+            <p id="detail-description" style="font-size:15px; color:#cbd5e1; line-height:1.7; margin:0;">
+              Full description loading from CMS store...
+            </p>
+          </div>
+
+          <!-- Highlights Card -->
+          <div id="highlights-box" style="background:#0f172a; border:1px solid rgba(255,255,255,0.08); padding:28px; border-radius:20px;">
+            <h3 style="font-size:20px; font-weight:800; color:#fff; margin:0 0 16px;">Key Highlights & Inclusions</h3>
+            <div id="detail-highlights-list" style="display:flex; flex-wrap:wrap; gap:10px;">
+              <!-- Highlights rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Sticky Booking CTA Sidebar -->
+        <div style="position:sticky; top:100px;">
+          <div style="background:#0f172a; border:1px solid rgba(255,255,255,0.12); padding:28px; border-radius:20px; box-shadow:0 20px 40px -15px rgba(0,0,0,0.5);">
+            <div style="font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Ready to Experience?</div>
+            <div id="sidebar-price" style="font-size:28px; font-weight:900; color:#fbbf24; margin-bottom:14px;">₹0 <span style="font-size:13px; color:#94a3b8; font-weight:400;">/ person</span></div>
+
+            <button type="button" id="detail-book-now-btn" class="btn btn-primary btn-lg" style="width:100%; padding:14px; font-size:15px; font-weight:800; border-radius:12px; justify-content:center; margin-bottom:16px;">
+              Book Now →
+            </button>
+
+            <div style="font-size:12px; color:#94a3b8; line-height:1.5; text-align:center;">
+              ⚡ Instant CMS booking enquiry confirmation with direct WhatsApp concierge connection.
+            </div>
+
+            <hr style="border:none; border-top:1px solid rgba(255,255,255,0.08); margin:20px 0;" />
+
+            <div style="font-size:13px; color:#cbd5e1; display:flex; flex-direction:column; gap:10px;">
+              <div>✔️ 100% Flexible Dates</div>
+              <div>✔️ Michelin Culinary & Private Transfers</div>
+              <div>✔️ 24/7 Dedicated Luxury Concierge</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</main>
+
+<!-- Footer -->
+<footer style="background:#050a18; border-top:1px solid rgba(255,255,255,0.08); padding:30px 0; text-align:center; color:#94a3b8; font-size:13px;">
+  <div class="container">
+    &copy; 2026 Ventoura Travel Agency. All rights reserved. Connected to CMS Source of Truth.
+  </div>
+</footer>
+
+<!-- Scripts -->
+<script src="js/enquiry.js"></script>
+<script>
+  let currentLoadedItem = null;
+  let currentLoadedType = 'destination';
+
+  function formatINR(price) {
+    let num = Number(price);
+    if (isNaN(num) || num <= 0) return '₹0';
+    if (num < 10000) num = num * 100;
+    return '₹' + num.toLocaleString('en-IN');
+  }
+
+  function getHDImageUrl(url, width = 3840) {
+    if (!url || typeof url !== 'string') return url || '';
+    if (url.includes('images.unsplash.com')) {
+      let clean = url.replace(/w=\d+/g, `w=${width}`).replace(/q=\d+/g, 'q=95');
+      if (!clean.includes('w=')) clean += `&w=${width}`;
+      if (!clean.includes('q=')) clean += '&q=95';
+      return clean;
+    }
+    return url;
+  }
+
+  function formatDuration(item) {
+    if (!item) return '7 Days / 6 Nights';
+    if (item.duration && item.duration.includes('Nights')) return item.duration;
+    let days = item.days || 7;
+    let nights = item.nights || (days > 1 ? days - 1 : 1);
+    return `${days} Days / ${nights} Nights`;
+  }
+
+  document.addEventListener('DOMContentLoaded', async function() {
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type') || 'destination';
+    const id = params.get('id') || '';
+    const title = params.get('title') || '';
+
+    currentLoadedType = type;
+
+    // Determine endpoint
+    let apiEndpoint = '/api/destinations';
+    if (type === 'package') apiEndpoint = '/api/packages';
+    else if (type === 'hotel') apiEndpoint = '/api/hotels';
+    else if (type === 'cruise') apiEndpoint = '/api/cruises';
+
+    try {
+      const response = await fetch(apiEndpoint);
+      const result = await response.json();
+      const items = (result && result.data) || [];
+
+      // Find matching item by ID, title, or destination name
+      const cleanTitle = (title || id || '').replaceAll('+', ' ').trim().toLowerCase();
+      let item = items.find(x => String(x.id) === String(id) || String(x._id) === String(id));
+      if (!item && cleanTitle) {
+        item = items.find(x => {
+          const t = (x.title || x.name || x.city || '').toLowerCase();
+          return t === cleanTitle || t.includes(cleanTitle) || cleanTitle.includes(t);
+        });
+      }
+      if (!item && items.length > 0) {
+        // Fallback search across all collections if endpoint type didn't match
+        try {
+          const allRes = await fetch('/api/packages');
+          const allPkg = await allRes.json();
+          if (allPkg && allPkg.data) {
+            const found = allPkg.data.find(x => {
+              const t = (x.title || x.name || '').toLowerCase();
+              return t.includes(cleanTitle) || cleanTitle.includes(t);
+            });
+            if (found) item = found;
+          }
+        } catch (e) {}
+      }
+      if (!item && items.length > 0) {
+        item = items[0];
+      }
+
+      if (!item) {
+        document.getElementById('detail-loading').style.display = 'none';
+        document.getElementById('detail-error').style.display = 'block';
+        return;
+      }
+
+      currentLoadedItem = item;
+
+      // Populate UI
+      const itemTitle = item.title || item.name || 'Travel Experience';
+      const itemLocation = item.city ? `${item.city}, ${item.country || ''}` : (item.location || item.country || item.destination || item.route || 'Global');
+      const itemPrice = item.startingPrice || item.price || 180000;
+      const itemDuration = formatDuration(item);
+      const itemGuests = item.includedGuests || item.guests || 2;
+      const itemRating = item.rating || item.starRating || 4.9;
+      const itemCategory = item.category || type.toUpperCase();
+      const itemImage = getHDImageUrl(item.heroImage || item.heroImg || item.image || item.featuredImage || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=3840&q=95', 3840);
+      const itemDesc = item.description || item.content || 'Experience bespoke luxury travel carefully curated by Ventoura Travel concierges.';
+
+      document.title = `${itemTitle} | Ventoura Travel`;
+      document.getElementById('detail-hero-img').src = itemImage;
+      document.getElementById('detail-category-badge').textContent = itemCategory.toUpperCase();
+      document.getElementById('detail-title').textContent = itemTitle;
+      document.getElementById('detail-location-sub').textContent = `📍 ${itemLocation}`;
+
+      document.getElementById('detail-price').textContent = formatINR(itemPrice);
+      document.getElementById('detail-duration').textContent = itemDuration;
+      document.getElementById('detail-guests').textContent = `👥 ${itemGuests} Guests`;
+      document.getElementById('detail-rating').textContent = `★ ${itemRating}`;
+      document.getElementById('detail-description').textContent = itemDesc;
+
+      document.getElementById('sidebar-price').innerHTML = `${formatINR(itemPrice)} <span style="font-size:13px; color:#94a3b8; font-weight:400;">/ person</span>`;
+
+      // ── Package Image View 1 / View 2 / View 3 System ──
+      let packageViews = [];
+      if (item.images && Array.isArray(item.images) && item.images.length > 0) {
+        packageViews = item.images.filter(img => typeof img === 'string' && img.trim().length > 0);
+      } else if (item.gallery && Array.isArray(item.gallery) && item.gallery.length > 0) {
+        packageViews = item.gallery.filter(img => typeof img === 'string' && img.trim().length > 0);
+      }
+
+      // Package-specific multi-image views mapping
+      if (packageViews.length <= 1) {
+        const primaryImg = itemImage;
+        const lowTitle = itemTitle.toLowerCase();
+
+        if (lowTitle.includes('amalfi') || lowTitle.includes('positano')) {
+          packageViews = [
+            'assets/images/amalfi-view-1.jpg',
+            'assets/images/amalfi-view-2.jpg'
+          ];
+        } else if (lowTitle.includes('kyoto') || lowTitle.includes('japan')) {
+          packageViews = [
+            'assets/images/kyoto-view-1.jpg',
+            'assets/images/kyoto-view-2.jpg'
+          ];
+        } else if (lowTitle.includes('maldives') || lowTitle.includes('baa atoll')) {
+          packageViews = [
+            'assets/images/maldives-view-1.jpg',
+            'assets/images/maldives-view-2.jpg'
+          ];
+        } else if (lowTitle.includes('kerala') || lowTitle.includes('kochi')) {
+          packageViews = [
+            'assets/images/kerala-view-1.jpg',
+            'assets/images/kerala-view-2.jpg'
+          ];
+        } else if (lowTitle.includes('patagonia') || lowTitle.includes('torres del paine')) {
+          packageViews = [
+            'assets/images/patagonia-view-1.jpg',
+            'assets/images/patagonia-view-2.jpg'
+          ];
+        } else if (lowTitle.includes('st. moritz') || lowTitle.includes('alpine') || lowTitle.includes('swiss')) {
+          packageViews = [
+            'assets/images/stmoritz-view-1.jpg',
+            'assets/images/stmoritz-view-2.jpg'
+          ];
+        } else if (lowTitle.includes('safari') || lowTitle.includes('serengeti') || lowTitle.includes('seronera')) {
+          packageViews = [
+            'assets/images/serengeti-view-1.jpg',
+            'assets/images/serengeti-view-2.jpg'
+          ];
+        } else {
+          // Single image packages render VIEW 1 only
+          packageViews = [primaryImg];
+        }
+      }
+
+      // Render View Buttons
+      const viewsList = document.getElementById('detail-views-list');
+      viewsList.innerHTML = packageViews.map((imgUrl, index) => {
+        const viewNum = index + 1;
+        const isActive = index === 0;
+        return `
+          <button type="button" 
+                  class="btn-view-toggle" 
+                  data-img-url="${imgUrl}"
+                  style="display:flex; align-items:center; gap:8px; padding:6px 14px; border-radius:10px; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s ease; ${isActive ? 'background:rgba(22,138,173,0.25); border:2px solid #168AAD; color:#FFFFFF;' : 'background:#071525; border:1px solid #20354A; color:#94A3B8;'}">
+            <img src="${imgUrl}" alt="View ${viewNum}" style="width:24px; height:18px; object-fit:cover; border-radius:4px;" />
+            VIEW ${viewNum}
+          </button>
+        `;
+      }).join('');
+
+      // Wire View Switch Event Listeners
+      viewsList.querySelectorAll('.btn-view-toggle').forEach(btn => {
+        btn.onclick = function() {
+          const targetUrl = this.getAttribute('data-img-url');
+          const heroImg = document.getElementById('detail-hero-img');
+          heroImg.style.opacity = '0.4';
+          setTimeout(() => {
+            heroImg.src = getHDImageUrl(targetUrl, 3840);
+            heroImg.style.opacity = '1';
+          }, 150);
+
+          // Highlight Active View Button
+          viewsList.querySelectorAll('.btn-view-toggle').forEach(b => {
+            b.style.background = '#071525';
+            b.style.border = '1px solid #20354A';
+            b.style.color = '#94A3B8';
+          });
+          this.style.background = 'rgba(22,138,173,0.25)';
+          this.style.border = '2px solid #168AAD';
+          this.style.color = '#FFFFFF';
+        };
+      });
+
+      // Render Highlights
+      const highlightsList = document.getElementById('detail-highlights-list');
+      const highlights = item.highlights || ['Private Airport Transfers', '5-Star Accommodation', 'Guided Excursions', '24/7 Concierge Support'];
+      highlightsList.innerHTML = highlights.map(h => `
+        <div style="padding:8px 14px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; font-size:13px; color:#38bdf8; font-weight:700;">
+          ✓ ${h}
+        </div>
+      `).join('');
+
+      // Wire Book Now Button
+      document.getElementById('detail-book-now-btn').onclick = function() {
+        if (window.VentouraEnquiry) {
+          window.VentouraEnquiry.openEnquiryModal(currentLoadedItem, currentLoadedType);
+        }
+      };
+
+      document.getElementById('detail-loading').style.display = 'none';
+      document.getElementById('detail-content').style.display = 'block';
+
+    } catch (err) {
+      console.error('Error loading detail item:', err);
+      document.getElementById('detail-loading').style.display = 'none';
+      document.getElementById('detail-error').style.display = 'block';
+    }
+  });
+</script>
+<script src="js/enquiry.js"></script>
+<script src="js/fold-text.js"></script>
+</body>
+</html>
