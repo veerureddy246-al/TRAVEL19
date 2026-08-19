@@ -592,27 +592,63 @@
         </div>
       </div>
 
-      <!-- ════ BOOKINGS ════ -->
+      <!-- ════ BOOKINGS (BOOKING QUERIES & RESERVATIONS) ════ -->
       <div class="admin-panel" id="p-bookings">
         <div class="page-header">
           <div class="page-header-info">
-            <h1 class="page-title">Booking Ledger &amp; Reservations</h1>
-            <p>Comprehensive record of traveler bookings, dates, group sizes, total pricing, and status management.</p>
+            <h1 class="page-title">Booking Queries &amp; Reservations</h1>
+            <p>Customer booking requests created when travelers click "Book Now" across packages, destinations, cruises, and custom services.</p>
           </div>
           <div class="page-header-actions">
-            <button class="btn btn-secondary" onclick="renderBookingsTable()">🔄 Refresh Bookings</button>
+            <button class="btn btn-secondary" onclick="window.renderBookingsTable()">🔄 Refresh Bookings</button>
           </div>
         </div>
+
+        <!-- Live Daily Counters for Bookings (Calculated from Real Database) -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:20px;">
+          <div class="stat-counter-card" style="border-left:4px solid #0284C7;">
+            <div style="font-size:11.5px; font-weight:700; color:#0284C7; text-transform:uppercase; letter-spacing:0.04em;">Today's Booking Queries</div>
+            <div id="stat-bk-today" style="font-size:26px; font-weight:800; color:var(--navy-primary); margin-top:4px;">0</div>
+          </div>
+          <div class="stat-counter-card" style="border-left:4px solid #F59E0B;">
+            <div style="font-size:11.5px; font-weight:700; color:#D97706; text-transform:uppercase; letter-spacing:0.04em;">New / Pending</div>
+            <div id="stat-bk-pending" style="font-size:26px; font-weight:800; color:#D97706; margin-top:4px;">0</div>
+          </div>
+          <div class="stat-counter-card" style="border-left:4px solid #6366F1;">
+            <div style="font-size:11.5px; font-weight:700; color:#4F46E5; text-transform:uppercase; letter-spacing:0.04em;">In Progress</div>
+            <div id="stat-bk-progress" style="font-size:26px; font-weight:800; color:#4F46E5; margin-top:4px;">0</div>
+          </div>
+          <div class="stat-counter-card" style="border-left:4px solid #10B981;">
+            <div style="font-size:11.5px; font-weight:700; color:#059669; text-transform:uppercase; letter-spacing:0.04em;">Confirmed / Responded</div>
+            <div id="stat-bk-confirmed" style="font-size:26px; font-weight:800; color:#059669; margin-top:4px;">0</div>
+          </div>
+          <div class="stat-counter-card" style="border-left:4px solid #64748B;">
+            <div style="font-size:11.5px; font-weight:700; color:#64748B; text-transform:uppercase; letter-spacing:0.04em;">Total Bookings</div>
+            <div id="stat-bk-total" style="font-size:26px; font-weight:800; color:#334155; margin-top:4px;">0</div>
+          </div>
+        </div>
+
         <div class="admin-table-wrap">
-          <div class="admin-table-toolbar">
-            <div class="table-title-count" id="bookings-count-label">Loading Bookings...</div>
+          <div class="admin-table-toolbar" style="gap:14px;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div class="table-title-count" id="bookings-count-label">Loading Bookings...</div>
+              <!-- Date Filter Pills -->
+              <div class="date-filter-bar" id="bookings-date-filter-bar">
+                <button type="button" class="date-filter-btn active" data-date="all" onclick="window.filterBookingsDate('all')">All Time</button>
+                <button type="button" class="date-filter-btn" data-date="today" onclick="window.filterBookingsDate('today')">Today</button>
+                <button type="button" class="date-filter-btn" data-date="yesterday" onclick="window.filterBookingsDate('yesterday')">Yesterday</button>
+                <button type="button" class="date-filter-btn" data-date="7days" onclick="window.filterBookingsDate('7days')">Last 7 Days</button>
+                <button type="button" class="date-filter-btn" data-date="30days" onclick="window.filterBookingsDate('30days')">Last 30 Days</button>
+              </div>
+            </div>
             <div class="toolbar-controls">
-              <input type="text" class="admin-search-bar" data-table="bookings-table-body" placeholder="🔍 Search by guest, ref, destination..." />
+              <input type="text" class="admin-search-bar" data-table="bookings-table-body" placeholder="🔍 Search by guest, ref, package..." style="min-width:200px" />
               <select class="admin-search-bar" id="bookings-status-filter" style="min-width:140px" onchange="window.filterBookingsByStatus(this.value)">
                 <option value="ALL">All Statuses</option>
                 <option value="Confirmed">Confirmed</option>
                 <option value="In Progress">In Progress</option>
                 <option value="Pending">Pending</option>
+                <option value="Responded">Responded</option>
                 <option value="Cancelled">Cancelled</option>
               </select>
             </div>
@@ -622,18 +658,19 @@
               <thead>
                 <tr>
                   <th>Booking ID</th>
-                  <th>Customer</th>
-                  <th>Service / Package</th>
+                  <th>Customer Name</th>
+                  <th>Contact Info</th>
+                  <th>Service / Destination</th>
                   <th>Travel Date</th>
-                  <th>Travelers</th>
-                  <th>Amount</th>
-                  <th>Payment Status</th>
-                  <th>Booking Status</th>
+                  <th>Travellers</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Admin Response</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="bookings-table-body">
-                <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text-muted)">Loading real-time bookings from database...</td></tr>
+                <tr><td colspan="10" style="text-align:center;padding:24px;color:var(--text-muted)">Loading real-time bookings from database...</td></tr>
               </tbody>
             </table>
           </div>
@@ -911,62 +948,73 @@
         <div class="page-header">
           <div class="page-header-info">
             <h1 class="page-title">Customer Contact Enquiries</h1>
-            <p>Real-time customer enquiries and messages submitted via the website contact forms.</p>
+            <p>General enquiries, inquiries, and customer messages submitted via website contact &amp; inquiry forms.</p>
           </div>
           <div class="page-header-actions">
             <button class="btn btn-secondary" onclick="window.fetchAndRenderInquiries()">🔄 Refresh Enquiries</button>
           </div>
         </div>
 
-        <!-- Metric Stat Cards -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
-          <div class="admin-card" style="padding:18px;">
-            <div style="font-size:12px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Total Enquiries</div>
-            <div id="stat-enq-total" style="font-size:26px; font-weight:800; color:var(--navy-primary); margin-top:4px;">0</div>
+        <!-- Live Daily Counters for Enquiries (Calculated from Real Database) -->
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:14px; margin-bottom:20px;">
+          <div class="stat-counter-card" style="border-left:4px solid #0284C7;">
+            <div style="font-size:11.5px; font-weight:700; color:#0284C7; text-transform:uppercase; letter-spacing:0.04em;">Today's Customer Enquiries</div>
+            <div id="stat-enq-today" style="font-size:26px; font-weight:800; color:var(--navy-primary); margin-top:4px;">0</div>
           </div>
-          <div class="admin-card" style="padding:18px; border-left:4px solid #38BDF8;">
-            <div style="font-size:12px; font-weight:700; color:#0284C7; text-transform:uppercase;">New Messages</div>
+          <div class="stat-counter-card" style="border-left:4px solid #38BDF8;">
+            <div style="font-size:11.5px; font-weight:700; color:#0284C7; text-transform:uppercase; letter-spacing:0.04em;">New</div>
             <div id="stat-enq-new" style="font-size:26px; font-weight:800; color:#0284C7; margin-top:4px;">0</div>
           </div>
-          <div class="admin-card" style="padding:18px; border-left:4px solid #F59E0B;">
-            <div style="font-size:12px; font-weight:700; color:#D97706; text-transform:uppercase;">In Progress</div>
+          <div class="stat-counter-card" style="border-left:4px solid #F59E0B;">
+            <div style="font-size:11.5px; font-weight:700; color:#D97706; text-transform:uppercase; letter-spacing:0.04em;">In Progress</div>
             <div id="stat-enq-progress" style="font-size:26px; font-weight:800; color:#D97706; margin-top:4px;">0</div>
           </div>
-          <div class="admin-card" style="padding:18px; border-left:4px solid #10B981;">
-            <div style="font-size:12px; font-weight:700; color:#059669; text-transform:uppercase;">Replied &amp; Resolved</div>
+          <div class="stat-counter-card" style="border-left:4px solid #10B981;">
+            <div style="font-size:11.5px; font-weight:700; color:#059669; text-transform:uppercase; letter-spacing:0.04em;">Responded</div>
             <div id="stat-enq-replied" style="font-size:26px; font-weight:800; color:#059669; margin-top:4px;">0</div>
+          </div>
+          <div class="stat-counter-card" style="border-left:4px solid #6366F1;">
+            <div style="font-size:11.5px; font-weight:700; color:#4F46E5; text-transform:uppercase; letter-spacing:0.04em;">Resolved</div>
+            <div id="stat-enq-resolved" style="font-size:26px; font-weight:800; color:#4F46E5; margin-top:4px;">0</div>
           </div>
         </div>
 
-        <div class="admin-card">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <h3 style="margin:0; font-size:16px; color:var(--navy-primary)">All Customer Enquiries</h3>
-              <span id="inquiry-count-label" style="font-size:12px; font-weight:700; color:var(--text-muted)">0 Enquiries</span>
+        <div class="admin-table-wrap">
+          <div class="admin-table-toolbar" style="gap:14px;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <div class="table-title-count" id="inquiry-count-label">Loading Enquiries...</div>
+              <!-- Date Filter Pills -->
+              <div class="date-filter-bar" id="inquiries-date-filter-bar">
+                <button type="button" class="date-filter-btn active" data-date="all" onclick="window.filterInquiriesDate('all')">All Time</button>
+                <button type="button" class="date-filter-btn" data-date="today" onclick="window.filterInquiriesDate('today')">Today</button>
+                <button type="button" class="date-filter-btn" data-date="yesterday" onclick="window.filterInquiriesDate('yesterday')">Yesterday</button>
+                <button type="button" class="date-filter-btn" data-date="7days" onclick="window.filterInquiriesDate('7days')">Last 7 Days</button>
+                <button type="button" class="date-filter-btn" data-date="30days" onclick="window.filterInquiriesDate('30days')">Last 30 Days</button>
+              </div>
             </div>
-            <div class="toolbar-controls" style="display:flex; gap:10px;">
-              <input type="text" class="admin-search-bar" data-table="inquiries-table-body" placeholder="🔍 Search enquiries..." style="min-width:220px" />
+            <div class="toolbar-controls">
+              <input type="text" class="admin-search-bar" data-table="inquiries-table-body" placeholder="🔍 Search enquiries..." style="min-width:200px" />
               <select class="admin-search-bar" id="inquiries-status-filter" style="min-width:140px" onchange="window.filterInquiriesByStatus(this.value)">
                 <option value="ALL">All Statuses</option>
                 <option value="NEW">New</option>
                 <option value="IN PROGRESS">In Progress</option>
-                <option value="REPLIED">Replied</option>
+                <option value="REPLIED">Responded</option>
                 <option value="RESOLVED">Resolved</option>
               </select>
             </div>
           </div>
-          <div class="table-container">
+          <div style="overflow-x:auto">
             <table class="admin-table">
               <thead>
                 <tr>
                   <th>Reference ID</th>
                   <th>Customer Name</th>
-                  <th>Email</th>
-                  <th>Phone</th>
-                  <th>Interested In</th>
+                  <th>Contact Info</th>
+                  <th>Interested Service</th>
                   <th>Message Preview</th>
-                  <th>Date</th>
+                  <th>Submitted Date</th>
                   <th>Status</th>
+                  <th>Admin Response</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -1330,13 +1378,29 @@
       </div>
     </div>
 
+    <!-- PREVIOUS ADMIN RESPONSE (IF ANY) -->
+    <div id="bk-modal-existing-reply-wrap" style="display:none; margin-bottom:16px; background:#F0FDF4; border:1px solid #86EFAC; border-radius:8px; padding:12px 16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <strong style="color:#166534; font-size:12px;">🌟 Previous Admin Response:</strong>
+        <span id="bk-modal-reply-date" style="font-size:11px; color:#15803D;">Aug 16, 2026</span>
+      </div>
+      <div id="bk-modal-existing-reply" style="font-size:13px; color:#14532D; line-height:1.5; white-space:pre-wrap;"></div>
+    </div>
+
+    <!-- ADMIN RESPONSE & CONCIERGE NOTES -->
+    <div style="margin-bottom:18px;">
+      <label style="font-size:12px; font-weight:700; color:#475569; display:block; margin-bottom:6px; text-transform:uppercase;">Admin Response / Concierge Reply</label>
+      <textarea id="bk-modal-reply-text" rows="3" placeholder="Enter notes or reply sent to customer (e.g. Booking confirmed, voucher issued and sent via WhatsApp/email)..." style="width:100%; padding:10px 14px; border:1px solid #CBD5E1; border-radius:8px; font-size:13px; line-height:1.5; font-family:var(--font-sans, Inter, sans-serif);"></textarea>
+    </div>
+
     <!-- STATUS CHANGER & QUICK ACTIONS -->
     <div style="margin-bottom:24px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
         <label style="font-size:12px; font-weight:700; color:#475569; margin:0; text-transform:uppercase;">Update Booking Status</label>
         <div style="display:flex; gap:6px;">
-          <button type="button" class="btn btn-sm" onclick="window.setBookingModalStatus('Confirmed')" style="padding:4px 10px; font-size:11.5px; background:rgba(16,185,129,0.12); color:#059669; border:1px solid rgba(16,185,129,0.35); font-weight:700; border-radius:6px; cursor:pointer;">✓ Confirm</button>
+          <button type="button" class="btn btn-sm" onclick="window.setBookingModalStatus('Confirmed')" style="padding:4px 10px; font-size:11.5px; background:rgba(16,185,129,0.12); color:#059669; border:1px solid rgba(16,185,129,0.35); font-weight:700; border-radius:6px; cursor:pointer;">✓ Confirmed</button>
           <button type="button" class="btn btn-sm" onclick="window.setBookingModalStatus('In Progress')" style="padding:4px 10px; font-size:11.5px; background:rgba(245,158,11,0.12); color:#D97706; border:1px solid rgba(245,158,11,0.35); font-weight:700; border-radius:6px; cursor:pointer;">⏳ In Progress</button>
+          <button type="button" class="btn btn-sm" onclick="window.setBookingModalStatus('Responded')" style="padding:4px 10px; font-size:11.5px; background:rgba(2,132,199,0.12); color:#0284C7; border:1px solid rgba(2,132,199,0.35); font-weight:700; border-radius:6px; cursor:pointer;">💬 Responded</button>
           <button type="button" class="btn btn-sm" onclick="window.setBookingModalStatus('Cancelled')" style="padding:4px 10px; font-size:11.5px; background:rgba(239,68,68,0.12); color:#DC2626; border:1px solid rgba(239,68,68,0.35); font-weight:700; border-radius:6px; cursor:pointer;">✕ Cancel</button>
         </div>
       </div>
@@ -1344,16 +1408,20 @@
         <option value="Confirmed">Confirmed (Reserved &amp; Active)</option>
         <option value="In Progress">In Progress (Concierge Review)</option>
         <option value="Pending">Pending (Awaiting Payment / Info)</option>
+        <option value="Responded">Responded (Customer Contacted)</option>
         <option value="Cancelled">Cancelled (Revoked)</option>
       </select>
     </div>
 
     <!-- ACTION BUTTONS -->
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
-      <a id="bk-modal-wa-btn" href="#" target="_blank" class="btn btn-sm" style="background:#25D366; color:#FFFFFF; border:none; padding:10px 16px; font-weight:700; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">💬 Chat on WhatsApp</a>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+      <div style="display:flex; gap:8px;">
+        <a id="bk-modal-wa-btn" href="#" target="_blank" class="btn btn-sm" style="background:#25D366; color:#FFFFFF; border:none; padding:9px 14px; font-weight:700; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">💬 WhatsApp</a>
+        <a id="bk-modal-email-btn" href="#" class="btn btn-sm btn-secondary" style="padding:9px 14px; font-weight:700; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">✉️ Email</a>
+      </div>
       <div style="display:flex; gap:10px;">
         <button type="button" class="btn btn-secondary btn-sm" onclick="window.closeBookingDetailModal()">Close</button>
-        <button type="button" class="btn btn-primary btn-sm" onclick="window.saveBookingModalChanges()" style="padding:10px 20px; font-weight:700;">Save Status Changes</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="window.saveBookingModalChanges()" style="padding:9px 20px; font-weight:700;">Save Response &amp; Status</button>
       </div>
     </div>
   </div>

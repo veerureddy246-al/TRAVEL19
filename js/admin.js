@@ -2757,67 +2757,165 @@
   }
 
   /* ── RENDER INQUIRIES & CUSTOMER CONTACT MESSAGES ── */
+  /* ══════════════════════════════════════════════════════════
+     HELPER: DATE FILTER MATCHING
+     ══════════════════════════════════════════════════════════ */
+  function isDateInFilter(dateValue, filterKey) {
+    if (!filterKey || filterKey === 'all' || filterKey === 'ALL') return true;
+    if (!dateValue) return false;
+
+    try {
+      let d;
+      if (typeof dateValue === 'string' && dateValue.includes(' ')) {
+        d = new Date(dateValue.replace(' ', 'T'));
+      } else {
+        d = new Date(dateValue);
+      }
+
+      if (isNaN(d.getTime())) return true; // Keep record if date format is unusual
+
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterdayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+
+      if (filterKey === 'today') {
+        return d >= todayStart;
+      }
+      if (filterKey === 'yesterday') {
+        return d >= yesterdayStart && d < todayStart;
+      }
+      if (filterKey === '7days') {
+        const past7 = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
+        return d >= past7;
+      }
+      if (filterKey === '30days') {
+        const past30 = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 30);
+        return d >= past30;
+      }
+    } catch (e) {
+      return true;
+    }
+    return true;
+  }
+
+  /* ══════════════════════════════════════════════════════════
+     CONTENT: CUSTOMER CONTACT ENQUIRIES
+     - Generated from website Contact / "Send Us a Message" forms
+     - Completely separated from Book Now booking requests
+     ══════════════════════════════════════════════════════════ */
   let currentActiveInquiry = null;
-  /* ── CONTENT: CUSTOMER CONTACT ENQUIRIES ── */
   let inquiriesPollTimer = null;
   window._adminInquiriesList = [];
+  let currentInquiryDateFilter = 'all';
+  let currentInquiryStatusFilter = 'ALL';
+
+  window.filterInquiriesDate = function(dateKey) {
+    currentInquiryDateFilter = dateKey || 'all';
+    const container = document.getElementById('inquiries-date-filter-bar');
+    if (container) {
+      container.querySelectorAll('.date-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.date === currentInquiryDateFilter);
+      });
+    }
+    window.filterInquiriesTable();
+  };
 
   window.filterInquiriesByStatus = function(statusFilter) {
+    currentInquiryStatusFilter = statusFilter || 'ALL';
+    window.filterInquiriesTable();
+  };
+
+  window.filterInquiriesTable = function() {
     const tbody = document.getElementById('inquiries-table-body');
     const label = document.getElementById('inquiry-count-label');
     if (!tbody) return;
 
     let items = window._adminInquiriesList || [];
-    if (statusFilter && statusFilter !== 'ALL') {
-      items = items.filter(iq => (iq.status || 'NEW').toUpperCase() === statusFilter.toUpperCase());
+
+    // Filter by Date
+    if (currentInquiryDateFilter && currentInquiryDateFilter !== 'all') {
+      items = items.filter(iq => isDateInFilter(iq.createdAt || iq.created_at || iq.submitted_at || iq.date, currentInquiryDateFilter));
+    }
+
+    // Filter by Status
+    if (currentInquiryStatusFilter && currentInquiryStatusFilter !== 'ALL') {
+      items = items.filter(iq => {
+        const s = (iq.status || 'NEW').toUpperCase();
+        if (currentInquiryStatusFilter === 'NEW') return s === 'NEW';
+        if (currentInquiryStatusFilter === 'IN PROGRESS') return s === 'IN PROGRESS';
+        if (currentInquiryStatusFilter === 'REPLIED') return ['REPLIED', 'RESPONDED'].includes(s);
+        if (currentInquiryStatusFilter === 'RESOLVED') return ['RESOLVED', 'CLOSED'].includes(s);
+        return s === currentInquiryStatusFilter.toUpperCase();
+      });
     }
 
     if (label) {
-      label.textContent = statusFilter === 'ALL' ? `${window._adminInquiriesList.length} Enquiries` : `${items.length} ${statusFilter} Enquiries`;
+      label.textContent = `${items.length} Enquiries Shown`;
     }
 
     if (items.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted)">No customer inquiries matching filter criteria.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:36px;color:var(--text-muted)">No customer enquiries matching current date/status filter criteria.</td></tr>`;
       return;
     }
 
     tbody.innerHTML = items.map(iq => {
       const rawStatus = (iq.status || 'NEW').toUpperCase();
-      let statusBadgeClass = rawStatus === 'NEW' ? 'ab-active' : rawStatus === 'IN PROGRESS' ? 'ab-pending' : 'ab-confirmed';
-      let displayStatus = rawStatus === 'NEW' ? 'New' : rawStatus === 'IN PROGRESS' ? 'In Progress' : rawStatus === 'REPLIED' ? 'Replied' : 'Resolved';
+      let statusBadgeClass = rawStatus === 'NEW' ? 'ab-active' : rawStatus === 'IN PROGRESS' ? 'ab-pending' : rawStatus === 'RESOLVED' ? 'ab-confirmed' : 'ab-confirmed';
+      let displayStatus = rawStatus === 'NEW' ? 'New' : rawStatus === 'IN PROGRESS' ? 'In Progress' : (rawStatus === 'REPLIED' || rawStatus === 'RESPONDED') ? 'Responded' : 'Resolved';
 
       const refNo = iq.ref_no || iq.refNo || iq.id || 'VT-000000';
       const custName = iq.customer_name || iq.customerName || (iq.first_name ? `${iq.first_name} ${iq.last_name || ''}` : '') || iq.email || 'Website Traveler';
-      const email = iq.email || 'N/A';
-      const phone = iq.phone || 'N/A';
+      const email = iq.email || '';
+      const phone = iq.phone || '';
       const category = iq.product_name || iq.productName || iq.interest_category || iq.destination || iq.product_type || 'General Enquiry';
       const msgText = iq.message || iq.question || 'No message provided';
       const subDate = iq.created_at || iq.createdAt || 'Recent';
-      const formattedDate = subDate.includes('T') ? new Date(subDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : subDate;
+      const formattedDate = subDate.includes('T') ? new Date(subDate).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : subDate;
+
+      // WhatsApp link preparation
+      let waLinkHtml = '';
+      if (phone && phone !== 'N/A') {
+        const cleanPhone = phone.replace(/[^0-9]/g, '');
+        if (cleanPhone.length >= 7) {
+          const waMsg = `Hello ${custName}, this is Ventoura Travel following up on your enquiry (Ref: ${refNo}) regarding "${category}". How may we assist you today?`;
+          waLinkHtml = `<a class="aab-wa" href="https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}" target="_blank" title="Chat on WhatsApp">💬 WhatsApp</a>`;
+        }
+      }
+
+      const adminReplyText = iq.admin_reply || '';
 
       return `
         <tr id="enquiry-row-${iq.id || iq._id}">
           <td><code class="ref" style="font-weight:700;color:#0284c7;">${escapeHtml(refNo)}</code></td>
           <td><strong>${escapeHtml(custName)}</strong></td>
-          <td><a href="mailto:${escapeHtml(email)}" style="color:#0284c7;text-decoration:none;">✉️ ${escapeHtml(email)}</a></td>
-          <td>📞 ${escapeHtml(phone)}</td>
+          <td>
+            ${email ? `<div>✉️ <a href="mailto:${escapeHtml(email)}" style="color:#0284c7;text-decoration:none;font-size:12px;">${escapeHtml(email)}</a></div>` : ''}
+            <div>📞 <a href="tel:${escapeHtml(phone)}" style="color:#334155;text-decoration:none;font-size:12px;">${escapeHtml(phone || 'N/A')}</a></div>
+          </td>
           <td><span class="abadge ab-active">${escapeHtml(category)}</span></td>
           <td>
-            <div style="font-size:12px;color:#64748b;max-width:240px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">
+            <div style="font-size:12px;color:#64748b;max-width:220px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;" title="${escapeHtml(msgText)}">
               ${escapeHtml(msgText)}
             </div>
-            ${iq.admin_reply ? `<div style="margin-top:2px;font-size:11px;color:#059669;font-weight:600;">✓ Replied</div>` : ''}
           </td>
-          <td style="font-size:12px;color:#64748b;">${escapeHtml(formattedDate)}</td>
+          <td style="font-size:12px;color:#64748b;white-space:nowrap;">${escapeHtml(formattedDate)}</td>
           <td>
             <span class="abadge ${statusBadgeClass}">
               <span class="abadge-dot"></span>${escapeHtml(displayStatus)}
             </span>
           </td>
           <td>
-            <div class="action-btn-group" style="display:flex; gap:6px; align-items:center;">
-              <button class="aab-edit" onclick="openEnquiryDetailModal('${iq.id || iq._id}')" style="background:#0284C7;color:#FFFFFF;border-color:#0284C7;font-weight:700;padding:5px 10px;border-radius:6px;cursor:pointer;">View &amp; Reply</button>
-              <button class="aab-delete" onclick="confirmDeleteCmsItem('inquiries', '${iq.id || iq._id}', 'Enquiry ${escapeHtml(refNo)}')" style="padding:5px 8px;border-radius:6px;cursor:pointer;">Delete</button>
+            ${adminReplyText ? `
+              <div style="font-size:11.5px;color:#059669;font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(adminReplyText)}">
+                ✓ ${escapeHtml(adminReplyText)}
+              </div>
+            ` : `<span style="color:#94a3b8;font-size:11px;">No response yet</span>`}
+          </td>
+          <td>
+            <div class="action-btn-group" style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+              <button class="aab-edit" onclick="openEnquiryDetailModal('${iq.id || iq._id}')" style="background:#0284C7;color:#FFFFFF;border-color:#0284C7;font-weight:700;padding:4px 8px;border-radius:6px;cursor:pointer;">View &amp; Reply</button>
+              ${waLinkHtml}
+              <button class="aab-delete" onclick="confirmDeleteCmsItem('inquiries', '${iq.id || iq._id}', 'Enquiry ${escapeHtml(refNo)}')" style="padding:4px 8px;border-radius:6px;cursor:pointer;">Delete</button>
             </div>
           </td>
         </tr>
@@ -2827,32 +2925,35 @@
 
   window.fetchAndRenderInquiries = async function() {
     const tbody = document.getElementById('inquiries-table-body');
-    const label = document.getElementById('inquiry-count-label');
     if (!tbody) return;
 
     try {
       const res = await fetch('/api/inquiries?all=true');
       const json = await res.json();
-      const items = (json.success && json.data) ? json.data : [];
+      const items = (json.success && Array.isArray(json.data)) ? json.data : [];
 
       window._adminInquiriesList = items;
 
-      // Update Top Metrics
-      const totalCount = items.length;
+      // Update Live Daily Counters from Real Database Records
+      const todayCount = items.filter(i => isDateInFilter(i.createdAt || i.created_at || i.submitted_at || i.date, 'today')).length;
       const newCount = items.filter(i => (i.status || '').toUpperCase() === 'NEW').length;
       const progressCount = items.filter(i => (i.status || '').toUpperCase() === 'IN PROGRESS').length;
-      const repliedCount = items.filter(i => ['REPLIED', 'RESOLVED', 'CLOSED', 'CONFIRMED'].includes((i.status || '').toUpperCase())).length;
+      const repliedCount = items.filter(i => ['REPLIED', 'RESPONDED'].includes((i.status || '').toUpperCase())).length;
+      const resolvedCount = items.filter(i => ['RESOLVED', 'CLOSED'].includes((i.status || '').toUpperCase())).length;
 
-      const statTotal = document.getElementById('stat-enq-total');
+      const statToday = document.getElementById('stat-enq-today');
       const statNew = document.getElementById('stat-enq-new');
       const statProg = document.getElementById('stat-enq-progress');
       const statRep = document.getElementById('stat-enq-replied');
+      const statRes = document.getElementById('stat-enq-resolved');
       const newBadge = document.getElementById('admin-new-enquiry-badge');
 
-      if (statTotal) statTotal.textContent = totalCount;
+      if (statToday) statToday.textContent = todayCount;
       if (statNew) statNew.textContent = newCount;
       if (statProg) statProg.textContent = progressCount;
       if (statRep) statRep.textContent = repliedCount;
+      if (statRes) statRes.textContent = resolvedCount;
+
       if (newBadge) {
         if (newCount > 0) {
           newBadge.style.display = 'inline-block';
@@ -2862,9 +2963,7 @@
         }
       }
 
-      const filterEl = document.getElementById('inquiries-status-filter');
-      const currentFilter = filterEl ? filterEl.value : 'ALL';
-      window.filterInquiriesByStatus(currentFilter);
+      window.filterInquiriesTable();
 
     } catch (e) {
       console.error('Error fetching inquiries:', e);
@@ -2876,10 +2975,14 @@
   window.openEnquiryDetailModal = async function(id) {
     if (!id) return;
     try {
-      const res = await fetch('/api/inquiries?all=true');
-      const json = await res.json();
-      const list = (json.success && json.data) ? json.data : [];
-      const item = list.find(i => String(i.id || i._id) === String(id));
+      let list = window._adminInquiriesList || [];
+      if (list.length === 0) {
+        const res = await fetch('/api/inquiries?all=true');
+        const json = await res.json();
+        list = (json.success && json.data) ? json.data : [];
+        window._adminInquiriesList = list;
+      }
+      const item = list.find(i => String(i.id || i._id) === String(id) || String(i.refNo) === String(id) || String(i.ref_no) === String(id));
       if (!item) return;
 
       currentActiveInquiry = item;
@@ -2920,7 +3023,7 @@
       if (item.admin_reply) {
         if (replyWrap) replyWrap.style.display = 'block';
         if (replyTextEl) replyTextEl.textContent = item.admin_reply;
-        if (replyDateEl) replyDateEl.textContent = item.replied_at ? new Date(item.replied_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'Earlier';
+        if (replyDateEl) replyDateEl.textContent = item.replied_at ? new Date(item.replied_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Earlier';
         if (replyInput) replyInput.value = item.admin_reply;
       } else {
         if (replyWrap) replyWrap.style.display = 'none';
@@ -2945,7 +3048,6 @@
     if (select) select.value = status;
     if (currentActiveInquiry) {
       currentActiveInquiry.status = status;
-      await window.updateInquiryStatus(currentActiveInquiry.id || currentActiveInquiry._id, status);
     }
   };
 
@@ -2959,38 +3061,39 @@
 
     const replyText = (replyInput?.value || '').trim();
     if (!replyText) {
-      showToast('Please type a reply message.', '⚠️');
+      showToast('Please type a response message.', '⚠️');
       return;
     }
 
-    const newStatus = statusSelect ? statusSelect.value : 'REPLIED';
+    let newStatus = statusSelect ? statusSelect.value : 'REPLIED';
+    if (newStatus === 'NEW') newStatus = 'REPLIED'; // auto-mark replied when answering
     const repliedAt = new Date().toISOString();
 
     if (submitBtn) {
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Saving Reply...';
+      submitBtn.textContent = 'Saving Response...';
     }
 
     const payload = {
-      ...currentActiveInquiry,
       admin_reply: replyText,
       replied_at: repliedAt,
-      status: (newStatus === 'NEW') ? 'REPLIED' : newStatus
+      status: newStatus
     };
 
     try {
-      const res = await fetch(`/api/inquiries/${currentActiveInquiry.id || currentActiveInquiry._id}`, {
-        method: 'PUT',
+      const targetId = currentActiveInquiry.id || currentActiveInquiry._id || currentActiveInquiry.refNo || currentActiveInquiry.ref_no;
+      const res = await fetch(`/api/inquiries/${targetId}`, {
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
 
       if (res.ok) {
-        showToast(`Reply sent to ${currentActiveInquiry.customer_name || 'customer'}!`, '✅');
+        showToast(`Response saved and status updated to ${newStatus}!`, '✅');
         closeEnquiryModal();
         window.fetchAndRenderInquiries();
       } else {
-        showToast('Failed to save reply. Please retry.', '⚠️');
+        showToast('Failed to save response. Please retry.', '⚠️');
       }
     } catch (err) {
       showToast('Error saving response.', '⚠️');
@@ -3006,7 +3109,7 @@
     if (!id || !newStatus) return;
     try {
       const res = await fetch(`/api/inquiries/${id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
@@ -3019,63 +3122,67 @@
     }
   };
 
-  // Setup real-time periodic inquiry sync when admin is active
   if (!inquiriesPollTimer) {
     inquiriesPollTimer = setInterval(() => {
       const pInq = document.getElementById('p-inquiries');
       if (pInq && pInq.classList.contains('active')) {
         window.fetchAndRenderInquiries();
       }
-    }, 12000);
+    }, 15000);
   }
 
   /* ══════════════════════════════════════════════════════════
-     COMMERCE: BOOKINGS LEDGER & DETAIL MODAL
+     COMMERCE: BOOKINGS LEDGER (BOOKING QUERIES & RESERVATIONS)
+     - Generated when customer clicks "Book Now"
+     - Completely separated from general customer enquiries
      ══════════════════════════════════════════════════════════ */
   let currentActiveBooking = null;
   window._adminBookingsList = [];
+  let currentBookingDateFilter = 'all';
+  let currentBookingStatusFilter = 'ALL';
 
-  window.renderBookingsTable = async function() {
-    const tbody = document.getElementById('bookings-table-body');
-    const label = document.getElementById('bookings-count-label');
-    if (!tbody) return;
-
-    try {
-      const res = await fetch('/api/bookings?all=true');
-      const json = await res.json();
-      const items = (json.success && json.data) ? json.data : [];
-
-      window._adminBookingsList = items;
-
-      if (label) {
-        label.textContent = `${items.length} Total Bookings in Ledger`;
-      }
-
-      const filterEl = document.getElementById('bookings-status-filter');
-      const currentFilter = filterEl ? filterEl.value : 'ALL';
-      window.filterBookingsByStatus(currentFilter);
-    } catch (e) {
-      console.error('Error fetching bookings:', e);
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:24px;color:#EF4444">⚠️ Error loading bookings. Click Refresh to try again.</td></tr>`;
+  window.filterBookingsDate = function(dateKey) {
+    currentBookingDateFilter = dateKey || 'all';
+    const container = document.getElementById('bookings-date-filter-bar');
+    if (container) {
+      container.querySelectorAll('.date-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.date === currentBookingDateFilter);
+      });
     }
+    window.filterBookingsTable();
   };
 
   window.filterBookingsByStatus = function(statusFilter) {
+    currentBookingStatusFilter = statusFilter || 'ALL';
+    window.filterBookingsTable();
+  };
+
+  window.filterBookingsTable = function() {
     const tbody = document.getElementById('bookings-table-body');
     const label = document.getElementById('bookings-count-label');
     if (!tbody) return;
 
     let items = window._adminBookingsList || [];
-    if (statusFilter && statusFilter !== 'ALL') {
-      items = items.filter(b => (b.booking_status || b.status || 'Confirmed').toLowerCase() === statusFilter.toLowerCase());
+
+    // Filter by Date
+    if (currentBookingDateFilter && currentBookingDateFilter !== 'all') {
+      items = items.filter(b => isDateInFilter(b.created_at || b.createdAt || b.date, currentBookingDateFilter));
+    }
+
+    // Filter by Status
+    if (currentBookingStatusFilter && currentBookingStatusFilter !== 'ALL') {
+      items = items.filter(b => {
+        const s = (b.booking_status || b.status || 'Confirmed').toLowerCase();
+        return s === currentBookingStatusFilter.toLowerCase();
+      });
     }
 
     if (label) {
-      label.textContent = statusFilter === 'ALL' ? `${window._adminBookingsList.length} Total Bookings in Ledger` : `${items.length} ${statusFilter} Bookings`;
+      label.textContent = `${items.length} Bookings Shown`;
     }
 
     if (items.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:32px;color:var(--text-muted)">No bookings found matching filter criteria.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:36px;color:var(--text-muted)">No bookings matching current date/status filter criteria.</td></tr>`;
       return;
     }
 
@@ -3089,19 +3196,30 @@
       const travelDate = b.travel_date || b.travelDate || b.date || '2026-09-20';
       const travelers = b.guests_label || (b.travelers_count ? `${b.travelers_count} Person(s)` : `${b.guests || 2} Travellers`);
       const amount = b.total_amount || b.price || b.amount || 180000;
-      const paymentStatus = b.payment_status || 'Pending';
       const bookingStatus = b.booking_status || b.status || 'Confirmed';
 
-      const statusClass = bookingStatus.toLowerCase() === 'confirmed' ? 'ab-confirmed' : bookingStatus.toLowerCase() === 'cancelled' ? 'ab-cancelled' : 'ab-pending';
-      const payClass = paymentStatus.toLowerCase() === 'paid' ? 'ab-confirmed' : 'ab-pending';
+      const sLow = bookingStatus.toLowerCase();
+      const statusClass = sLow === 'confirmed' ? 'ab-confirmed' : sLow === 'cancelled' ? 'ab-cancelled' : sLow === 'responded' ? 'ab-active' : 'ab-pending';
+
+      // WhatsApp link preparation
+      let waLinkHtml = '';
+      if (phone && phone !== 'N/A') {
+        const cleanPhone = phone.replace(/[^0-9]/g, '');
+        if (cleanPhone.length >= 7) {
+          const waMsg = `Hello ${name}, this is Ventoura Travel Concierge regarding your booking request for ${serviceTitle} (Ref: ${ref}) scheduled for ${travelDate}. We are happy to assist you!`;
+          waLinkHtml = `<a class="aab-wa" href="https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}" target="_blank" title="Contact on WhatsApp">💬 WhatsApp</a>`;
+        }
+      }
+
+      const adminReplyText = b.admin_reply || '';
 
       return `
-        <tr id="booking-row-${b.id}">
+        <tr id="booking-row-${b.id || ref}">
           <td><code class="ref" style="font-weight:700;color:#0284c7;">${escapeHtml(ref)}</code></td>
+          <td><strong>${escapeHtml(name)}</strong></td>
           <td>
-            <strong>${escapeHtml(name)}</strong>
-            <div style="font-size:11px;color:#64748b;">${escapeHtml(phone)}</div>
-            ${email ? `<div style="font-size:11px;color:#0284c7;">${escapeHtml(email)}</div>` : ''}
+            <div>📞 <a href="tel:${escapeHtml(phone)}" style="color:#334155;text-decoration:none;font-size:12px;">${escapeHtml(phone || 'N/A')}</a></div>
+            ${email ? `<div>✉️ <a href="mailto:${escapeHtml(email)}" style="color:#0284c7;text-decoration:none;font-size:12px;">${escapeHtml(email)}</a></div>` : ''}
           </td>
           <td>
             <strong>${escapeHtml(serviceTitle)}</strong>
@@ -3113,24 +3231,61 @@
             <strong style="color:#059669;font-size:13.5px;">${formatINR(amount)}</strong>
             ${b.coupon_code ? `<div style="font-size:10px;color:#0284c7;font-weight:700;">🎟️ ${escapeHtml(b.coupon_code)}</div>` : ''}
           </td>
-          <td><span class="abadge ${payClass}">${escapeHtml(paymentStatus)}</span></td>
           <td><span class="abadge ${statusClass}"><span class="abadge-dot"></span>${escapeHtml(bookingStatus)}</span></td>
           <td>
-            <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;">
-              <button class="aab-view" onclick="window.openBookingDetailModal('${b.id || ref}')">View</button>
-              <select onchange="window.updateBookingStatus('${b.id || ref}', this.value)" style="padding:4px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:11.5px;font-weight:600;background:#F8FAFC;cursor:pointer;" aria-label="Change status">
-                <option value="" disabled selected>Status ▾</option>
-                <option value="Confirmed">Confirmed</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Pending">Pending</option>
-                <option value="Cancelled">Cancelled</option>
-              </select>
-              <button class="aab-delete" onclick="confirmDeleteCmsItem('bookings', '${b.id || ref}', 'Booking ${escapeHtml(ref)}')" style="padding:4px 8px;">Delete</button>
+            ${adminReplyText ? `
+              <div style="font-size:11.5px;color:#059669;font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(adminReplyText)}">
+                ✓ ${escapeHtml(adminReplyText)}
+              </div>
+            ` : `<span style="color:#94a3b8;font-size:11px;">No response yet</span>`}
+          </td>
+          <td>
+            <div class="action-btn-group" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+              <button class="aab-view" onclick="window.openBookingDetailModal('${b.id || ref}')" style="background:#0284C7;color:#FFFFFF;border-color:#0284C7;font-weight:700;padding:4px 8px;border-radius:6px;cursor:pointer;">View &amp; Reply</button>
+              ${waLinkHtml}
+              <button class="aab-delete" onclick="confirmDeleteCmsItem('bookings', '${b.id || ref}', 'Booking ${escapeHtml(ref)}')" style="padding:4px 8px;border-radius:6px;cursor:pointer;">Delete</button>
             </div>
           </td>
         </tr>
       `;
     }).join('');
+  };
+
+  window.renderBookingsTable = async function() {
+    const tbody = document.getElementById('bookings-table-body');
+    if (!tbody) return;
+
+    try {
+      const res = await fetch('/api/bookings?all=true');
+      const json = await res.json();
+      const items = (json.success && Array.isArray(json.data)) ? json.data : [];
+
+      window._adminBookingsList = items;
+
+      // Calculate Live Daily Counters from Real Database Records
+      const todayCount = items.filter(b => isDateInFilter(b.created_at || b.createdAt || b.date, 'today')).length;
+      const pendingCount = items.filter(b => ['pending', 'new', 'draft'].includes((b.booking_status || b.status || '').toLowerCase())).length;
+      const progressCount = items.filter(b => ['in progress', 'pending review', 'processing'].includes((b.booking_status || b.status || '').toLowerCase())).length;
+      const confirmedCount = items.filter(b => ['confirmed', 'approved', 'responded', 'active'].includes((b.booking_status || b.status || 'confirmed').toLowerCase())).length;
+      const totalCount = items.length;
+
+      const statToday = document.getElementById('stat-bk-today');
+      const statPend = document.getElementById('stat-bk-pending');
+      const statProg = document.getElementById('stat-bk-progress');
+      const statConf = document.getElementById('stat-bk-confirmed');
+      const statTotal = document.getElementById('stat-bk-total');
+
+      if (statToday) statToday.textContent = todayCount;
+      if (statPend) statPend.textContent = pendingCount;
+      if (statProg) statProg.textContent = progressCount;
+      if (statConf) statConf.textContent = confirmedCount;
+      if (statTotal) statTotal.textContent = totalCount;
+
+      window.filterBookingsTable();
+    } catch (e) {
+      console.error('Error fetching bookings:', e);
+      tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:24px;color:#EF4444">⚠️ Error loading bookings. Click Refresh to try again.</td></tr>`;
+    }
   };
 
   window.openBookingDetailModal = async function(id) {
@@ -3193,18 +3348,43 @@
         if (notesWrap) notesWrap.style.display = 'none';
       }
 
+      // Existing Admin Response display
+      const replyWrap = document.getElementById('bk-modal-existing-reply-wrap');
+      const replyTextEl = document.getElementById('bk-modal-existing-reply');
+      const replyDateEl = document.getElementById('bk-modal-reply-date');
+      const replyInput = document.getElementById('bk-modal-reply-text');
+
+      if (booking.admin_reply) {
+        if (replyWrap) replyWrap.style.display = 'block';
+        if (replyTextEl) replyTextEl.textContent = booking.admin_reply;
+        if (replyDateEl) replyDateEl.textContent = booking.replied_at ? new Date(booking.replied_at).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Earlier';
+        if (replyInput) replyInput.value = booking.admin_reply;
+      } else {
+        if (replyWrap) replyWrap.style.display = 'none';
+        if (replyInput) replyInput.value = '';
+      }
+
       const statusSelect = document.getElementById('bk-modal-status-select');
       if (statusSelect) statusSelect.value = status;
 
-      // WhatsApp Concierge Button
+      // WhatsApp Button
       const waBtn = document.getElementById('bk-modal-wa-btn');
       if (waBtn && phone && phone !== 'N/A') {
         const cleanPhone = phone.replace(/[^0-9]/g, '');
-        const waMsg = `Hello ${name}, this is Ventoura Travel Concierge regarding your booking for ${itemTitle} (Ref: ${ref}). How may we assist with your upcoming journey on ${travelDate}?`;
+        const waMsg = `Hello ${name}, this is Ventoura Travel Concierge regarding your booking for ${itemTitle} (Ref: ${ref}). How may we assist with your journey on ${travelDate}?`;
         waBtn.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`;
         waBtn.style.display = 'inline-flex';
       } else if (waBtn) {
         waBtn.style.display = 'none';
+      }
+
+      // Email Button
+      const emailBtn = document.getElementById('bk-modal-email-btn');
+      if (emailBtn && email && email !== 'N/A') {
+        emailBtn.href = `mailto:${email}?subject=Ventoura%20Travel%20Booking%20Confirmation%20${encodeURIComponent(ref)}`;
+        emailBtn.style.display = 'inline-flex';
+      } else if (emailBtn) {
+        emailBtn.style.display = 'none';
       }
 
       const modal = document.getElementById('booking-detail-modal');
@@ -3228,10 +3408,35 @@
   window.saveBookingModalChanges = async function() {
     if (!currentActiveBooking) return;
     const select = document.getElementById('bk-modal-status-select');
+    const replyInput = document.getElementById('bk-modal-reply-text');
     const newStatus = select ? select.value : 'Confirmed';
+    const replyText = replyInput ? replyInput.value.trim() : '';
 
-    await window.updateBookingStatus(currentActiveBooking.id || currentActiveBooking.booking_reference, newStatus);
-    window.closeBookingDetailModal();
+    const targetId = currentActiveBooking.id || currentActiveBooking.booking_reference || currentActiveBooking.refNo;
+    const payload = {
+      booking_status: newStatus,
+      status: newStatus,
+      admin_reply: replyText,
+      replied_at: replyText ? new Date().toISOString() : (currentActiveBooking.replied_at || null)
+    };
+
+    try {
+      const res = await fetch(`/api/bookings/${targetId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) {
+        showToast(`Booking response and status updated to ${newStatus}`, '✅');
+        window.closeBookingDetailModal();
+        window.renderBookingsTable();
+        if (typeof renderDashboardRecentTable === 'function') renderDashboardRecentTable();
+      } else {
+        showToast('Failed to update booking.', '⚠️');
+      }
+    } catch (e) {
+      showToast('Error updating booking.', '❌');
+    }
   };
 
   window.updateBookingStatus = async function(id, newStatus) {
@@ -3245,7 +3450,7 @@
       if (res.ok) {
         showToast(`Booking status updated to ${newStatus}`, '✅');
         window.renderBookingsTable();
-        renderDashboardRecentTable();
+        if (typeof renderDashboardRecentTable === 'function') renderDashboardRecentTable();
       }
     } catch (e) {
       showToast('Failed to update booking status', '⚠️');
