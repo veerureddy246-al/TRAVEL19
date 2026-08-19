@@ -822,12 +822,25 @@ class VentouraUnifiedServerHandler(http.server.SimpleHTTPRequestHandler):
             resp = {"success": True, "message": f"{resource.title()} record deleted from database!"}
 
         self.send_json_response(resp)
+import sys
 
-def run(port=PORT):
+def run(port=8000):
     os.chdir(BASE_DIR)
-    with http.server.ThreadingHTTPServer(("", port), VentouraUnifiedServerHandler) as httpd:
-        print(f"Ventoura Travel Unified Server running at http://localhost:{port}")
-        httpd.serve_forever()
+    if len(sys.argv) > 1 and sys.argv[1].isdigit():
+        port = int(sys.argv[1])
+    elif 'PORT' in os.environ:
+        port = int(os.environ['PORT'])
+    
+    ports_to_try = [port, 8000, 5500, 3000, 8080]
+    for p in ports_to_try:
+        try:
+            httpd = http.server.ThreadingHTTPServer(("127.0.0.1", p), VentouraUnifiedServerHandler)
+            print(f"Ventoura Travel Unified Server running at http://localhost:{p}", flush=True)
+            httpd.serve_forever()
+            break
+        except OSError as e:
+            print(f"Port {p} is busy ({e}), trying next port...", flush=True)
+            continue
 
 if __name__ == "__main__":
     run()
