@@ -100,18 +100,23 @@
     // Render local synchronous tables first
     if (typeof renderUsersTable === 'function') renderUsersTable();
     if (typeof renderStaffTable === 'function') renderStaffTable();
-    if (typeof renderBookingsTable === 'function') renderBookingsTable();
+    if (typeof window.renderHotelsTable === 'function') window.renderHotelsTable();
+    if (typeof renderFlightsTable === 'function') renderFlightsTable();
     if (typeof renderCarsTable === 'function') renderCarsTable();
     if (typeof renderCruisesTable === 'function') renderCruisesTable();
     if (typeof renderVisaTable === 'function') renderVisaTable();
+    if (typeof renderInsuranceTable === 'function') renderInsuranceTable();
+    if (typeof renderBookingsTable === 'function') renderBookingsTable();
     if (typeof renderPaymentsTable === 'function') renderPaymentsTable();
     if (typeof renderRefundsTable === 'function') renderRefundsTable();
     if (typeof renderCouponsTable === 'function') renderCouponsTable();
     if (typeof renderBlogsTable === 'function') renderBlogsTable();
     if (typeof renderReviewsTable === 'function') renderReviewsTable();
     if (typeof renderGalleryGrid === 'function') renderGalleryGrid();
+    if (typeof window.renderReportsTable === 'function') window.renderReportsTable();
+    if (typeof window.fetchAndRenderFaqs === 'function') window.fetchAndRenderFaqs();
 
-    // Check active panel and only fetch dynamic CMS data for that panel
+    // Check active panel and fetch dynamic CMS data for that panel
     const activePanel = document.querySelector('.admin-panel.active');
     const panelId = activePanel ? activePanel.id : 'p-dashboard';
 
@@ -171,12 +176,18 @@
           window.fetchAndRenderDestinations();
         } else if (target === 'p-packages' && typeof window.fetchAndRenderPackages === 'function') {
           window.fetchAndRenderPackages();
+        } else if (target === 'p-hotels' && typeof window.renderHotelsTable === 'function') {
+          window.renderHotelsTable();
+        } else if (target === 'p-flights' && typeof renderFlightsTable === 'function') {
+          renderFlightsTable();
         } else if (target === 'p-cars' && typeof renderCarsTable === 'function') {
           renderCarsTable();
         } else if (target === 'p-cruises' && typeof renderCruisesTable === 'function') {
           renderCruisesTable();
         } else if (target === 'p-visa' && typeof renderVisaTable === 'function') {
           renderVisaTable();
+        } else if (target === 'p-insurance' && typeof renderInsuranceTable === 'function') {
+          renderInsuranceTable();
         } else if (target === 'p-users' && typeof renderUsersTable === 'function') {
           renderUsersTable();
         } else if (target === 'p-staff' && typeof renderStaffTable === 'function') {
@@ -195,6 +206,8 @@
           renderReviewsTable();
         } else if (target === 'p-gallery' && typeof renderGalleryGrid === 'function') {
           renderGalleryGrid();
+        } else if (target === 'p-reports' && typeof window.renderReportsTable === 'function') {
+          window.renderReportsTable();
         } else if (target === 'p-faqs' && typeof window.fetchAndRenderFaqs === 'function') {
           window.fetchAndRenderFaqs();
         } else if (target === 'p-audit' && typeof renderAuditLogs === 'function') {
@@ -1756,6 +1769,348 @@
     const modal = document.getElementById('cms-delete-modal');
     if (modal) modal.style.display = 'none';
   };
+
+  
+  /* ── DESTINATIONS MODAL ── */
+  window.openDestinationModal = async function(id = null) {
+    currentEditingType = 'destinations';
+    currentEditingItem = null;
+
+    if (id) {
+      const res = await fetch('/api/destinations?all=true');
+      const json = await res.json();
+      const list = (json.success && Array.isArray(json.data)) ? json.data : (window._adminDestinationsList || []);
+      currentEditingItem = list.find(d => String(d.id || d._id) === String(id));
+    }
+    const item = currentEditingItem || {};
+
+    document.getElementById('cms-modal-title').textContent = id ? 'Edit Destination' : 'Add New Destination';
+    document.getElementById('cms-modal-fields').innerHTML = `
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Destination Title *</label>
+        <input type="text" id="field-title" class="form-control" value="${escapeHtml(item.title || item.name || '')}" placeholder="e.g. Amalfi Coast Escape" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Country *</label>
+          <input type="text" id="field-country" class="form-control" value="${escapeHtml(item.country || 'Italy')}" placeholder="e.g. Italy" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">City / Region</label>
+          <input type="text" id="field-city" class="form-control" value="${escapeHtml(item.city || '')}" placeholder="e.g. Positano & Amalfi" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Starting Price (₹ or $) *</label>
+          <input type="number" id="field-price" class="form-control" value="${item.startingPrice || item.starting_price || item.price || 180000}" min="1" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Duration (Days) *</label>
+          <input type="number" id="field-days" class="form-control" value="${item.days || 7}" min="1" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Category *</label>
+        <select id="field-category" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
+          <option value="Luxury Beach & Wellness" ${item.category === 'Luxury Beach & Wellness' ? 'selected' : ''}>Luxury Beach &amp; Wellness</option>
+          <option value="Luxury Coastal & Yachting" ${item.category === 'Luxury Coastal & Yachting' ? 'selected' : ''}>Luxury Coastal &amp; Yachting</option>
+          <option value="Alpine & Mountain Retreat" ${item.category === 'Alpine & Mountain Retreat' ? 'selected' : ''}>Alpine &amp; Mountain Retreat</option>
+          <option value="Desert & Safari Sanctuary" ${item.category === 'Desert & Safari Sanctuary' ? 'selected' : ''}>Desert &amp; Safari Sanctuary</option>
+          <option value="Cultural Heritage & Ancient Wonders" ${item.category === 'Cultural Heritage & Ancient Wonders' ? 'selected' : ''}>Cultural Heritage &amp; Ancient Wonders</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Hero Image URL or Upload File</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="url" id="field-image" class="form-control" value="${item.image || item.image_url || 'assets/images/dest-maldives.jpg'}" style="flex:1;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+          <label class="btn btn-secondary btn-sm" style="margin:0;cursor:pointer;white-space:nowrap;padding:10px 14px">
+            📁 Upload
+            <input type="file" accept="image/*" style="display:none" onchange="uploadImageFile(this, 'field-image')" />
+          </label>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Description *</label>
+        <textarea id="field-description" class="form-control" rows="3" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">${escapeHtml(item.description || '')}</textarea>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Publication Status</label>
+        <select id="field-status" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
+          <option value="published" ${item.status !== 'unpublished' ? 'selected' : ''}>Published (Visible on Website)</option>
+          <option value="unpublished" ${item.status === 'unpublished' ? 'selected' : ''}>Unpublished (Hidden from Website)</option>
+        </select>
+      </div>
+    `;
+    document.getElementById('cms-modal-overlay').style.display = 'flex';
+  };
+
+  /* ── PACKAGES MODAL ── */
+  window.openPackageModal = async function(id = null) {
+    currentEditingType = 'packages';
+    currentEditingItem = null;
+
+    if (id) {
+      const res = await fetch('/api/packages?all=true');
+      const json = await res.json();
+      const list = (json.success && Array.isArray(json.data)) ? json.data : (window._adminPackagesList || []);
+      currentEditingItem = list.find(p => String(p.id || p._id) === String(id));
+    }
+    const item = currentEditingItem || {};
+
+    document.getElementById('cms-modal-title').textContent = id ? 'Edit Tour Package' : 'Add New Tour Package';
+    document.getElementById('cms-modal-fields').innerHTML = `
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Package Title *</label>
+        <input type="text" id="field-title" class="form-control" value="${escapeHtml(item.title || item.name || '')}" placeholder="e.g. 7-Day Overwater Maldives Dream" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Destination *</label>
+          <input type="text" id="field-destination" class="form-control" value="${escapeHtml(item.destination || 'Maldives')}" placeholder="e.g. Maldives" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Duration *</label>
+          <input type="text" id="field-duration" class="form-control" value="${escapeHtml(item.duration || '7 Days / 6 Nights')}" placeholder="e.g. 7 Days / 6 Nights" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Price (₹ or $) *</label>
+          <input type="number" id="field-price" class="form-control" value="${item.price || 249900}" min="1" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Badge Label</label>
+          <input type="text" id="field-badge" class="form-control" value="${escapeHtml(item.badge || 'BESTSELLER')}" placeholder="e.g. BESTSELLER, LUXURY" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Category *</label>
+        <select id="field-category" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
+          <option value="luxury" ${item.category === 'luxury' ? 'selected' : ''}>Luxury Experience</option>
+          <option value="honeymoon" ${item.category === 'honeymoon' ? 'selected' : ''}>Honeymoon &amp; Romantic</option>
+          <option value="adventure" ${item.category === 'adventure' ? 'selected' : ''}>Adventure &amp; Wildlife</option>
+          <option value="cultural" ${item.category === 'cultural' ? 'selected' : ''}>Cultural &amp; Heritage</option>
+          <option value="cruise" ${item.category === 'cruise' ? 'selected' : ''}>Ocean Cruise</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Featured Image URL or Upload File</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="url" id="field-image" class="form-control" value="${item.featuredImage || item.image || 'assets/images/dest-maldives.jpg'}" style="flex:1;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+          <label class="btn btn-secondary btn-sm" style="margin:0;cursor:pointer;white-space:nowrap;padding:10px 14px">
+            📁 Upload
+            <input type="file" accept="image/*" style="display:none" onchange="uploadImageFile(this, 'field-image')" />
+          </label>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Description *</label>
+        <textarea id="field-description" class="form-control" rows="3" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">${escapeHtml(item.description || '')}</textarea>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Publication Status</label>
+        <select id="field-status" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
+          <option value="published" ${item.status !== 'unpublished' ? 'selected' : ''}>Published (Visible on Website)</option>
+          <option value="unpublished" ${item.status === 'unpublished' ? 'selected' : ''}>Unpublished (Hidden from Website)</option>
+        </select>
+      </div>
+    `;
+    document.getElementById('cms-modal-overlay').style.display = 'flex';
+  };
+
+  /* ── HOTELS & RESORTS MODAL ── */
+  window.openHotelModal = async function(id = null) {
+    currentEditingType = 'hotels';
+    currentEditingItem = null;
+
+    if (id) {
+      const res = await fetch('/api/hotels?all=true');
+      const json = await res.json();
+      const list = (json.success && Array.isArray(json.data)) ? json.data : [];
+      currentEditingItem = list.find(h => String(h.id || h._id) === String(id));
+    }
+    const item = currentEditingItem || {};
+
+    document.getElementById('cms-modal-title').textContent = id ? 'Edit Hotel / Resort' : 'Add New Hotel / Resort';
+    document.getElementById('cms-modal-fields').innerHTML = `
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Property Name *</label>
+        <input type="text" id="field-name" class="form-control" value="${escapeHtml(item.title || item.name || '')}" placeholder="e.g. Soneva Jani Luxury Resort" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Location / Destination *</label>
+          <input type="text" id="field-location" class="form-control" value="${escapeHtml(item.destination || item.location || item.city || '')}" placeholder="e.g. Maldives / Positano" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Price per Night (₹ or $) *</label>
+          <input type="number" id="field-price" class="form-control" value="${item.startingPrice || item.price || 45000}" min="1" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Hero Image URL or Upload File</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="url" id="field-image" class="form-control" value="${item.heroImage || item.image || 'https://images.unsplash.com/photo-1566073771259-6a8506099945'}" style="flex:1;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+          <label class="btn btn-secondary btn-sm" style="margin:0;cursor:pointer;white-space:nowrap;padding:10px 14px">
+            📁 Upload
+            <input type="file" accept="image/*" style="display:none" onchange="uploadImageFile(this, 'field-image')" />
+          </label>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Description *</label>
+        <textarea id="field-description" class="form-control" rows="3" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">${escapeHtml(item.description || '')}</textarea>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Publication Status</label>
+        <select id="field-status" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
+          <option value="published" ${item.status !== 'unpublished' ? 'selected' : ''}>Published (Active)</option>
+          <option value="unpublished" ${item.status === 'unpublished' ? 'selected' : ''}>Unpublished</option>
+        </select>
+      </div>
+    `;
+    document.getElementById('cms-modal-overlay').style.display = 'flex';
+  };
+
+  /* ── FAQS MODAL & RENDERER ── */
+  window._adminFaqsList = [];
+  window.fetchAndRenderFaqs = async function() {
+    const container = document.getElementById('faqs-accordion-container');
+    const countEl = document.getElementById('faq-count-label');
+    if (!container) return;
+
+    try {
+      const res = await fetch('/api/faqs?all=true');
+      const json = await res.json();
+      const faqs = (json.success && Array.isArray(json.data) && json.data.length > 0) ? json.data : (adminData.faqs || []);
+      window._adminFaqsList = faqs;
+      if (countEl) countEl.textContent = `${faqs.length} FAQs`;
+
+      if (faqs.length === 0) {
+        container.innerHTML = `<div style="text-align:center;padding:24px;color:var(--text-muted)">No FAQ entries found. Click "+ Add New FAQ" to create one.</div>`;
+        return;
+      }
+
+      container.innerHTML = faqs.map((f, i) => `
+        <div class="faq-accordion-item" style="background:#FFF;border:1px solid var(--border-color);border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,0.04)">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+                <span class="abadge ab-active" style="font-size:10px;padding:2px 6px">${escapeHtml(f.category || 'General')}</span>
+                <span class="abadge ${f.status === 'unpublished' ? 'ab-cancelled' : 'ab-confirmed'}" style="font-size:10px;padding:2px 6px">${f.status === 'unpublished' ? 'Unpublished' : 'Published'}</span>
+              </div>
+              <h4 style="margin:0 0 6px 0;font-size:14px;color:var(--navy-primary);font-weight:700">Q: ${escapeHtml(f.question || '')}</h4>
+              <p style="margin:0;font-size:13px;color:var(--text-secondary);line-height:1.5">${escapeHtml(f.answer || '')}</p>
+            </div>
+            <div class="action-btn-group" style="flex-shrink:0">
+              <button class="aab-edit" onclick="openFaqModal('${f.id || f._id}')">Edit</button>
+              <button class="aab-delete" onclick="confirmDeleteCmsItem('faqs', '${f.id || f._id}', '${(f.question || '').replace(/'/g, "\'")}')">Delete</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } catch (e) {
+      console.warn('FAQs load error:', e);
+    }
+  };
+
+  window.openFaqModal = function(id = null) {
+    currentEditingType = 'faqs';
+    currentEditingItem = null;
+    let item = {};
+    if (id && window._adminFaqsList) {
+      item = window._adminFaqsList.find(f => String(f.id || f._id) === String(id)) || {};
+      currentEditingItem = item;
+    }
+
+    document.getElementById('cms-modal-title').textContent = id ? 'Edit FAQ Item' : 'Add New FAQ Item';
+    document.getElementById('cms-modal-fields').innerHTML = `
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Question *</label>
+        <input type="text" id="field-faq-question" class="form-control" value="${escapeHtml(item.question || '')}" placeholder="e.g. What is your cancellation policy?" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" />
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Category</label>
+        <select id="field-faq-category" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
+          <option value="Booking & Reservations" ${item.category === 'Booking & Reservations' ? 'selected' : ''}>Booking &amp; Reservations</option>
+          <option value="Payment & Pricing" ${item.category === 'Payment & Pricing' ? 'selected' : ''}>Payment &amp; Pricing</option>
+          <option value="Cancellation & Refunds" ${item.category === 'Cancellation & Refunds' ? 'selected' : ''}>Cancellation &amp; Refunds</option>
+          <option value="Travel Documentation" ${item.category === 'Travel Documentation' ? 'selected' : ''}>Travel Documentation</option>
+          <option value="General" ${item.category === 'General' ? 'selected' : ''}>General</option>
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Answer *</label>
+        <textarea id="field-faq-answer" class="form-control" rows="4" required style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px" placeholder="Provide a detailed, clear answer...">${escapeHtml(item.answer || '')}</textarea>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:700;color:var(--text-secondary);display:block;margin-bottom:4px">Status</label>
+        <select id="field-status" class="form-control" style="width:100%;padding:10px 14px;border:1px solid var(--border-color);border-radius:6px">
+          <option value="published" ${item.status !== 'unpublished' ? 'selected' : ''}>Published</option>
+          <option value="unpublished" ${item.status === 'unpublished' ? 'selected' : ''}>Unpublished</option>
+        </select>
+      </div>
+    `;
+    document.getElementById('cms-modal-overlay').style.display = 'flex';
+  };
+
+  /* ── REFUND ACTIONS ── */
+  window.approveRefund = async function(id) {
+    try {
+      const res = await fetch(`/api/admin/refunds/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Processed' })
+      });
+      const json = await res.json();
+      if (json.success) {
+        showToast(`Refund ${id} processed successfully!`, '✅');
+      } else {
+        const rf = adminData.refunds.find(x => x.id === id);
+        if (rf) rf.status = 'Processed';
+        showToast(`Refund ${id} processed!`, '✅');
+      }
+      renderRefundsTable();
+    } catch (e) {
+      const rf = adminData.refunds.find(x => x.id === id);
+      if (rf) rf.status = 'Processed';
+      renderRefundsTable();
+      showToast(`Refund ${id} processed!`, '✅');
+    }
+  };
+
+  window.rejectRefund = async function(id) {
+    try {
+      const res = await fetch(`/api/admin/refunds/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'Rejected' })
+      });
+      const json = await res.json();
+      if (json.success) {
+        showToast(`Refund ${id} rejected.`, '⚠️');
+      } else {
+        const rf = adminData.refunds.find(x => x.id === id);
+        if (rf) rf.status = 'Rejected';
+        showToast(`Refund ${id} rejected.`, '⚠️');
+      }
+      renderRefundsTable();
+    } catch (e) {
+      const rf = adminData.refunds.find(x => x.id === id);
+      if (rf) rf.status = 'Rejected';
+      renderRefundsTable();
+      showToast(`Refund ${id} rejected.`, '⚠️');
+    }
+  };
+
+  window.openCmsModal = function(type, id) {
+    if (type === 'hotels') window.openHotelModal(id);
+    else if (type === 'destinations') window.openDestinationModal(id);
+    else if (type === 'packages') window.openPackageModal(id);
+    else if (type === 'cruises') window.openCruiseModal(id);
+  };
+
 
   /* ── STAFF MODAL ── */
   window.openStaffModal = function(id = null) {
@@ -3777,8 +4132,16 @@
   };
 
   window.togglePublishStatus = window.setCmsItemStatus;
-  window.confirmDeleteCmsItem = window.confirmPermanentDelete;
+  window.confirmDeleteCmsItem = function(resource, id, name) {
+    if (['destinations', 'packages', 'cruises'].includes(resource)) {
+      window.moveToRecycleBin(resource, id, name);
+    } else {
+      window.confirmPermanentDelete(resource, id, name);
+    }
+  };
+  window.fetchAndRenderHotels = window.renderHotelsTable;
 
 })();
+
 
 

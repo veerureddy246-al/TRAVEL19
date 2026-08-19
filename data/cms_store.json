@@ -1333,8 +1333,97 @@
       "likes": 420
     }
   ],
-  "users": [],
-  "staff": [],
+  "users": [
+    {
+      "id": "usr-101",
+      "name": "Sarah Mitchell",
+      "email": "sarah@example.com",
+      "country": "United States",
+      "bookings": 4,
+      "status": "Active",
+      "tier": "VIP Gold",
+      "joined": "2025-03-15",
+      "role": "Customer"
+    },
+    {
+      "id": "usr-102",
+      "name": "James Kowalski",
+      "email": "james@example.com",
+      "country": "United Kingdom",
+      "bookings": 2,
+      "status": "Active",
+      "tier": "Standard",
+      "joined": "2025-01-10",
+      "role": "Customer"
+    },
+    {
+      "id": "usr-103",
+      "name": "Priya Sharma",
+      "email": "priya@example.com",
+      "country": "India",
+      "bookings": 6,
+      "status": "Active",
+      "tier": "VIP Platinum",
+      "joined": "2024-06-20",
+      "role": "VIP Platinum"
+    },
+    {
+      "id": "usr-104",
+      "name": "Carlos Mendoza",
+      "email": "carlos@example.com",
+      "country": "Spain",
+      "bookings": 1,
+      "status": "Suspended",
+      "tier": "Standard",
+      "joined": "2026-04-05",
+      "role": "Customer"
+    },
+    {
+      "id": "usr-105",
+      "name": "Yuki Tanaka",
+      "email": "yuki@example.com",
+      "country": "Japan",
+      "bookings": 9,
+      "status": "Active",
+      "tier": "VIP Gold",
+      "joined": "2024-02-12",
+      "role": "VIP Gold"
+    }
+  ],
+  "staff": [
+    {
+      "id": "stf-201",
+      "name": "Emily Chen",
+      "email": "emily@ventoura.com",
+      "role": "Travel Specialist",
+      "dept": "Packages & Logistics",
+      "status": "Active"
+    },
+    {
+      "id": "stf-202",
+      "name": "Marcus Reed",
+      "email": "marcus@ventoura.com",
+      "role": "Visa Manager",
+      "dept": "Visa & Consular Services",
+      "status": "Active"
+    },
+    {
+      "id": "stf-203",
+      "name": "Leila Hassan",
+      "email": "leila@ventoura.com",
+      "role": "Hotel Coordinator",
+      "dept": "Hospitality Procurement",
+      "status": "Active"
+    },
+    {
+      "id": "stf-204",
+      "name": "Tom Barrett",
+      "email": "tom@ventoura.com",
+      "role": "Super Admin",
+      "dept": "Executive Operations",
+      "status": "Active"
+    }
+  ],
   "bookings": [
     {
       "customer_name": "Test Booking Customer",
@@ -1661,7 +1750,26 @@
       "createdAt": "2026-08-16 16:53:05"
     }
   ],
-  "refunds": [],
+  "refunds": [
+    {
+      "id": "RF-0238",
+      "traveler": "Carlos Mendoza",
+      "booking": "BK-2026-0005",
+      "amount": 209900,
+      "reason": "Safari expedition reschedule",
+      "date": "2026-04-12",
+      "status": "Processed"
+    },
+    {
+      "id": "RF-0239",
+      "traveler": "Ana Kowalska",
+      "booking": "BK-2026-0006",
+      "amount": 140000,
+      "reason": "Medical emergency postponement",
+      "date": "2026-07-26",
+      "status": "Pending Review"
+    }
+  ],
   "wishlists": [],
   "faqs": [
     {
@@ -1719,6 +1827,108 @@
       "answer": "Every Ventoura traveler has access to 24/7 dedicated support via WhatsApp, phone, and our traveler portal. You'll receive emergency contact numbers and a dedicated concierge before departure to assist with anything from flight changes to local reservations.",
       "category": "On-Trip Support",
       "status": "published"
+    }
+  ],
+  "visa": [
+    {
+      "id": "VR-0091",
+      "customer": "James Kowalski",
+      "country": "Japan",
+      "type": "Tourist Visa (90 Days)",
+      "travelDate": "2026-09-20",
+      "submitted": "2026-07-24",
+      "status": "Pending"
+    },
+    {
+      "id": "VR-0088",
+      "customer": "Yuki Tanaka",
+      "country": "United States",
+      "type": "Business Visa (B1/B2)",
+      "travelDate": "2026-08-15",
+      "submitted": "2026-07-20",
+      "status": "Approved"
+    },
+    {
+      "id": "VR-0085",
+      "customer": "Sarah Mitchell",
+      "country": "India",
+      "type": "Tourist eVisa",
+      "travelDate": "2026-10-05",
+      "submitted": "2026-07-15",
+      "status": "Pending"
+    }
+  ],
+  "insurance": [
+    {
+      "id": "INS-0441",
+      "traveler": "John Doe",
+      "type": "Comprehensive Worldwide",
+      "coverage": 50000,
+      "premium": 129,
+      "destination": "Maldives",
+      "startDate": "2026-09-01",
+      "endDate": "2026-09-30",
+      "status": "Active"
+    },
+    {
+      "id": "INS-0440",
+      "traveler": "Sarah Mitchell",
+      "type": "Medical Evacuation",
+      "coverage": 25000,
+      "premium": 79,
+      "destination": "Greece",
+      "startDate": "2026-08-10",
+      "endDate": "2026-08-25",
+      "status": "Active"
+    },
+    {
+      "id": "CLAIM-0089",
+      "traveler": "Carlos Mendoza",
+      "type": "Flight Cancellation Claim",
+      "coverage": 2099,
+      "premium": 0,
+      "destination": "Kenya",
+      "startDate": "2026-07-01",
+      "endDate": "2026-07-15",
+      "status": "Under Review"
+    }
+  ],
+  "payments": [
+    {
+      "id": "TXN-881002",
+      "customer": "John Doe",
+      "ref": "BK-2026-0001",
+      "amount": 249900,
+      "gateway": "Stripe",
+      "date": "2026-07-20",
+      "status": "Captured"
+    },
+    {
+      "id": "TXN-880914",
+      "customer": "Sarah Mitchell",
+      "ref": "BK-2026-0002",
+      "amount": 129900,
+      "gateway": "PayPal",
+      "date": "2026-05-14",
+      "status": "Captured"
+    },
+    {
+      "id": "TXN-879401",
+      "customer": "Carlos Mendoza",
+      "ref": "BK-2026-0005",
+      "amount": 209900,
+      "gateway": "Stripe",
+      "date": "2026-04-10",
+      "status": "Refunded"
+    },
+    {
+      "id": "TXN-881300",
+      "customer": "Priya Sharma",
+      "ref": "BK-2026-0004",
+      "amount": 99900,
+      "gateway": "Apple Pay",
+      "date": "2026-06-03",
+      "status": "Captured"
     }
   ]
 }

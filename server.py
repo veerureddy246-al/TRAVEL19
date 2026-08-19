@@ -320,6 +320,10 @@ class VentouraUnifiedServerHandler(http.server.SimpleHTTPRequestHandler):
                 resource_key = 'insurance'
             elif path_str in ['/api/visa', '/api/visas', '/api/admin/visa', '/api/admin/visas']:
                 resource_key = 'visa'
+            elif path_str in ['/api/payments', '/api/payment', '/api/admin/payments']:
+                resource_key = 'payments'
+            elif path_str in ['/api/refunds', '/api/refund', '/api/admin/refunds']:
+                resource_key = 'refunds'
 
             if resource_key:
                 user_id_param = query_params.get('user_id', [None])[0]
@@ -662,7 +666,7 @@ class VentouraUnifiedServerHandler(http.server.SimpleHTTPRequestHandler):
                 resource = path_parts[2]
                 if len(path_parts) >= 4:
                     item_id = path_parts[3]
-            elif path_parts[1] in ['destinations', 'destination', 'packages', 'package', 'hotels', 'hotel', 'cruises', 'cruise', 'flights', 'cars', 'blogs', 'reviews', 'gallery', 'coupons', 'users', 'staff', 'bookings', 'booking', 'inquiries', 'inquiry', 'enquiries', 'enquiry', 'refunds', 'wishlist', 'wishlists', 'faqs', 'faq', 'insurance', 'visa', 'visas']:
+            elif path_parts[1] in ['destinations', 'destination', 'packages', 'package', 'hotels', 'hotel', 'cruises', 'cruise', 'flights', 'cars', 'blogs', 'reviews', 'gallery', 'coupons', 'users', 'staff', 'bookings', 'booking', 'inquiries', 'inquiry', 'enquiries', 'enquiry', 'payments', 'payment', 'refunds', 'refund', 'wishlist', 'wishlists', 'faqs', 'faq', 'insurance', 'visa', 'visas']:
                 resource = path_parts[1]
                 if resource in ['enquiry', 'enquiries', 'inquiry', 'inquiries']:
                     resource = 'inquiries'
@@ -670,6 +674,10 @@ class VentouraUnifiedServerHandler(http.server.SimpleHTTPRequestHandler):
                     resource = 'faqs'
                 elif resource in ['booking', 'bookings']:
                     resource = 'bookings'
+                elif resource in ['payment', 'payments']:
+                    resource = 'payments'
+                elif resource in ['refund', 'refunds']:
+                    resource = 'refunds'
                 elif resource in ['wishlist', 'wishlists']:
                     resource = 'wishlists'
                 elif resource in ['visa', 'visas']:
